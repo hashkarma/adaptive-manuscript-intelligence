@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Adaptive Orchestration Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg:#f5f7fb; --card:#fff; --border:#dbe3f0; --text:#1f2937;
+      --muted:#6b7280; --blue:#2563eb; --green:#16a34a;
+      --amber:#d97706; --red:#dc2626; --shadow:0 2px 10px rgba(0,0,0,.05);
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; padding:24px; background:var(--bg); color:var(--text); font-family:Arial,sans-serif; line-height:1.5; }
+    .page { max-width:1500px; margin:0 auto; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:20px; margin-bottom:20px; box-shadow:var(--shadow); }
+    h1,h2,h3,h4 { margin-top:0; }
+    .muted { color:var(--muted); }
+    .topbar { display:grid; grid-template-columns:1fr auto; gap:16px; align-items:end; }
+    .input-row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    input { min-width:360px; padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px; }
+    button { padding:10px 16px; border:none; border-radius:8px; background:var(--blue); color:#fff; cursor:pointer; }
+    .summary-grid { display:grid; grid-template-columns:repeat(6,1fr); gap:12px; }
+    .summary-box { border:1px solid #e5e7eb; border-radius:12px; padding:14px; background:#fafcff; }
+    .label { color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.04em; }
+    .value { font-weight:800; font-size:21px; margin-top:5px; }
+    .layers { display:grid; grid-template-columns:repeat(6,1fr); gap:16px; }
+    .layer { border:1px solid #dbeafe; border-radius:15px; padding:16px; background:#fff; }
+    .layer-head { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
+    .badge { display:inline-block; padding:4px 10px; color:#fff; border-radius:999px; font-size:12px; font-weight:700; }
+    .ok-bg { background:var(--green); } .warning-bg { background:var(--amber); } .poor-bg { background:var(--red); } .review-bg { background:#7c3aed; } .na-bg { background:#94a3b8; }
+    .ok { color:var(--green); } .warning { color:var(--amber); } .poor { color:var(--red); } .review_required { color:#7c3aed; }
+    .metrics { display:grid; gap:8px; margin-top:12px; }
+    .metric { border:1px solid #e5e7eb; background:#fafafa; border-radius:10px; padding:10px; display:flex; justify-content:space-between; gap:12px; }
+    .signal-strip { display:grid; grid-template-columns:repeat(8,1fr); gap:10px; }
+    .signal { border:1px solid #dbeafe; border-radius:12px; padding:12px; text-align:center; background:#f8fbff; }
+    .signal strong { display:block; font-size:23px; }
+    .notice { padding:13px 15px; border:1px solid #fde68a; background:#fffbeb; color:#92400e; border-radius:10px; margin-top:12px; }
+    .success { padding:13px 15px; border:1px solid #bbf7d0; background:#f0fdf4; color:#166534; border-radius:10px; margin-top:12px; }
+    .visual-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+    .visual { border:1px solid #e5e7eb; border-radius:12px; padding:12px; }
+    .visual img { width:100%; border-radius:8px; border:1px solid #ddd; margin-top:8px; }
+    .pipeline { display:grid; grid-template-columns:repeat(6,1fr); gap:8px; align-items:center; }
+    .pipe-stage { border:1px solid #dbeafe; border-radius:10px; padding:12px; text-align:center; background:#f8fbff; min-height:82px; }
+    .pipe-stage.future { border-style:dashed; background:#fff7ed; border-color:#fed7aa; }
+    .semantic-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+    .semantic-box { border:1px solid #e5e7eb; border-radius:12px; padding:14px; background:#fafafa; }
+    .semantic-box strong { display:block; font-size:22px; margin-top:4px; }
+    .preprocess { margin-bottom:10px; color:#6b7280; }
+    .htr-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+    .htr-box { border:1px solid #e5e7eb; border-radius:12px; padding:14px; background:#fafafa; }
+    .htr-box strong { display:block; font-size:22px; margin-top:4px; }
+    .danger { padding:13px 15px; border:1px solid #fecaca; background:#fef2f2; color:#991b1b; border-radius:10px; margin-top:12px; }
+    .info { padding:13px 15px; border:1px solid #bfdbfe; background:#eff6ff; color:#1e3a8a; border-radius:10px; margin-top:12px; }
+    .transcription-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .transcription-panel { border:1px solid #dbe3f0; border-radius:12px; padding:14px; background:#fff; }
+    .devanagari-text { white-space:pre-wrap; line-height:1.9; font-size:18px; font-family:"Noto Sans Devanagari","Kohinoor Devanagari","Mangal",sans-serif; }
+    .agreement-low { color:#b91c1c; font-weight:700; }
+    .agreement-mid { color:#b45309; font-weight:700; }
+    .agreement-high { color:#15803d; font-weight:700; }
+    .transcription-table td:nth-child(2),
+    .transcription-table td:nth-child(3) {
+      font-size:17px;
+      line-height:1.7;
+      font-family:"Noto Sans Devanagari","Kohinoor Devanagari","Mangal",sans-serif;
+    }
+    .hidden { display:none; }
+    ul { padding-left:20px; }
+    table { width:100%; border-collapse:collapse; font-size:14px; }
+    th,td { border:1px solid #d1d5db; padding:10px; vertical-align:top; text-align:left; }
+    th { background:#eef4ff; }
+    @media (max-width:1200px) {
+      .topbar,.summary-grid,.layers,.signal-strip,.visual-grid,.pipeline,.htr-grid,.transcription-grid,.semantic-grid { grid-template-columns:1fr; }
+      input { min-width:0; width:100%; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="card">
+    <div class="topbar">
+      <div>
+        <h1>Adaptive AI Orchestration Dashboard</h1>
+        <p class="muted">
+          Explainable control plane for the six-stage manuscript research pipeline. Upload and condition analysis are pre-processing; C(p), B(p), G(p), L(p), R(p), S(p), H(p) and T(p) are orchestration signals, not additional stages. T(p) is the Stage-6 semantic/transcription trust signal.
+        </p>
+      </div>
+      <div class="input-row">
+        <input id="runIdInput" placeholder="Enter run_id">
+        <button onclick="loadReport()">Load Report</button>
+      </div>
+    </div>
+    <p id="status" class="muted"></p>
+  </div>
+
+  <div class="card">
+    <div class="preprocess"><b>Pre-processing:</b> Upload → condition analysis</div>
+    <div class="pipeline">
+      <div class="pipe-stage"><b>Stage 1</b><br>Restoration</div>
+      <div class="pipe-stage"><b>Stage 2</b><br>Damage & uncertainty</div>
+      <div class="pipe-stage"><b>Stage 3</b><br>Layout</div>
+      <div class="pipe-stage"><b>Stage 4</b><br>Line segmentation</div>
+      <div class="pipe-stage"><b>Stage 5</b><br>Sequence-based HTR</div>
+      <div class="pipe-stage"><b>Stage 6</b><br>Semantic interpretation & trust</div>
+    </div>
+  </div>
+
+  <div id="summaryCard" class="card hidden">
+    <h3>Current Routing Decision</h3>
+    <div class="summary-grid" id="summaryGrid"></div>
+    <div id="adaptiveTrace"></div>
+  </div>
+
+  <div id="signalsCard" class="card hidden">
+    <h3>Orchestration Signals</h3>
+    <p class="muted">R(p) summarizes Research Stages 1–3. S(p) is independent Stage-4 segmentation-readiness evidence. H(p) is Stage-5 HTR readiness. T(p) is Stage-6 semantic/transcription trust. Neither H(p) nor T(p) is CER/WER, probability of correctness or scholarly validation.</p>
+    <div class="signal-strip" id="signalStrip"></div>
+  </div>
+
+  <div id="htrCard" class="card hidden">
+    <h3>Stage 5 — HTR Readiness & Provider Evidence</h3>
+    <p class="muted">Technical completion and recognition trust are shown separately. Successful inference does not imply correct transcription.</p>
+    <div class="htr-grid" id="htrGrid"></div>
+    <div id="htrInterpretation"></div>
+  </div>
+
+  <div id="semanticCard" class="card hidden">
+    <h3>Stage 6 — Semantic Interpretation, Reconstruction & Trust</h3>
+    <p class="muted">
+      Stage 6A–6F analyze HTR evidence, build candidate/morphology/context evidence,
+      perform abstention-capable reconstruction, and compute T(p). Stage 6G then chooses
+      translation validation, machine retry, or scholar review only after machine exhaustion.
+    </p>
+    <div class="semantic-grid" id="semanticGrid"></div>
+    <div id="semanticInterpretation"></div>
+  </div>
+
+  <div id="transcriptionCard" class="card hidden">
+    <h3>Stage 5 — Devanagari HTR Output</h3>
+    <p class="muted">
+      Both provider outputs are shown because the current HTR readiness is not high enough
+      to select either transcription as scholarly truth.
+    </p>
+
+    <div class="transcription-grid">
+      <div class="transcription-panel">
+        <h4>Provider A — Devanagari Hypothesis</h4>
+        <div id="providerAText" class="devanagari-text"></div>
+      </div>
+
+      <div class="transcription-panel">
+        <h4>Provider B — Devanagari Hypothesis</h4>
+        <div id="providerBText" class="devanagari-text"></div>
+      </div>
+    </div>
+
+    <div id="transcriptionNotice"></div>
+
+    <h4 style="margin-top:20px;">Line-by-Line Provider Comparison</h4>
+    <div style="overflow-x:auto;">
+      <table class="transcription-table">
+        <thead>
+          <tr>
+            <th>Line</th>
+            <th>Provider A</th>
+            <th>Provider B</th>
+            <th>Agreement</th>
+          </tr>
+        </thead>
+        <tbody id="transcriptionTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="layersCard" class="card hidden">
+    <h3>Implemented Research Stages</h3>
+    <div class="layers" id="layerGrid"></div>
+  </div>
+
+  <div id="visualsCard" class="card hidden">
+    <h3>Visual Evidence</h3>
+    <div class="visual-grid" id="visualGrid"></div>
+  </div>
+
+  <div class="card">
+    <h3>Stage Interpretation for Academic Review</h3>
+    <table>
+      <thead><tr><th>Research Stage</th><th>Current Prototype Role</th><th>Orchestrator Evidence</th><th>Boundary</th></tr></thead>
+      <tbody>
+        <tr><td>Stage 1 — Restoration</td><td>Background normalization, contrast enhancement, binarization and separator preservation.</td><td>C(p), provisional B(p)</td><td>Does not recognize text.</td></tr>
+        <tr><td>Stage 2 — Damage & Uncertainty</td><td>Estimates damaged and visually uncertain page regions.</td><td>G(p) upstream structural-risk proxy</td><td>Current G(p) is heuristic and not a full geometry model.</td></tr>
+        <tr><td>Stage 3 — Layout</td><td>Finds coarse text-bearing regions and structural organization.</td><td>L(p), pre-segmentation R(p)</td><td>Does not claim individual line segmentation.</td></tr>
+        <tr><td>Stage 4 — Script-Aware Segmentation</td><td>Separates ordered manuscript text lines while auditing ink preservation, overlap and boundary uncertainty.</td><td>S(p)</td><td>Does not perform HTR; it prepares validated line crops for Stage 5.</td></tr>
+        <tr><td>Stage 5 — Sequence-Based HTR</td><td>Evaluates HTR provider outputs, decoder/sequence behavior and cross-provider consistency.</td><td>H(p), decoder reliability, sequence quality, cross-provider agreement</td><td>H(p) is system readiness, not CER/WER, model confidence or scholarly correctness.</td></tr>
+        <tr><td>Stage 6 — Semantic Interpretation</td><td>HTR evidence parsing, candidate lattice, morphology, contextual retrieval, abstention-capable reconstruction and semantic/transcription trust evaluation.</td><td>T(p), reconstruction completion, contextual evidence, unresolved spans, adaptive retry state</td><td>Retrieved or linguistically plausible Sanskrit cannot silently override weak visual evidence. Scholar review is allowed only after Stage-6 machine recovery/retry exhaustion.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  const API = window.location.origin;
+
+  const layerNames = {
+    layer1: "Stage 1 — Restoration",
+    layer2: "Stage 2 — Damage & Uncertainty",
+    layer3: "Stage 3 — Layout & Text Regions",
+    layer4: "Stage 4 — Script-Aware Segmentation",
+    layer5: "Stage 5 — Sequence-Based HTR",
+    layer6: "Stage 6 — Semantic Interpretation & Trust"
+  };
+
+  const layerPurpose = {
+    layer1: "Improves readability while preserving script evidence.",
+    layer2: "Locates damaged and low-confidence visual regions.",
+    layer3: "Identifies coarse text-bearing regions; not individual lines.",
+    layer4: "Separates ordered text lines and validates suitability for HTR.",
+    layer5: "Evaluates HTR system readiness from provider, decoder, sequence and agreement evidence.",
+    layer6: "Performs evidence-constrained semantic recovery, computes T(p), and applies scholar-last adaptive routing."
+  };
+
+  const imageLabels = {
+    raw: "Original Manuscript",
+    balanced: "Stage 1 — Improved Readability",
+    damage_mask: "Stage 2 — Damage Evidence",
+    layout_overlay: "Stage 3 — Coarse Layout",
+    segmentation_overlay: "Stage 4 — Individual Text Lines",
+    segmentation_uncertainty: "Stage 4 — Boundary Uncertainty",
+    row_profile_debug: "Stage 4 — Row-Profile Evidence"
+  };
+
+  function badge(status) {
+    if (status === "ok") return "ok-bg";
+    if (status === "warning") return "warning-bg";
+    if (status === "poor") return "poor-bg";
+    if (status === "review_required") return "review-bg";
+    return "na-bg";
+  }
+
+  function statusClass(status) {
+    if (status === "ok") return "ok";
+    if (status === "warning") return "warning";
+    if (status === "review_required") return "review_required";
+    return "poor";
+  }
+
+  function esc(v) {
+    return String(v ?? "N/A");
+  }
+
+  function renderList(items) {
+    return items && items.length ? `<ul>${items.map(x => `<li>${x}</li>`).join("")}</ul>` : "";
+  }
+
+  function preferredMetrics(layer, metrics) {
+    const keys = {
+      layer1: ["contrast_gain", "binary_foreground_ratio", "separator_pixels"],
+      layer2: ["damage_ratio", "uncertainty_ratio", "mean_local_contrast"],
+      layer3: ["num_regions", "text_coverage_ratio", "mean_band_height"],
+      layer4: ["num_lines", "losslessness_score", "line_height_consistency", "mean_boundary_uncertainty", "suspected_merged_regions", "segmentation_confidence"],
+      layer5: ["htr_readiness_H", "completion", "script_integrity", "decoder_reliability", "sequence_quality", "cross_provider_agreement", "total_lines", "low_readiness_lines", "low_agreement_lines"],
+      layer6: ["semantic_transcription_trust_T", "page_T_mean", "page_T_status", "unresolved_lines", "adaptive_retry_required_lines", "translation_eligible_lines", "reconstructed_lines", "abstained_lines", "normalized_lines"]
+    }[layer] || [];
+    return keys.filter(k => Object.prototype.hasOwnProperty.call(metrics || {}, k));
+  }
+
+  async function loadReport() {
+    const runId = document.getElementById("runIdInput").value.trim();
+    if (!runId) { alert("Please enter a run_id"); return; }
+    document.getElementById("status").innerText = "Loading orchestration report...";
+
+    try {
+      const res = await fetch(`${API}/orchestration/${runId}?_=${Date.now()}`, { cache: "no-store" });
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || `HTTP ${res.status}`);
+      document.getElementById("status").innerText = `Loaded report for ${runId}`;
+      renderSummary(data);
+      renderSignals(data);
+      renderHTR(data);
+      renderSemantic(data);
+      renderTranscription(data);
+      renderLayers(data);
+      renderVisuals(data);
+    } catch (err) {
+      console.error(err);
+      document.getElementById("status").innerText = "Failed to load report: " + err.message;
+    }
+  }
+
+  function renderSummary(data) {
+    const final = data.final_decision || {};
+    const reports = data.layer_reports || {};
+    const totalComplaints = Object.values(reports).reduce((n, r) => n + ((r && r.complaints) ? r.complaints.length : 0), 0);
+
+    document.getElementById("summaryGrid").innerHTML = `
+      <div class="summary-box"><div class="label">Run ID</div><div class="value" style="font-size:15px">${esc(data.run_id)}</div></div>
+      <div class="summary-box"><div class="label">Decision Phase</div><div class="value" style="font-size:17px">${esc(final.phase)}</div></div>
+      <div class="summary-box"><div class="label">Overall Status</div><div class="value ${statusClass(final.overall_status)}">${esc(final.overall_status)}</div></div>
+      <div class="summary-box"><div class="label">Next Action</div><div class="value" style="font-size:17px">${esc(final.next_action)}</div></div>
+      <div class="summary-box"><div class="label">Pipeline Complaints</div><div class="value">${totalComplaints}</div></div>
+      <div class="summary-box"><div class="label">Failure Domain</div><div class="value" style="font-size:15px">${esc(final.failure_domain)}</div></div>
+    `;
+
+    let trace = "";
+    if (final.summary) trace += `<p><b>Summary:</b> ${final.summary}</p>`;
+    if (final.validation_trace && final.validation_trace.length) {
+      trace += `<div class="success"><b>Adaptive validation:</b>${renderList(final.validation_trace)}</div>`;
+    }
+    if (final.advisories && final.advisories.length) {
+      trace += `<div class="notice"><b>Advisories:</b>${renderList(final.advisories)}</div>`;
+    }
+    trace += renderList(final.complaints);
+    document.getElementById("adaptiveTrace").innerHTML = trace;
+    document.getElementById("summaryCard").classList.remove("hidden");
+  }
+
+  function renderSignals(data) {
+    const final = data.final_decision || {};
+    const s = final.signals || {};
+    const order = ["C", "B", "G", "L", "R", "S", "H", "T"];
+    const names = {
+      C:"Enhancement C(p)", B:"Bleed-through B(p)", G:"Structural G(p)",
+      L:"Layout L(p)", R:"Readiness R(p)", S:"Segmentation S(p)", H:"HTR Readiness H(p)", T:"Semantic Trust T(p)"
+    };
+
+    document.getElementById("signalStrip").innerHTML = order
+      .filter(k => Object.prototype.hasOwnProperty.call(s, k))
+      .map(k => `<div class="signal"><span class="label">${names[k]}</span><strong>${esc(s[k])}</strong></div>`)
+      .join("");
+    document.getElementById("signalsCard").classList.remove("hidden");
+  }
+
+  function renderHTR(data) {
+    const stage5 = data.stage5 || {};
+    const final = data.final_decision || {};
+    const reports = data.layer_reports || {};
+    const layer5 = reports.layer5 || {};
+    const evidence = stage5.evidence || final.htr_evidence || layer5.evidence || {};
+    const comparison = stage5.provider_comparison || {};
+
+    const H = stage5.H ?? (final.signals || {}).H ?? (layer5.metrics || {}).htr_readiness_H;
+    if (H === undefined || H === null) {
+      document.getElementById("htrCard").classList.add("hidden");
+      return;
+    }
+
+    document.getElementById("htrGrid").innerHTML = `
+      <div class="htr-box"><span class="label">HTR Readiness H(p)</span><strong>${esc(H)}</strong></div>
+      <div class="htr-box"><span class="label">Decoder Reliability</span><strong>${esc(evidence.decoder_reliability)}</strong></div>
+      <div class="htr-box"><span class="label">Sequence Quality</span><strong>${esc(evidence.sequence_quality)}</strong></div>
+      <div class="htr-box"><span class="label">Cross-Provider Agreement</span><strong>${esc(evidence.cross_provider_agreement)}</strong></div>
+      <div class="htr-box"><span class="label">Completion</span><strong>${esc(evidence.completion)}</strong></div>
+      <div class="htr-box"><span class="label">Script Integrity</span><strong>${esc(evidence.script_integrity)}</strong></div>
+      <div class="htr-box"><span class="label">Low-Readiness Lines</span><strong>${esc(evidence.low_readiness_lines)}</strong></div>
+      <div class="htr-box"><span class="label">Low-Agreement Lines</span><strong>${esc(evidence.low_agreement_lines)}</strong></div>
+    `;
+
+    const decision = final.htr_decision || layer5.decision || "N/A";
+    const nextAction = final.next_action || layer5.next_action || "N/A";
+    const meanAgreement = comparison.mean_content_char_similarity;
+
+    let html = `
+      <div class="info">
+        <b>Interpretation:</b> H(p) is system HTR readiness for downstream processing. It is not transcription accuracy, CER, WER or a scholar-verified confidence score.
+      </div>
+    `;
+
+    if (meanAgreement !== undefined && meanAgreement !== null) {
+      html += `
+        <div class="notice">
+          <b>Provider comparison:</b> Mean content agreement = ${esc(meanAgreement)}.
+          Agreement is consistency evidence only, not accuracy.
+        </div>
+      `;
+    }
+
+    html += `
+      <div class="${decision === "scholar_review_required" ? "danger" : "success"}">
+        <b>Stage-5 decision:</b> ${esc(decision)}<br>
+        <b>Next action:</b> ${esc(nextAction)}<br>
+        <b>Ground truth available:</b> ${stage5.ground_truth_available === true ? "Yes" : "No"}<br>
+        <b>CER:</b> ${esc(stage5.cer)} | <b>WER:</b> ${esc(stage5.wer)}
+      </div>
+    `;
+
+    document.getElementById("htrInterpretation").innerHTML = html;
+    document.getElementById("htrCard").classList.remove("hidden");
+  }
+
+  function renderSemantic(data) {
+    const stage6 = data.stage6 || {};
+    const reports = data.layer_reports || {};
+    const layer6 = reports.layer6 || {};
+    const final = data.final_decision || {};
+    const metrics = layer6.metrics || {};
+
+    const T =
+      stage6.T ??
+      (final.signals || {}).T ??
+      metrics.semantic_transcription_trust_T;
+
+    if (T === undefined || T === null) {
+      document.getElementById("semanticCard").classList.add("hidden");
+      return;
+    }
+
+    document.getElementById("semanticGrid").innerHTML = `
+      <div class="semantic-box"><span class="label">Semantic Trust T(p)</span><strong>${esc(T)}</strong></div>
+      <div class="semantic-box"><span class="label">T Status</span><strong style="font-size:15px">${esc(stage6.T_status ?? metrics.page_T_status)}</strong></div>
+      <div class="semantic-box"><span class="label">Unresolved Lines</span><strong>${esc(stage6.unresolved_lines ?? metrics.unresolved_lines)}</strong></div>
+      <div class="semantic-box"><span class="label">Translation-Eligible Lines</span><strong>${esc(stage6.translation_eligible_lines ?? metrics.translation_eligible_lines)}</strong></div>
+      <div class="semantic-box"><span class="label">Reconstructed Lines</span><strong>${esc(stage6.reconstructed_lines ?? metrics.reconstructed_lines)}</strong></div>
+      <div class="semantic-box"><span class="label">Abstained Lines</span><strong>${esc(stage6.abstained_lines ?? metrics.abstained_lines)}</strong></div>
+      <div class="semantic-box"><span class="label">Failure Domain</span><strong style="font-size:15px">${esc(final.failure_domain ?? layer6.failure_domain)}</strong></div>
+      <div class="semantic-box"><span class="label">Machine Retry Exhausted</span><strong>${(final.machine_retry_exhausted ?? layer6.machine_retry_exhausted) ? "Yes" : "No"}</strong></div>
+    `;
+
+    const scholar = final.scholar_review_required ?? layer6.scholar_review_required;
+    const decision = final.semantic_decision ?? layer6.decision ?? "N/A";
+    const next = final.next_action ?? layer6.next_action ?? "N/A";
+    const selectedRetry = final.selected_retry_action ?? layer6.selected_retry_action;
+
+    document.getElementById("semanticInterpretation").innerHTML = `
+      <div class="info">
+        <b>Interpretation:</b> T(p) is an uncalibrated semantic/transcription
+        trust/readiness signal. It is not probability, CER, WER or scholarly correctness.
+        Stage 6E may explicitly abstain rather than fabricate Sanskrit.
+      </div>
+
+      <div class="${scholar ? "danger" : (decision === "proceed_to_translation_validation" ? "success" : "notice")}">
+        <b>Stage-6G decision:</b> ${esc(decision)}<br>
+        <b>Next action:</b> ${esc(next)}<br>
+        <b>Selected machine retry:</b> ${esc(selectedRetry || "None")}<br>
+        <b>Scholar review required:</b> ${scholar ? "Yes" : "No"}
+      </div>
+
+      ${renderList(layer6.recommendations)}
+    `;
+
+    document.getElementById("semanticCard").classList.remove("hidden");
+  }
+
+  function agreementClass(value) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return "";
+    if (n >= 0.75) return "agreement-high";
+    if (n >= 0.50) return "agreement-mid";
+    return "agreement-low";
+  }
+
+  function renderTranscription(data) {
+    const stage5 = data.stage5 || {};
+    const tx = stage5.transcription || {};
+
+    if (!tx.lines || !tx.lines.length) {
+      document.getElementById("transcriptionCard").classList.add("hidden");
+      return;
+    }
+
+    document.getElementById("providerAText").textContent =
+      tx.provider_a_page_devanagari_display || tx.provider_a_page_devanagari || "No Provider-A Devanagari output.";
+
+    document.getElementById("providerBText").textContent =
+      tx.provider_b_page_devanagari_display || tx.provider_b_page_devanagari || "No Provider-B Devanagari output.";
+
+    document.getElementById("transcriptionNotice").innerHTML = `
+      <div class="notice">
+        <b>Trust status:</b> ${esc(tx.status)}<br>
+        <b>H(p):</b> ${esc(tx.H)}<br>
+        <b>Trusted combined transcription available:</b>
+        ${tx.trusted_combined_transcription_available ? "Yes" : "No"}<br>
+        ${esc(tx.interpretation)}<br>
+        <b>Display note:</b> Vedic/extension and residual combining marks that
+        commonly appear as square boxes are hidden only in this readable view.
+        Exact provider output remains preserved in the Stage-5 artifacts.
+      </div>
+    `;
+
+    document.getElementById("transcriptionTableBody").innerHTML =
+      tx.lines.map(row => `
+        <tr>
+          <td>${esc(row.line_id)}</td>
+          <td>${esc(row.provider_a_devanagari_display || row.provider_a_devanagari)}</td>
+          <td>${esc(row.provider_b_devanagari_display || row.provider_b_devanagari)}</td>
+          <td class="${agreementClass(row.content_char_similarity)}">
+            ${esc(row.content_char_similarity)}
+          </td>
+        </tr>
+      `).join("");
+
+    document.getElementById("transcriptionCard").classList.remove("hidden");
+  }
+
+  function renderLayers(data) {
+    const reports = data.layer_reports || {};
+    document.getElementById("layerGrid").innerHTML = ["layer1","layer2","layer3","layer4","layer5","layer6"].map(layer => {
+      const r = reports[layer] || {};
+      const m = r.metrics || {};
+      const metricHtml = preferredMetrics(layer, m).map(k => `<div class="metric"><span>${k.replaceAll("_"," ")}</span><b>${esc(m[k])}</b></div>`).join("");
+      return `
+        <div class="layer">
+          <div class="layer-head">
+            <div><h4>${layerNames[layer]}</h4><p class="muted">${layerPurpose[layer]}</p></div>
+            <span class="badge ${badge(r.status)}">${esc(r.status || "not run")}</span>
+          </div>
+          <div class="metrics">${metricHtml || '<span class="muted">No metrics yet.</span>'}</div>
+          ${renderList(r.complaints)}
+          ${r.next_action ? `<p><b>Layer action:</b> ${r.next_action}</p>` : ""}
+        </div>`;
+    }).join("");
+    document.getElementById("layersCard").classList.remove("hidden");
+  }
+
+  function renderVisuals(data) {
+    const images = data.images || {};
+    const html = Object.entries(images).map(([key, src]) => `
+      <div class="visual">
+        <h4>${imageLabels[key] || key}</h4>
+        <img src="${src}" alt="${key}">
+      </div>`).join("");
+    document.getElementById("visualGrid").innerHTML = html || '<p class="muted">No visual artifacts available.</p>';
+    document.getElementById("visualsCard").classList.remove("hidden");
+  }
+</script>
+</body>
+</html>

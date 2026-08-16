@@ -1,0 +1,118 @@
+# ============================================================
+# Manuscript Intelligence Platform - Git Ignore
+# Keep source code, orchestration, tests and frontend in Git.
+# Keep generated data, environments, model weights and artifacts out.
+# ============================================================
+
+# Python virtual environments
+venv/
+.venv/
+venv-*/
+env/
+.envdir/
+
+# Python caches / build outputs
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# Secrets / local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+
+# macOS / editors
+.DS_Store
+.AppleDouble
+.LSOverride
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Generated manuscript pipeline artifacts
+artifacts/
+stage5_runtime_logs/
+stage6_runtime_logs/
+runs/
+logs/
+*.log
+
+# Raw / temporary manuscript uploads
+data/raw/
+data/tmp/
+data/processed/
+!data/raw/.gitkeep
+
+# Downloaded models / weights / NLP resources
+models/
+model_cache/
+.cache/
+huggingface/
+hf_cache/
+
+# Common ML model / tensor formats
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+*.onnx
+*.h5
+*.hdf5
+*.tflite
+
+# Generated numeric/vector/index files
+*.npy
+*.npz
+*.faiss
+*.index
+*.parquet
+*.arrow
+
+# Large generated Sanskrit / RAG corpora
+knowledge/stage6d_dcs/
+knowledge/**/passages.jsonl
+knowledge/**/embeddings*
+knowledge/**/index*
+
+# Media / archives usually not appropriate for source repo
+*.m4a
+*.mp3
+*.mp4
+*.mov
+*.avi
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.orig
+*~
+
+# Downloaded Sanskrit corpora / knowledge resources
+knowledge/
+
+# Historical local development snapshots
+*_backup.py
+*_old.py
+*_before_*.py
+*.pre_stage5.py
+*_pre_stage5.py

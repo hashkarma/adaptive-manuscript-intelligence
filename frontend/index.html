@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Manuscript Intelligence Platform</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f7fb; margin: 0; padding: 24px; color: #1f2937; }
+    .page { max-width: 1480px; margin: 0 auto; }
+    .card { background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    .muted { color: #6b7280; }
+    .journey { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+    .pill { display: inline-block; padding: 7px 12px; border-radius: 999px; background: #eef4ff; color: #24499d; font-size: 13px; font-weight: 600; border: 1px solid #dbeafe; }
+    .pill.pre { background: #f3f4f6; color: #4b5563; border-color: #e5e7eb; }
+    .pill.current { background: #eef2ff; color: #4338ca; border-color: #c7d2fe; }
+    .pill.future { background: #fff7ed; color: #9a3412; border-color: #fed7aa; }
+    .action-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    button { padding: 10px 16px; border: none; border-radius: 8px; background: #2563eb; color: white; cursor: pointer; font-size: 14px; }
+    button:hover { filter: brightness(0.96); }
+    .status-box, .report-box { background: #fafafa; border: 1px solid #e5e7eb; border-radius: 12px; padding: 14px; margin-top: 12px; line-height: 1.55; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .transcription-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px; }
+    .transcription-panel { border:1px solid #dbe3f0; border-radius:12px; padding:14px; background:#fff; }
+    .devanagari-text { white-space:pre-wrap; line-height:1.9; font-size:18px; font-family:"Noto Sans Devanagari","Kohinoor Devanagari","Mangal",sans-serif; }
+    table { width:100%; border-collapse:collapse; margin-top:12px; }
+    th, td { border:1px solid #d1d5db; padding:9px; text-align:left; vertical-align:top; }
+    th { background:#eef4ff; }
+    .semantic-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:12px; }
+    .semantic-box { background:#fff; border:1px solid #e5e7eb; border-radius:10px; padding:11px; }
+    .semantic-box small { display:block; color:#6b7280; }
+    .semantic-box strong { font-size:20px; }
+    .runtime-list { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:12px; }
+    .runtime-step { border:1px solid #dbeafe; background:#f8fbff; border-radius:10px; padding:10px; text-align:center; }
+
+    .visual-card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 14px; padding: 14px; }
+    .visual-card img { width: 100%; border: 1px solid #ddd; border-radius: 10px; margin-top: 8px; background: #fafafa; }
+    .hidden { display: none; }
+    code { background: #eef2ff; padding: 2px 6px; border-radius: 6px; }
+    .research-label { display: inline-block; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; font-weight: 700; color: #2563eb; margin-bottom: 4px; }
+    .pre-label { display: inline-block; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; font-weight: 700; color: #6b7280; margin-bottom: 4px; }
+    .metric-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 12px; }
+    .metric { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 11px; }
+    .metric small { color: #6b7280; display: block; }
+    .metric strong { font-size: 20px; }
+    .ok { color: #15803d; }
+    .warning { color: #b45309; }
+    .poor { color: #b91c1c; }
+    .review_required { color: #7c3aed; }
+    .notice { margin-top: 12px; padding: 12px 14px; border-radius: 10px; border: 1px solid #fde68a; background: #fffbeb; color: #92400e; }
+    .success { margin-top: 12px; padding: 12px 14px; border-radius: 10px; border: 1px solid #bbf7d0; background: #f0fdf4; color: #166534; }
+    .danger { margin-top: 12px; padding: 12px 14px; border-radius: 10px; border: 1px solid #fecaca; background: #fef2f2; color: #991b1b; }
+    .info { margin-top: 12px; padding: 12px 14px; border-radius: 10px; border: 1px solid #bfdbfe; background: #eff6ff; color: #1e3a8a; }
+    input[type="text"] { min-width: 360px; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; }
+    hr { border: none; border-top: 1px solid #e5e7eb; margin: 14px 0; }
+    @media (max-width: 1100px) { .grid-2, .grid-3, .metric-grid, .transcription-grid, .semantic-grid, .runtime-list { grid-template-columns: 1fr; } input[type="text"] { min-width:0; width:100%; } }
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="card">
+    <h1>Manuscript Intelligence Platform</h1>
+    <p class="muted">
+      A six-stage research pipeline for degraded manuscript restoration, uncertainty analysis,
+      layout understanding, script-aware segmentation, HTR and semantic interpretation — governed by an Adaptive AI Orchestrator.
+    </p>
+
+    <div class="journey">
+      <span class="pill pre">Pre-processing: Upload</span>
+      <span class="pill pre">Pre-processing: Condition Analysis</span>
+      <span class="pill">Stage 1: Restoration</span>
+      <span class="pill">Stage 2: Damage & Uncertainty</span>
+      <span class="pill">Stage 3: Layout</span>
+      <span class="pill">Stage 4: Line Segmentation</span>
+      <span class="pill">Stage 5: HTR</span>
+      <span class="pill current">Stage 6: Semantic Interpretation & Trust</span>
+    </div>
+
+    <p style="margin-top:14px;">
+      <a href="/orchestration" target="_blank"><button>Open Adaptive Orchestration Dashboard</button></a>
+    </p>
+  </div>
+
+  <div class="card">
+    <span class="pre-label">Existing pipeline run</span>
+    <h3>Load an Existing Pipeline Run</h3>
+    <p class="muted">
+      Development/test convenience: load any existing run. The UI checks the persisted orchestration state and enables Stage 5 and/or Stage 6 as appropriate. Stage 6 now executes 6A–6F through isolated runtime environments and then invokes Stage 6G adaptive routing.
+    </p>
+    <div class="action-row">
+      <input id="existingRunId" type="text" placeholder="Example: web_20260811_235729">
+      <button onclick="resumeExistingRun()">Load Existing Run</button>
+    </div>
+    <div id="resumeStatus" class="status-box muted"></div>
+  </div>
+
+  <div id="uploadCard" class="card">
+    <span class="pre-label">Pre-processing</span>
+    <h3>Upload Manuscript</h3>
+    <div class="action-row">
+      <input type="file" id="fileInput" accept="image/*">
+      <button onclick="uploadImage()">Upload</button>
+    </div>
+    <div id="uploadStatus" class="status-box muted"></div>
+  </div>
+
+  <div id="analysis" class="card hidden">
+    <span class="pre-label">Pre-processing</span>
+    <h3>Examine Manuscript Condition</h3>
+    <button onclick="runConditionAnalysis()">Examine Condition</button>
+    <div id="diagnostics" class="report-box"></div>
+    <div class="grid-2">
+      <div class="visual-card">
+        <h4>Original Manuscript</h4>
+        <img id="rawImage" alt="Raw manuscript preview">
+      </div>
+      <div class="visual-card">
+        <h4>Interpretation</h4>
+        <p class="muted">
+          This pre-processing step observes visible manuscript condition before the six-stage research pipeline begins.
+          It does not count as Research Stage 1.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div id="restore" class="card hidden">
+    <span class="research-label">Research Stage 1 of 6</span>
+    <h3>Degradation-Aware Restoration & Readability Enhancement</h3>
+    <button onclick="runResearchStage1()">Run Stage 1</button>
+    <div id="stage1Report" class="report-box"></div>
+    <div class="grid-2" id="restoreImages"></div>
+  </div>
+
+  <div id="damage" class="card hidden">
+    <span class="research-label">Research Stage 2 of 6</span>
+    <h3>Damage, Interference & Uncertainty Analysis</h3>
+    <button onclick="runResearchStage2()">Run Stage 2</button>
+    <div id="stage2Report" class="report-box"></div>
+    <div class="grid-2" id="damageImages"></div>
+  </div>
+
+  <div id="layout" class="card hidden">
+    <span class="research-label">Research Stage 3 of 6</span>
+    <h3>Layout & Text-Region Analysis</h3>
+    <button onclick="runResearchStage3()">Run Stage 3</button>
+    <div id="stage3Report" class="report-box"></div>
+    <div class="grid-2" id="layoutImages"></div>
+  </div>
+
+  <div id="segment" class="card hidden">
+    <span class="research-label">Research Stage 4 of 6</span>
+    <h3>Script-Aware Line Segmentation</h3>
+    <button onclick="runResearchStage4()">Run Stage 4</button>
+    <div id="stage4Report" class="report-box"></div>
+    <div class="grid-2" id="segmentImages"></div>
+  </div>
+
+  <div id="htr" class="card hidden">
+    <span class="research-label">Research Stage 5 of 6</span>
+    <h3>Sequence-Based HTR & Adaptive Readiness</h3>
+    <div class="info">
+      <b>Integrated execution:</b> FastAPI coordinates Provider A in <code>venv-stage5</code>
+      and Provider B in <code>venv-provider-b</code> as isolated ARM64 subprocesses.
+      It then compares both outputs, calculates H(p), and executes Stage-5 adaptive routing.
+      The run can take a few minutes.
+    </div>
+    <button id="stage5RunButton" onclick="runResearchStage5()">Run Stage 5 — HTR</button>
+    <div id="stage5Report" class="report-box"></div>
+  </div>
+
+  <div id="semantic" class="card hidden">
+    <span class="research-label">Research Stage 6 of 6</span>
+    <h3>Semantic Interpretation, Evidence-Constrained Reconstruction & Trust</h3>
+    <div class="info">
+      <b>Integrated execution:</b> FastAPI launches Stage 6A, 6B, 6C, 6D, 6E and 6F
+      in <code>venv-stage6</code>, Stage 6D.2 in <code>venv-stage6-rag</code>,
+      then returns to the main application process for Stage 6G adaptive retry / scholar-last routing.
+    </div>
+
+    <div class="runtime-list">
+      <div class="runtime-step"><b>6A</b><br>HTR Evidence</div>
+      <div class="runtime-step"><b>6B</b><br>Candidate Lattice</div>
+      <div class="runtime-step"><b>6C</b><br>Morphology</div>
+      <div class="runtime-step"><b>6D</b><br>Context Retrieval</div>
+      <div class="runtime-step"><b>6D.2</b><br>Noisy Retrieval</div>
+      <div class="runtime-step"><b>6E</b><br>Reconstruction</div>
+      <div class="runtime-step"><b>6F</b><br>T(p)</div>
+      <div class="runtime-step"><b>6G</b><br>Adaptive Routing</div>
+    </div>
+
+    <button id="stage6RunButton" onclick="runResearchStage6()">Run Stage 6 — Semantics & Trust</button>
+    <div id="stage6Report" class="report-box"></div>
+  </div>
+</div>
+
+<script>
+  let runId = null;
+  const API = window.location.origin;
+
+  function statusClass(status) {
+    if (status === "ok") return "ok";
+    if (status === "warning") return "warning";
+    if (status === "review_required") return "review_required";
+    return "poor";
+  }
+
+  function list(items) {
+    return items && items.length
+      ? "<ul>" + items.map(x => `<li>${x}</li>`).join("") + "</ul>"
+      : "";
+  }
+
+  async function parseResponse(res) {
+    const json = await res.json();
+    if (!res.ok || json.error) {
+      throw new Error(json.error || `HTTP ${res.status}`);
+    }
+    return json;
+  }
+
+  async function resumeExistingRun() {
+    const value = document.getElementById("existingRunId").value.trim();
+    if (!value) {
+      alert("Please enter a run_id.");
+      return;
+    }
+
+    runId = value;
+
+    const uploadCard = document.getElementById("uploadCard");
+    if (uploadCard) uploadCard.classList.add("hidden");
+
+    document.getElementById("resumeStatus").innerHTML =
+      `Loading persisted pipeline state for <code>${runId}</code>...`;
+
+    try {
+      const json = await parseResponse(
+        await fetch(
+          API + "/orchestration/" + runId + "?_=" + Date.now(),
+          { cache: "no-store" }
+        )
+      );
+
+      const final = json.final_decision || {};
+      const stage5 = json.stage5 || {};
+      const stage6 = json.stage6 || {};
+      const H = stage5.H;
+      const T = stage6.T;
+
+      document.getElementById("htr").classList.remove("hidden");
+
+      if (H !== undefined && H !== null) {
+        document.getElementById("stage5Report").innerHTML = `
+          <div class="info">
+            <b>Existing Stage 5 detected.</b><br>
+            H(p): ${H}<br>
+            Final persisted phase: ${final.phase ?? "N/A"}<br>
+            You may rerun Stage 5 to regenerate provider evidence, or continue to Stage 6.
+          </div>
+        `;
+        document.getElementById("semantic").classList.remove("hidden");
+      } else {
+        document.getElementById("stage5Report").innerHTML = `
+          <div class="info">
+            No persisted Stage-5 H(p) was found. Run Stage 5 first.
+          </div>
+        `;
+      }
+
+      if (T !== undefined && T !== null) {
+        document.getElementById("semantic").classList.remove("hidden");
+        document.getElementById("stage6Report").innerHTML = `
+          <div class="info">
+            <b>Existing Stage 6 detected.</b><br>
+            T(p): ${T}<br>
+            T status: ${stage6.T_status ?? "N/A"}<br>
+            Final decision: ${final.semantic_decision ?? final.next_action ?? "N/A"}<br>
+            You may rerun Stage 6 to regenerate semantic/reconstruction evidence.
+          </div>
+        `;
+      }
+
+      document.getElementById("resumeStatus").innerHTML = `
+        <b>Run loaded.</b><br>
+        Run ID: <code>${runId}</code><br>
+        Persisted phase: <b>${final.phase ?? "N/A"}</b><br>
+        H(p): <b>${H ?? "not available"}</b> |
+        T(p): <b>${T ?? "not available"}</b>
+      `;
+    } catch (err) {
+      console.error(err);
+      document.getElementById("resumeStatus").innerHTML = `
+        <div class="danger">
+          Could not load orchestration state: ${err.message}
+        </div>
+        <div class="info">
+          The run ID is still selected. If this is an older Stage-4 run,
+          you can try Stage 5 directly.
+        </div>
+      `;
+      document.getElementById("htr").classList.remove("hidden");
+    }
+  }
+
+  async function uploadImage() {
+    const fileInput = document.getElementById("fileInput");
+    if (!fileInput.files.length) {
+      alert("Please select a manuscript image first.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+
+    try {
+      const json = await parseResponse(
+        await fetch(API + "/upload", { method: "POST", body: formData })
+      );
+      runId = json.run_id;
+      document.getElementById("stage5Report").innerHTML = "";
+      document.getElementById("uploadStatus").innerHTML =
+        `<b>Upload successful.</b><br>Run ID: <code>${runId}</code>`;
+      document.getElementById("analysis").classList.remove("hidden");
+      document.getElementById("rawImage").src = json.raw_image;
+    } catch (err) {
+      console.error(err);
+      document.getElementById("uploadStatus").innerText = "Upload failed: " + err.message;
+    }
+  }
+
+  async function runConditionAnalysis() {
+    try {
+      const json = await parseResponse(
+        await fetch(API + "/analyze/" + runId, { method: "POST" })
+      );
+      let html = "<h4>Condition Summary</h4>" + list(json.summary);
+      html += `
+        <p><b>Brightness:</b> ${json.diagnostics.brightness}</p>
+        <p><b>Contrast:</b> ${json.diagnostics.contrast}</p>
+        <p><b>Uneven page lighting:</b> ${json.diagnostics.uneven_illumination}</p>
+        <p><b>Faded ink:</b> ${json.diagnostics.faded_ink}</p>
+        <p><b>Background discoloration:</b> ${json.diagnostics.background_yellowing}</p>
+      `;
+      document.getElementById("diagnostics").innerHTML = html;
+      document.getElementById("restore").classList.remove("hidden");
+    } catch (err) {
+      document.getElementById("diagnostics").innerText = err.message;
+    }
+  }
+
+  async function runResearchStage1() {
+    try {
+      const json = await parseResponse(
+        await fetch(API + "/pipeline/stage1/restore/" + runId, { method: "POST" })
+      );
+
+      const labels = {
+        tone: "Original Appearance Preserved",
+        balanced: "Improved Readability",
+        binary: "Text Extraction View",
+        separator_mask: "Detected Special Markings"
+      };
+
+      document.getElementById("restoreImages").innerHTML =
+        Object.entries(json.images).map(([key, src]) => `
+          <div class="visual-card">
+            <h4>${labels[key] || key}</h4>
+            <img src="${src}" alt="${key}">
+          </div>
+        `).join("");
+
+      const report = json.orchestration_report;
+      document.getElementById("stage1Report").innerHTML = `
+        <b>Research Stage 1 Status:</b> <span class="${statusClass(report.status)}">${report.status}</span><br>
+        <b>Purpose:</b> Improve degraded page readability while preserving script evidence.<br>
+        <b>Orchestrator evidence:</b> Stage 1 metrics contribute to enhancement adequacy C(p) and the provisional B(p) interference signal.
+        ${list(report.complaints)}
+      `;
+
+      document.getElementById("damage").classList.remove("hidden");
+    } catch (err) {
+      document.getElementById("stage1Report").innerText = err.message;
+    }
+  }
+
+  async function runResearchStage2() {
+    try {
+      const json = await parseResponse(
+        await fetch(API + "/pipeline/stage2/damage/" + runId, { method: "POST" })
+      );
+
+      const labels = {
+        damage_mask: "Damaged Regions",
+        uncertainty_map: "Unclear / Low-Confidence Areas"
+      };
+
+      document.getElementById("damageImages").innerHTML =
+        Object.entries(json.images).map(([key, src]) => `
+          <div class="visual-card">
+            <h4>${labels[key] || key}</h4>
+            <img src="${src}" alt="${key}">
+          </div>
+        `).join("");
+
+      const report = json.orchestration_report;
+      document.getElementById("stage2Report").innerHTML = `
+        <b>Research Stage 2 Status:</b> <span class="${statusClass(report.status)}">${report.status}</span><br>
+        <b>Purpose:</b> Locate damage and uncertainty so downstream stages know where visual evidence is less trustworthy.<br>
+        <b>Orchestrator evidence:</b> These metrics contribute to upstream structural reliability G(p).
+        ${list(report.complaints)}
+      `;
+
+      document.getElementById("layout").classList.remove("hidden");
+    } catch (err) {
+      document.getElementById("stage2Report").innerText = err.message;
+    }
+  }
+
+  async function runResearchStage3() {
+    try {
+      const json = await parseResponse(
+        await fetch(API + "/pipeline/stage3/layout/" + runId, { method: "POST" })
+      );
+
+      const labels = {
+        text_region_mask: "Coarse Text-Region Mask",
+        layout_overlay: "Detected Page Layout"
+      };
+
+      document.getElementById("layoutImages").innerHTML =
+        Object.entries(json.images).map(([key, src]) => `
+          <div class="visual-card">
+            <h4>${labels[key] || key}</h4>
+            <img src="${src}" alt="${key}">
+            ${key === "text_region_mask" ? '<p class="muted">Coarse text-bearing regions only. Individual manuscript lines are separated in Research Stage 4.</p>' : ''}
+          </div>
+        `).join("");
+
+      const report = json.orchestration_report;
+      const final = json.pre_stage4_orchestration;
+      const g = Number(final.signals.G);
+      const geometryNote = g < 0.55
+        ? `<div class="notice"><b>Adaptive validation required:</b> G(p)=${g.toFixed(4)} is comparatively low. The page is allowed to continue because Research Stage 4 will explicitly test whether reliable line segmentation is still possible.</div>`
+        : "";
+
+      document.getElementById("stage3Report").innerHTML = `
+        <b>Research Stage 3 Status:</b> <span class="${statusClass(report.status)}">${report.status}</span><br>
+        <b>Purpose:</b> Identify text-bearing regions and page structure; this is not yet line segmentation.
+        <hr>
+        <b>Pre-Segmentation Readiness R(p):</b> ${final.signals.R}<br>
+        <b>C(p):</b> ${final.signals.C} |
+        <b>B(p):</b> ${final.signals.B} |
+        <b>G(p):</b> ${final.signals.G} |
+        <b>L(p):</b> ${final.signals.L}<br>
+        <b>Orchestrator Status:</b> <span class="${statusClass(final.overall_status)}">${final.overall_status}</span><br>
+        <b>Next Action:</b> ${final.next_action}<br>
+        <b>Summary:</b> ${final.summary}
+        ${geometryNote}
+        ${list(final.advisories)}
+        ${list(final.complaints)}
+      `;
+
+      document.getElementById("segment").classList.remove("hidden");
+    } catch (err) {
+      document.getElementById("stage3Report").innerText = err.message;
+    }
+  }
+
+  async function runResearchStage4() {
+    try {
+      const json = await parseResponse(
+        await fetch(API + "/pipeline/stage4/segment/" + runId, { method: "POST" })
+      );
+
+      const labels = {
+        segmentation_overlay: "Detected Individual Text Lines",
+        segmentation_mask: "Line Assignment Mask",
+        uncertainty_map: "Segmentation Boundary Uncertainty",
+        row_profile_debug: "Row-Profile Evidence"
+      };
+
+      document.getElementById("segmentImages").innerHTML =
+        Object.entries(json.images).map(([key, src]) => `
+          <div class="visual-card">
+            <h4>${labels[key] || key}</h4>
+            <img src="${src}" alt="${key}">
+          </div>
+        `).join("");
+
+      const report = json.orchestration_report;
+      const final = json.final_orchestration;
+      const m = json.metrics;
+      const trace = final.validation_trace && final.validation_trace.length
+        ? `<div class="success"><b>Adaptive validation trace:</b>${list(final.validation_trace)}</div>`
+        : "";
+
+      document.getElementById("stage4Report").innerHTML = `
+        <b>Research Stage 4 Status:</b> <span class="${statusClass(report.status)}">${report.status}</span><br>
+        <b>Algorithm:</b> ${m.algorithm_version} — ${m.algorithm}<br>
+
+        <div class="metric-grid">
+          <div class="metric"><small>Detected lines</small><strong>${m.num_lines}</strong></div>
+          <div class="metric"><small>Segmentation readiness S(p)</small><strong>${final.signals.S}</strong></div>
+          <div class="metric"><small>Ink preservation</small><strong>${(m.losslessness_score * 100).toFixed(1)}%</strong></div>
+          <div class="metric"><small>Merged regions</small><strong>${m.suspected_merged_regions}</strong></div>
+          <div class="metric"><small>Line consistency</small><strong>${(m.line_height_consistency * 100).toFixed(1)}%</strong></div>
+          <div class="metric"><small>Boundary uncertainty</small><strong>${(m.mean_boundary_uncertainty * 100).toFixed(1)}%</strong></div>
+          <div class="metric"><small>Orphan ink</small><strong>${(m.orphan_ink_ratio * 100).toFixed(2)}%</strong></div>
+          <div class="metric"><small>Duplicate assignment</small><strong>${(m.duplicate_assignment_ratio * 100).toFixed(2)}%</strong></div>
+        </div>
+
+        <hr>
+        <b>Adaptive Orchestrator Status:</b> <span class="${statusClass(final.overall_status)}">${final.overall_status}</span><br>
+        <b>Next Action:</b> ${final.next_action}<br>
+        <b>Summary:</b> ${final.summary}
+        ${trace}
+        ${list(final.advisories)}
+        ${list(final.complaints)}
+      `;
+
+      document.getElementById("htr").classList.remove("hidden");
+    } catch (err) {
+      document.getElementById("stage4Report").innerText = err.message;
+    }
+  }
+
+  function stage5TranscriptionHtml(tx) {
+    if (!tx || !tx.lines || !tx.lines.length) {
+      return "";
+    }
+
+    const rows = tx.lines.map(row => `
+      <tr>
+        <td>${row.line_id ?? "N/A"}</td>
+        <td>${row.provider_a_devanagari_display ?? row.provider_a_devanagari ?? ""}</td>
+        <td>${row.provider_b_devanagari_display ?? row.provider_b_devanagari ?? ""}</td>
+        <td>${row.content_char_similarity ?? "N/A"}</td>
+      </tr>
+    `).join("");
+
+    return `
+      <hr>
+      <h4>Devanagari HTR Output</h4>
+
+      <div class="notice">
+        <b>Important:</b> Provider A and Provider B are shown as separate HTR
+        hypotheses. No final scholarly transcription is selected while H(p)
+        and cross-provider agreement remain below the acceptance gates.<br>
+        <b>Readable display:</b> Vedic/extension and residual combining marks
+        that commonly render as square boxes are hidden only in the UI.
+        Exact provider output remains preserved in Stage-5 artifacts.
+      </div>
+
+      <div class="transcription-grid">
+        <div class="transcription-panel">
+          <h4>Provider A</h4>
+          <div class="devanagari-text">${tx.provider_a_page_devanagari_display ?? tx.provider_a_page_devanagari ?? ""}</div>
+        </div>
+
+        <div class="transcription-panel">
+          <h4>Provider B</h4>
+          <div class="devanagari-text">${tx.provider_b_page_devanagari_display ?? tx.provider_b_page_devanagari ?? ""}</div>
+        </div>
+      </div>
+
+      <div style="overflow-x:auto;">
+        <table class="transcription-table">
+          <thead>
+            <tr>
+              <th>Line</th>
+              <th>Provider A</th>
+              <th>Provider B</th>
+              <th>Agreement</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  async function runResearchStage5() {
+    if (!runId) {
+      alert("No active run_id.");
+      return;
+    }
+
+    const button = document.getElementById("stage5RunButton");
+    button.disabled = true;
+    button.innerText = "Stage 5 Running...";
+
+    document.getElementById("stage5Report").innerHTML =
+      "Running Provider A and Provider B. This may take a few minutes...";
+
+    try {
+      const json = await parseResponse(
+        await fetch(
+          API + "/pipeline/stage5/htr/" + runId,
+          { method: "POST" }
+        )
+      );
+
+      const final = json.final_orchestration || {};
+      const readiness = json.htr_readiness || {};
+      const comparison = json.provider_comparison || {};
+      const signals = json.signals || {};
+      const report = json.orchestration_report || {};
+
+      const resultClass =
+        final.overall_status === "review_required"
+          ? "danger"
+          : "success";
+
+      document.getElementById("stage5Report").innerHTML = `
+        <b>Research Stage 5 Status:</b>
+        <span class="${statusClass(report.status)}">${report.status}</span><br>
+
+        <b>Backend execution mode:</b> ${json.backend_execution_mode}<br>
+        <b>Provider inference executed:</b>
+        ${json.provider_inference_executed_by_endpoint ? "Yes" : "No"}<br>
+        <b>Runtime:</b> ${json.runtime?.runtime_seconds ?? "N/A"} seconds<br>
+        <b>Provider A:</b> ${json.runtime?.provider_a?.provider ?? "N/A"}
+        (${json.runtime?.provider_a?.device ?? "N/A"})<br>
+        <b>Provider B:</b> ${json.runtime?.provider_b?.provider ?? "N/A"}
+        (${json.runtime?.provider_b?.device ?? "N/A"})<br>
+
+        <div class="metric-grid">
+          <div class="metric"><small>Segmentation readiness S(p)</small><strong>${signals.S ?? "N/A"}</strong></div>
+          <div class="metric"><small>HTR readiness H(p)</small><strong>${signals.H ?? "N/A"}</strong></div>
+          <div class="metric"><small>Decoder reliability</small><strong>${readiness.decoder_reliability ?? "N/A"}</strong></div>
+          <div class="metric"><small>Cross-provider agreement</small><strong>${readiness.cross_provider_agreement ?? "N/A"}</strong></div>
+          <div class="metric"><small>Sequence quality</small><strong>${readiness.sequence_quality ?? "N/A"}</strong></div>
+          <div class="metric"><small>Script integrity</small><strong>${readiness.script_integrity ?? "N/A"}</strong></div>
+          <div class="metric"><small>Low-readiness lines</small><strong>${readiness.low_readiness_lines ?? "N/A"}</strong></div>
+          <div class="metric"><small>Low-agreement lines</small><strong>${readiness.low_agreement_lines ?? "N/A"}</strong></div>
+        </div>
+
+        <div class="notice">
+          <b>Provider consistency evidence:</b><br>
+          Mean content similarity: ${comparison.mean_content_char_similarity ?? "N/A"}<br>
+          Median content similarity: ${comparison.median_content_char_similarity ?? "N/A"}<br>
+          Low-agreement lines: ${comparison.low_agreement_lines ?? "N/A"}<br>
+          This is consistency evidence only, not recognition accuracy.
+        </div>
+
+        <div class="${resultClass}">
+          <b>Adaptive Orchestrator Decision:</b>
+          ${final.htr_decision ?? report.decision ?? "N/A"}<br>
+          <b>Overall Status:</b>
+          ${final.overall_status ?? report.status ?? "N/A"}<br>
+          <b>Next Action:</b>
+          ${json.next_action ?? final.next_action ?? "N/A"}<br>
+          <b>Ground truth available:</b>
+          ${readiness.ground_truth_available ? "Yes" : "No"}<br>
+          <b>CER:</b> ${readiness.cer ?? "N/A"} |
+          <b>WER:</b> ${readiness.wer ?? "N/A"}
+        </div>
+
+        <div class="info">
+          <b>Interpretation:</b>
+          H(p) is system HTR readiness for downstream processing.
+          It is not model confidence, CER, WER or scholar-verified correctness.
+        </div>
+
+        ${stage5TranscriptionHtml(json.transcription)}
+
+        ${list(report.complaints)}
+        ${list(report.recommendations)}
+      `;
+
+      // Stage 6 is now implemented. Any completed Stage 5 can proceed to
+      // semantic/reconstruction processing; Stage 6 itself decides whether
+      // the evidence can be trusted or must abstain.
+      document.getElementById("semantic").classList.remove("hidden");
+      document.getElementById("stage6Report").innerHTML = `
+        <div class="info">
+          Stage 5 completed with H(p)=${signals.H ?? "N/A"}.
+          Stage 6 is ready to run integrated semantic interpretation,
+          reconstruction, T(p), and Stage-6G adaptive routing.
+        </div>
+      `;
+
+    } catch (err) {
+      document.getElementById("stage5Report").innerHTML = `
+        <div class="danger">
+          <b>Stage 5 execution failed:</b><br>
+          ${err.message}
+        </div>
+        <div class="info">
+          Check the failed-stage and provider log reported by the API. Provider A and
+          Provider B run in isolated environments, so an environment/model failure can
+          be diagnosed without disturbing Stages 1–4.
+        </div>
+      `;
+    } finally {
+      button.disabled = false;
+      button.innerText = "Run Stage 5 — HTR";
+    }
+  }
+
+  function stage6DecisionClass(decision, scholarRequired) {
+    if (scholarRequired) return "danger";
+    if (decision === "proceed_to_translation_validation") return "success";
+    if (decision === "machine_retry_required") return "notice";
+    return "info";
+  }
+
+  async function runResearchStage6() {
+    if (!runId) {
+      alert("No active run_id.");
+      return;
+    }
+
+    const button = document.getElementById("stage6RunButton");
+    button.disabled = true;
+    button.innerText = "Stage 6 Running...";
+
+    document.getElementById("stage6Report").innerHTML = `
+      Running Stage 6A–6F across isolated ARM64 environments and then
+      executing Stage 6G adaptive routing. This can take around 1–2 minutes.
+    `;
+
+    try {
+      const json = await parseResponse(
+        await fetch(
+          API + "/pipeline/stage6/run/" + runId,
+          { method: "POST" }
+        )
+      );
+
+      const signals = json.signals || {};
+      const stage6 = json.stage6 || {};
+      const routing = json.adaptive_routing || {};
+      const final = json.final_orchestration || {};
+      const runtime = json.runtime || {};
+      const substages = runtime.substages || [];
+
+      const substageRows = substages.length
+        ? substages.map(s => `
+            <tr>
+              <td>${s.substage ?? "N/A"}</td>
+              <td>${s.status ?? "N/A"}</td>
+              <td>${s.layer_version ?? "N/A"}</td>
+              <td>${s.runtime_seconds ?? s.runtime_seconds_observed_by_coordinator ?? "N/A"} s</td>
+              <td>${s.machine ?? "N/A"}</td>
+            </tr>
+          `).join("")
+        : `<tr><td colspan="5">No substage runtime details returned.</td></tr>`;
+
+      const decisionClass = stage6DecisionClass(
+        routing.decision,
+        routing.scholar_review_required
+      );
+
+      document.getElementById("stage6Report").innerHTML = `
+        <b>Research Stage 6 Status:</b>
+        <span class="${statusClass(
+          routing.scholar_review_required
+            ? "review_required"
+            : (routing.decision === "proceed_to_translation_validation" ? "ok" : "warning")
+        )}">
+          ${routing.decision ?? "N/A"}
+        </span><br>
+
+        <b>Backend execution mode:</b> ${json.backend_execution_mode ?? "N/A"}<br>
+        <b>Coordinator:</b> ${runtime.coordinator_version ?? "N/A"}<br>
+        <b>Total Stage-6 runtime:</b> ${runtime.runtime_seconds ?? "N/A"} seconds<br>
+
+        <div class="semantic-grid">
+          <div class="semantic-box"><small>Segmentation readiness S(p)</small><strong>${signals.S ?? "N/A"}</strong></div>
+          <div class="semantic-box"><small>HTR readiness H(p)</small><strong>${signals.H ?? "N/A"}</strong></div>
+          <div class="semantic-box"><small>Semantic trust T(p)</small><strong>${signals.T ?? "N/A"}</strong></div>
+          <div class="semantic-box"><small>T status</small><strong style="font-size:15px">${stage6.trust_status ?? "N/A"}</strong></div>
+          <div class="semantic-box"><small>Reconstructed lines</small><strong>${stage6.reconstructed_lines ?? "N/A"}</strong></div>
+          <div class="semantic-box"><small>Abstained lines</small><strong>${stage6.abstained_lines ?? "N/A"}</strong></div>
+          <div class="semantic-box"><small>Unresolved lines</small><strong>${stage6.unresolved_lines ?? "N/A"}</strong></div>
+          <div class="semantic-box"><small>Translation-eligible lines</small><strong>${stage6.translation_eligible_lines ?? "N/A"}</strong></div>
+        </div>
+
+        <h4 style="margin-top:18px;">Stage-6 Runtime Trace</h4>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Substage</th>
+                <th>Status</th>
+                <th>Version</th>
+                <th>Runtime</th>
+                <th>Machine</th>
+              </tr>
+            </thead>
+            <tbody>${substageRows}</tbody>
+          </table>
+        </div>
+
+        <div class="${decisionClass}">
+          <b>Stage 6G Adaptive Decision:</b> ${routing.decision ?? "N/A"}<br>
+          <b>Failure domain:</b> ${routing.failure_domain ?? "N/A"}<br>
+          <b>Selected retry action:</b> ${routing.selected_retry_action ?? "None"}<br>
+          <b>Machine retry exhausted:</b> ${routing.machine_retry_exhausted ? "Yes" : "No"}<br>
+          <b>Scholar review required:</b> ${routing.scholar_review_required ? "Yes" : "No"}<br>
+          <b>Next action:</b> ${routing.next_action ?? json.next_action ?? "N/A"}
+        </div>
+
+        <div class="info">
+          <b>Interpretation:</b>
+          T(p) is a system semantic/transcription trust signal, not a calibrated
+          probability, CER, WER or scholarly correctness score. Stage 6E may
+          explicitly abstain rather than fabricate Sanskrit.
+        </div>
+
+        ${list(routing.recommendations)}
+      `;
+
+    } catch (err) {
+      document.getElementById("stage6Report").innerHTML = `
+        <div class="danger">
+          <b>Stage 6 execution failed:</b><br>
+          ${err.message}
+        </div>
+        <div class="info">
+          Check <code>artifacts/${runId}/stage6_runtime/</code>.
+          Each isolated substage has its own log, so Vidyut/RAG environment
+          failures can be diagnosed without disturbing the main FastAPI process.
+        </div>
+      `;
+    } finally {
+      button.disabled = false;
+      button.innerText = "Run Stage 6 — Semantics & Trust";
+    }
+  }
+</script>
+</body>
+</html>
