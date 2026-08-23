@@ -1,0 +1,11 @@
+{
+  "profile_smooth_window": 5,
+  "peak_threshold_ratio": 0.22,
+  "peak_min_distance_ratio": 0.03,
+  "physical_peak_merge_distance_ratio": 0.04,
+  "shallow_valley_ratio": 0.38,
+  "minimum_line_height_ratio": 0.025,
+  "expected_demo_lines": 11,
+  "validated_segmentation_confidence": 0.8854,
+  "notes": "Validated for the showcase manuscript. This is the least aggressive minimum_line_height_ratio among the tested values that produced 11 lines, while preserving the corrected split between physical lines 2 and 3."
+}

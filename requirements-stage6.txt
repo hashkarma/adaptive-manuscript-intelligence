@@ -1,0 +1,3 @@
+# Stage 6 deterministic Sanskrit reconstruction / morphology runtime
+# Clean Linux recreation of the working venv-stage6 environment.
+vidyut==0.4.0

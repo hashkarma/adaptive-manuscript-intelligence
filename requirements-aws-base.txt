@@ -1,0 +1,11 @@
+# AWS / Linux base runtime for FastAPI + Stage 0-4 + Bedrock/Qwen Provider C
+# Derived from the validated local base environment.
+fastapi==0.110.0
+uvicorn==0.29.0
+opencv-python-headless==4.9.0.80
+numpy==1.26.4
+Pillow==10.2.0
+python-multipart==0.0.9
+boto3==1.43.74
+openai==3.3.1
+aws-bedrock-token-generator==1.1.0

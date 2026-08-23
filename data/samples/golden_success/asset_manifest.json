@@ -1,0 +1,18 @@
+{
+  "case_id": "golden_success",
+  "purpose": "Canonical input assets for the Golden Success manuscript professor-showcase case.",
+  "assets": [
+    {
+      "file": "manuscript.png",
+      "sha256": "39d7c69f5831dacb6d417f31db1c0f9e888f6267f6fbd13c06ad96c473c8825f",
+      "bytes": 3695648,
+      "source_during_normalization": "showcase/qwen_test/manuscript.png"
+    },
+    {
+      "file": "line1.png",
+      "sha256": "5c5352d42f413ab127d20b3d40b19c770942783285062610aba55252d6128a39",
+      "bytes": 357646,
+      "source_during_normalization": "showcase/qwen_test/line1.png"
+    }
+  ]
+}

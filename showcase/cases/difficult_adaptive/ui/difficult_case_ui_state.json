@@ -1,0 +1,55 @@
+{
+  "case_id": "difficult_adaptive",
+  "case_label": "Difficult Adaptive Manuscript",
+  "execution_state": "VALIDATED_PRIOR_EXECUTION",
+  "case_role": "JUDGEMENT_AND_SAFE_ABSTENTION",
+  "metrics": {
+    "S": 0.8854,
+    "H_AB": 0.3371,
+    "T": 0.0,
+    "H_AC": 0.3297,
+    "H_BC": 0.3298,
+    "delta_H": -0.0073
+  },
+  "stage5_evidence": {
+    "segmentation_readiness": 0.8854,
+    "completion": 1.0,
+    "script_integrity": 0.9864,
+    "decoder_reliability": 0.1271,
+    "sequence_quality": 0.9159,
+    "cross_provider_agreement": 0.2823
+  },
+  "adaptive_path": [
+    "Stage 0-4 deterministic processing",
+    "Stage 5 TrOCR Provider A",
+    "Stage 5 TrOCR Provider B",
+    "Stage 5 readiness evaluation",
+    "Stage 6 deterministic reconstruction/evidence",
+    "Adaptive diagnosis: Stage-5 recognition weakness",
+    "Independent Provider C: Qwen3-VL",
+    "Pairwise readiness comparison",
+    "Retry did not improve H",
+    "Current executable machine path exhausted",
+    "Route to scholar review"
+  ],
+  "labels": [
+    "STRONG SEGMENTATION",
+    "LOW RECOGNITION READINESS",
+    "LOW SEMANTIC TRUST",
+    "ADAPTIVE PROVIDER RETRY EXECUTED",
+    "RETRY DID NOT IMPROVE READINESS",
+    "SCHOLAR REVIEW AFTER MACHINE EXHAUSTION"
+  ],
+  "provider_retry": {
+    "selected_pair": "B+C",
+    "selected_retry_H": 0.3298,
+    "delta_H": -0.0073,
+    "improved_over_baseline": false
+  },
+  "final_status": "review_required",
+  "final_decision": "scholar_review_after_machine_exhaustion",
+  "next_action": "route_to_scholar_review",
+  "machine_retry_exhausted": true,
+  "scholar_review_required": true,
+  "translation_state": "NO SAFE TRANSLATION AVAILABLE"
+}

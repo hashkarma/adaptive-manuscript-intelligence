@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "python": {
+    "target_major_minor": "3.12",
+    "validated_local_version": "3.12.10"
+  },
+  "providers": {
+    "stage5_provider_a": {
+      "environment": "venv-stage5",
+      "model_id": "Piyush3142/trocr-sanskrit-ocr",
+      "requirements_file": "requirements-stage5-a.txt"
+    },
+    "stage5_provider_b": {
+      "environment": "venv-provider-b",
+      "model_id": "yzk/trocr-large-printed-vedic",
+      "processor_id": "microsoft/trocr-large-printed",
+      "requirements_file": "requirements-stage5-b.txt"
+    },
+    "stage5_provider_c": {
+      "provider": "qwen_bedrock_mantle",
+      "model_id": "qwen.qwen3-vl-235b-a22b-instruct",
+      "region": "us-east-1",
+      "requirements_file": "requirements-aws-base.txt"
+    }
+  },
+  "stage6": {
+    "vidyut_asset_root": "models/vidyut-0.4.0",
+    "dcs_asset_root": "knowledge/stage6d_dcs",
+    "requirements_file": "requirements-stage6.txt",
+    "rag_requirements_file": "requirements-stage6-rag.txt"
+  },
+  "notes": [
+    "Mac virtual environments must not be copied to EC2.",
+    "Linux environments are recreated from these manifests.",
+    "Large Stage-6 assets are provisioned separately and verified before full Stage-6 execution."
+  ]
+}

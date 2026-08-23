@@ -1,0 +1,236 @@
+{
+  "catalog_version": "1.0.0",
+  "showcase_name": "Adaptive Manuscript Intelligence",
+  "showcase_subtitle": "Stage 0 manuscript profiling + six-stage core processing pipeline with adaptive multi-model orchestration",
+  "default_execution_mode": "auto_adaptive",
+  "available_execution_modes": [
+    {
+      "id": "auto_adaptive",
+      "label": "Auto Adaptive",
+      "description": "The orchestrator chooses deterministic or AI-assisted paths based on evidence and stage readiness."
+    },
+    {
+      "id": "user_guided",
+      "label": "User Guided",
+      "description": "The user can inspect evidence and explicitly choose fallback or comparison paths."
+    },
+    {
+      "id": "research_compare",
+      "label": "Research Compare",
+      "description": "Compare multiple providers and evidence states for research analysis."
+    }
+  ],
+  "stage_model": [
+    {
+      "stage": 0,
+      "name": "Manuscript Profiling / Ingest",
+      "role": "Input validation and manuscript profiling"
+    },
+    {
+      "stage": 1,
+      "name": "Restoration",
+      "role": "Image restoration and contrast normalization"
+    },
+    {
+      "stage": 2,
+      "name": "Damage Analysis",
+      "role": "Damage and uncertainty characterization"
+    },
+    {
+      "stage": 3,
+      "name": "Layout Analysis",
+      "role": "Text-region and page-layout understanding"
+    },
+    {
+      "stage": 4,
+      "name": "Segmentation",
+      "role": "Classical line segmentation with adaptive Qwen visual fallback when segmentation evidence is weak"
+    },
+    {
+      "stage": 5,
+      "name": "HTR",
+      "role": "Adaptive handwritten-text recognition using TrOCR and Qwen3-VL providers"
+    },
+    {
+      "stage": 6,
+      "name": "Reconstruction & Translation",
+      "role": "Evidence-aware Sanskrit reconstruction, contextual analysis, trust assessment, and translation candidates"
+    }
+  ],
+  "cases": [
+    {
+      "id": "golden_success",
+      "display_name": "Golden Success Manuscript",
+      "tagline": "Case 1 proves capability",
+      "case_role": "CAPABILITY",
+      "execution_state": "VALIDATED_PRIOR_EXECUTION",
+      "status": "SUCCESS_WITH_SCHOLAR_VALIDATION_PENDING",
+      "metrics": {
+        "S": 0.8854,
+        "recognized_lines": 11,
+        "normalized_lines": 11,
+        "translated_lines": 11
+      },
+      "headline_evidence": [
+        "11/11 lines segmented",
+        "11/11 lines recognized",
+        "11/11 Sanskrit/Devanagari normalization candidates",
+        "11/11 English translation candidates",
+        "Page-level English translation available"
+      ],
+      "scientific_status": {
+        "ground_truth_available": false,
+        "cer": null,
+        "wer": null,
+        "scholar_verified": false,
+        "display_label": "AI CANDIDATE — SCHOLAR VALIDATION PENDING"
+      },
+      "page_translation_candidate": "Salutations to Sri Ganesha. The Keshaviya Drishti, accompanied by the Yaudamanorama commentary, begins. Of the Aditya mantras, dense with rays, I praise Sri Bhaskara, the radiant form, cause of the world’s memory, existence, and destruction. I bow to the treasure of knowledge, the twice-born, worshipped by the gods. By whose remembrance, accomplishment and success are swiftly attained. The words of Sri Keshavaarya triumph; those are to be declared. In the bound chapters, filled with auspiciousness, contrary to disciples’ understanding, yet pleasing to the wise astrologers. Even so, by the most learned Syanda Manda, whose fierce scholarship is unbroken. The guru of the king of knowledge, Nrsimha, of fierce and swift intellect — I praise him. O jewel of the mathematical circle of Makshvaarya, bound to the noble king, by the incomparable one, even the unexcelled one, O he who is beyond description! Those. By Sri Kashyapeya’s calculations, 40 verses bound to the Aditya horoscope method. By them alone, its exposition is made; yet, beyond that, there is none. What is the reasoning? Acquired by the group of disciples, the reasoning is to be done by Karyotivarya — I divine it thus. Hence, I do this, for the people may know. The rope of the arts. Though it is impossible to describe, as said by Ajadanamalaksheshvara. Yet, by the grace of Kuvaisinapadapat. Named Shraddhamanorama, the horse-verse, of Ashvakasunibarcha, near the riverbank of Anopardaravara, in Nandigram, the abode region. Thus, by worshipping the pair of lotus feet of Rasundara, the learned one is pleased — I, the teacher of all scriptures, Sri Kamalakaradevanandana.",
+      "plain_english_summary": "This page opens with invocations to Ganesha and Bhaskara, introduces a commentary on Aditya mantras and horoscopes, credits scholars and teachers, and ends with the author’s self-identification as a learned teacher devoted to Rasundara. It blends devotional, scholarly, and autobiographical elements.",
+      "unresolved_items": [
+        "Unclear compound names: 'अजडनामलक्षेश्वरोक्तः', 'कुवैशिनपादपत्प्रसादतः', 'अश्वश्लोकोऽश्वकसुनिबर्चशोऽनोपर्दारावारतीर'",
+        "Ambiguous segmentation in line 11: 'रसुन्दरचरणकमलयुगलभजनावाप्रसन्नस्तविद्यः'"
+      ],
+      "ui_state_file": "golden_success/ui/golden_case_ui_state.json",
+      "summary_file": "golden_success/golden_case_summary.json",
+      "normalized_page_candidate": "श्रीगणेशाय नमः।। यौदमनोरमाटीकासहिता केशवीयदृष्टिः प्रारभ्यते।। आदित्यमन्त्राणां घनास्य\nकारञ्चिदंसदंसं ततमादधानम्। जगत्यस्मृतिस्थितिनाशहेतुं श्रीभास्करं भास्वररूपमीडे॥ विद्यानिधिमहं वन्दे\nद्वपं विबुधार्चितम्। यस्य स्मरणतः साध्यं सिद्धिः प्राप्नोति सत्वरम्॥ श्रीकेशवार्येवचनानि जयति तानि निर्देष्टव्यानि\nनिबद्धलाथेषु पूरितानि धन्यानि शिष्यजनबुद्धिविरुद्धानि खल्याश्रगणिबुधतोषविधायकानि॥ अपि स्कुर\nस्याण्डतमण्डनेन प्रचण्डपाण्डित्यमखण्डयेन। ज्ञानाधिराजस्य गुरुर्नृसिंहः प्रचण्डचण्डाशुमति तमीडे॥ श्री\nमाक्ष्वार्यगाणितचक्रचूडामणि सज्जनरन्द्रवन्धमाविटविटययेण नतुल्यतनौ मिनिर्व्यधिषणापि हे\nताः॥ श्रीकश्यपेगणनाभिः ४० वृत्तबद्धादित्यजातकपद्धतियः। तैरेव तस्याविरुतिः कृता ऽस्ति परं न तन्नाऽस्ति स\nयुक्तिर्ह का॥ संप्राप्तितः शिष्यगणेन युक्तिः कार्योतिवर्येति दिव्याकरोहम् सना सनां तदिदं तिं करोमि यतो जनो मेत\nकलापिरज्जुः॥ यद्यप्यशक्याविद्यति विधातुमयाजडनामलक्षेश्वरोक्तः। तथापि कुवैशिनपादपत्प्रसादतः।\nश्राद्धमनोरमाख्याम् अश्वश्लोकोऽश्वकसुनिबर्चशोऽनोपर्दारावारतीरनिकटवृत्तिनन्दिग्रामनिवासक्षेत्रम्\nतथा रसुन्दरचरणकमलयुगलभजनावाप्रसन्नस्तविद्यः सकलागमाचार्येव यं श्रीकमलाकरटेवन्नन्दनः",
+      "hindi_translation_candidate": "श्री गणेश को प्रणाम। यौदमनोरमा टीका सहित केशवीय दृष्टि का आरम्भ होता है। आदित्य मन्त्रों के प्रसंग में श्री भास्कर की स्तुति की गई है, जिन्हें तेजस्वी स्वरूप और जगत की स्थिति तथा विनाश के कारण के रूप में संबोधित किया गया है। ज्ञान के भण्डार को प्रणाम किया गया है और स्मरण से शीघ्र सिद्धि प्राप्त होने की बात कही गई है। श्री केशवार्य के वचनों की प्रशंसा की गई है और आगे विद्वानों, आचार्यों तथा गुरु नृसिंह का आदरपूर्वक उल्लेख आता है। कुछ पंक्तियों में गणित, ज्योतिष, जातक-पद्धति और चालीस वृत्तों/श्लोकों जैसी तकनीकी सामग्री का संकेत मिलता है। आगे शिष्यों के लिए युक्ति या पद्धति के उपयोग, पूर्व आचार्यों की कृपा तथा किसी ग्रन्थ या परम्परा के स्थान/वंश से जुड़े उल्लेख दिखाई देते हैं। अंतिम भाग में चरण-कमलों की भक्ति, समस्त विद्या की प्राप्ति और श्री कमलाकर से संबंधित आत्मपरिचय जैसा अंश दिखाई देता है।\n\nयह हिन्दी पाठ वर्तमान Stage-6 व्याख्या का अनुवाद-मात्र है। जिन नामों, संयुक्त शब्दों और तकनीकी पदों की मूल पांडुलिपि-पठन में अनिश्चितता है, वे यहाँ भी विद्वान/शोधकर्ता सत्यापन के अधीन हैं।",
+      "original_manuscript_asset": "/showcase-assets/showcase_original_manuscript.png",
+      "hindi_translation_status": "AI_CANDIDATE_TRANSLATED_FROM_CURRENT_STAGE6_INTERPRETATION"
+    },
+    {
+      "id": "difficult_adaptive",
+      "display_name": "Difficult Adaptive Manuscript",
+      "tagline": "Case 2 proves judgement",
+      "case_role": "JUDGEMENT_AND_SAFE_ABSTENTION",
+      "execution_state": "VALIDATED_PRIOR_EXECUTION",
+      "status": "SCHOLAR_REVIEW_REQUIRED",
+      "metrics": {
+        "S": 0.8854,
+        "H_AB": 0.3371,
+        "T": 0.0,
+        "H_AC": 0.3297,
+        "H_BC": 0.3298,
+        "delta_H": -0.0073
+      },
+      "headline_evidence": [
+        "Strong segmentation retained",
+        "Low HTR readiness detected",
+        "Stage-6 semantic trust remained zero",
+        "Independent Qwen Provider-C retry executed",
+        "Retry did not improve readiness",
+        "System routed to scholar review"
+      ],
+      "adaptive_outcome": {
+        "provider_c_improved": false,
+        "selected_retry_pair": "B+C",
+        "final_decision": "scholar_review_after_machine_exhaustion",
+        "next_action": "route_to_scholar_review",
+        "machine_retry_exhausted": true,
+        "scholar_review_required": true
+      },
+      "scientific_status": {
+        "ground_truth_available": false,
+        "cer": null,
+        "wer": null,
+        "accuracy_claimed": false,
+        "display_label": "NO SAFE TRANSLATION AVAILABLE"
+      },
+      "ui_state_file": "difficult_adaptive/ui/difficult_case_ui_state.json",
+      "summary_file": "difficult_adaptive/difficult_case_summary.json"
+    }
+  ],
+  "scientific_guardrails": [
+    "S, H and T are evidence/readiness/trust signals, not accuracy.",
+    "CER/WER require verified ground truth.",
+    "AI-generated normalized Sanskrit and English translations remain candidates until scholar validation.",
+    "Validated prior execution must be visibly distinguished from live execution.",
+    "Machine retry exhaustion is scoped to the currently declared executable capability set."
+  ],
+  "glossary": [
+    {
+      "term": "HTR",
+      "expansion": "Handwritten Text Recognition",
+      "meaning": "Machine recognition of handwritten or historical manuscript text. Think of it as OCR designed for difficult handwriting. हस्तलिखित/ऐतिहासिक पांडुलिपि को मशीन द्वारा पढ़ने की प्रक्रिया।",
+      "direction": "Higher quality is better"
+    },
+    {
+      "term": "Ground Truth",
+      "expansion": "Verified Reference Transcription",
+      "meaning": "A trusted scholar-verified transcription used as the answer key for measuring recognition quality. प्रोफेसर/विद्वान द्वारा सत्यापित सही पाठ, जिससे मशीन के परिणाम की तुलना की जाती है।",
+      "direction": "Required for real CER/WER"
+    },
+    {
+      "term": "CER",
+      "expansion": "Character Error Rate",
+      "meaning": "Character Error Rate: the percentage of characters that differ from verified ground truth. Lower is better. सत्यापित पाठ की तुलना में कितने अक्षर गलत पढ़े गए।",
+      "direction": "Lower is better"
+    },
+    {
+      "term": "WER",
+      "expansion": "Word Error Rate",
+      "meaning": "Word Error Rate: the percentage of words inserted, deleted or substituted compared with verified ground truth. Lower is better. सत्यापित पाठ की तुलना में कितने शब्द गलत, छूटे या अतिरिक्त आए।",
+      "direction": "Lower is better"
+    },
+    {
+      "term": "S",
+      "expansion": "Segmentation Readiness",
+      "meaning": "Segmentation Readiness: Stage-4 evidence showing whether the page was split into usable text lines well enough to continue. Stage-4 का संकेत कि पांडुलिपि उपयोगी text lines में पर्याप्त रूप से विभाजित हुई या नहीं।",
+      "direction": "Higher = stronger evidence"
+    },
+    {
+      "term": "H",
+      "expansion": "HTR Readiness",
+      "meaning": "HTR Readiness: Stage-5 evidence combining completion, script integrity, decoder reliability, sequence quality and provider agreement. Stage-5 का संयुक्त evidence score जो recognition readiness दर्शाता है।",
+      "direction": "Higher = stronger evidence"
+    },
+    {
+      "term": "T",
+      "expansion": "Semantic Trust",
+      "meaning": "Semantic Trust: Stage-6 evidence indicating whether reconstruction support is strong enough for a trusted downstream interpretation or translation. Stage-6 का trust signal कि reconstruction evidence आगे बढ़ने के लिए पर्याप्त है या नहीं।",
+      "direction": "Higher = stronger evidence"
+    },
+    {
+      "term": "Provider",
+      "expansion": "Independent Recognition Capability",
+      "meaning": "An independent recognition capability or model, such as TrOCR or Qwen3-VL. Multiple providers reduce dependence on one model. पांडुलिपि पढ़ने वाला स्वतंत्र model/engine।",
+      "direction": "Diversity reduces single-model dependence"
+    },
+    {
+      "term": "Adaptive Retry",
+      "expansion": "Targeted Second Attempt",
+      "meaning": "A targeted second attempt where the orchestrator reruns only the weak stage using another useful capability. Orchestrator केवल कमजोर stage पर दूसरी capability चलाता है।",
+      "direction": "Triggered only when useful"
+    },
+    {
+      "term": "ΔH",
+      "expansion": "Change in HTR Readiness",
+      "meaning": "Change in HTR Readiness after a retry. Positive means the evidence improved; negative means the retry did not improve the current H metric. Retry के बाद HTR readiness में आया बदलाव।",
+      "direction": "Positive = improvement"
+    },
+    {
+      "term": "Abstention",
+      "expansion": "Refusal to Pretend Certainty",
+      "meaning": "A safety behavior where the system refuses to invent a fluent answer when evidence is insufficient. Evidence कम होने पर system अनुमानित उत्तर बनाने की बजाय रुक जाता है।",
+      "direction": "A safety feature"
+    },
+    {
+      "term": "Scholar Review",
+      "expansion": "Human Expert Escalation",
+      "meaning": "Human expert escalation when the currently available machine capabilities cannot produce enough evidence for a safe conclusion. पर्याप्त machine evidence न मिलने पर मामला विशेषज्ञ/विद्वान को भेजा जाता है।",
+      "direction": "Human-in-the-loop"
+    }
+  ],
+  "adaptive_orchestrator": {
+    "name": "Adaptive Orchestrator",
+    "purpose": "Observe stage evidence, diagnose the weak stage, select the next useful capability, measure whether it helped, and decide whether to proceed, keep a candidate, abstain, or escalate to a scholar.",
+    "decision_loop": [
+      "observe_evidence",
+      "diagnose_failure_domain",
+      "select_capability",
+      "targeted_retry",
+      "compare_new_evidence",
+      "proceed_or_abstain_or_escalate"
+    ]
+  }
+}

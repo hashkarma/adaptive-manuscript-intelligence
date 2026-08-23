@@ -10,6 +10,7 @@ from typing import Any, Dict, List, Optional
 from core.artifact_store import ArtifactStore
 
 
+# STAGE6_ABC_EVIDENCE_V3
 LAYER6_VERSION = "0.1.0-htr-evidence-parser"
 
 
@@ -40,9 +41,12 @@ class Stage6LineEvidence:
     provider_a_top1_readable: str
     provider_b_top1_exact: str
     provider_b_top1_readable: str
+    provider_c_top1_exact: str
+    provider_c_top1_readable: str
 
     provider_a_hypotheses: List[Stage6Hypothesis]
     provider_b_hypotheses: List[Stage6Hypothesis]
+    provider_c_hypotheses: List[Stage6Hypothesis]
 
     shared_readable_tokens: List[str]
     notes: List[str]
@@ -385,6 +389,7 @@ def run_layer6_htr_evidence_parser(
     *,
     provider_a_dir: str = "L5_provider_A",
     provider_b_dir: str = "L5_provider_B",
+    provider_c_dir: str = "L5_provider_C",
     comparison_dir: str = "L5_compare",
     readiness_dir: str = "L5_readiness",
 ) -> Layer6Output:
@@ -419,6 +424,17 @@ def run_layer6_htr_evidence_parser(
         run_dir / provider_b_dir / "htr_manifest.json"
     )
 
+    # Provider C is optional and additive. Its presence never replaces
+    # canonical A+B readiness/comparison.
+    provider_c_manifest_path = (
+        run_dir / provider_c_dir / "htr_manifest.json"
+    )
+    manifest_c = (
+        _load_json(provider_c_manifest_path)
+        if provider_c_manifest_path.exists()
+        else {}
+    )
+
     comparison = _load_json(
         run_dir / comparison_dir / "provider_comparison.json"
     )
@@ -429,6 +445,7 @@ def run_layer6_htr_evidence_parser(
 
     a_lines = _manifest_lines(manifest_a)
     b_lines = _manifest_lines(manifest_b)
+    provider_c_lines = _manifest_lines(manifest_c)
     c_lines = _comparison_lines(comparison)
     h_lines = _readiness_lines(readiness)
 
@@ -453,6 +470,7 @@ def run_layer6_htr_evidence_parser(
 
         a = a_lines.get(line_id, {})
         b = b_lines.get(line_id, {})
+        provider_c = provider_c_lines.get(line_id, {})
         c = c_lines.get(line_id, {})
         hrow = h_lines.get(line_id, {})
 
@@ -464,6 +482,11 @@ def run_layer6_htr_evidence_parser(
         b_hypotheses = _extract_hypotheses(
             b,
             provider_name="provider_b",
+        )
+
+        c_hypotheses = _extract_hypotheses(
+            provider_c,
+            provider_name="provider_c",
         )
 
         a_exact = (
@@ -490,6 +513,18 @@ def run_layer6_htr_evidence_parser(
             else ""
         )
 
+        c_exact = (
+            c_hypotheses[0].exact_devanagari
+            if c_hypotheses
+            else ""
+        )
+
+        c_readable = (
+            c_hypotheses[0].readable_devanagari
+            if c_hypotheses
+            else ""
+        )
+
         H = _line_H(hrow, page_H)
         agreement = _line_agreement(c)
 
@@ -506,6 +541,13 @@ def run_layer6_htr_evidence_parser(
 
         if not b_exact:
             notes.append("PROVIDER_B_TEXT_MISSING")
+
+        if manifest_c:
+            notes.append(
+                "PROVIDER_C_ADAPTIVE_VISUAL_EVIDENCE_AVAILABLE"
+            )
+            if not c_exact:
+                notes.append("PROVIDER_C_TEXT_MISSING")
 
         shared = _shared_tokens(
             a_readable,
@@ -536,8 +578,11 @@ def run_layer6_htr_evidence_parser(
                 provider_a_top1_readable=a_readable,
                 provider_b_top1_exact=b_exact,
                 provider_b_top1_readable=b_readable,
+                provider_c_top1_exact=c_exact,
+                provider_c_top1_readable=c_readable,
                 provider_a_hypotheses=a_hypotheses,
                 provider_b_hypotheses=b_hypotheses,
+                provider_c_hypotheses=c_hypotheses,
                 shared_readable_tokens=shared,
                 notes=notes,
             )
@@ -577,6 +622,11 @@ def run_layer6_htr_evidence_parser(
         "stage6_substage": "6A_htr_evidence_parser",
         "num_lines": len(lines),
         "page_htr_readiness_H": page_H,
+        "canonical_htr_readiness_basis": "provider_a_plus_provider_b",
+        "provider_c_evidence_available": bool(manifest_c),
+        "provider_c_lines_with_text": sum(
+            1 for line in lines if line.provider_c_top1_exact
+        ),
         "low_htr_readiness_lines": low_htr_lines,
         "low_cross_provider_agreement_lines": low_agreement_lines,
         "deep_reconstruction_lines": deep_lines,
@@ -606,6 +656,17 @@ def run_layer6_htr_evidence_parser(
             "stage4_line_manifest": "L4/line_manifest.json",
             "provider_a_manifest": f"{provider_a_dir}/htr_manifest.json",
             "provider_b_manifest": f"{provider_b_dir}/htr_manifest.json",
+            "provider_c_manifest": (
+                f"{provider_c_dir}/htr_manifest.json"
+                if manifest_c
+                else None
+            ),
+            "provider_c_role": (
+                "optional_independent_visual_htr_evidence"
+                if manifest_c
+                else "not_available"
+            ),
+            "canonical_htr_readiness_basis": "provider_a_plus_provider_b",
             "provider_comparison": f"{comparison_dir}/provider_comparison.json",
             "htr_readiness": f"{readiness_dir}/htr_readiness.json",
         },
@@ -667,6 +728,7 @@ def run_layer6_htr_evidence_parser(
                 "evidence_status",
                 "provider_a_top1_readable",
                 "provider_b_top1_readable",
+                "provider_c_top1_readable",
                 "shared_readable_tokens",
             ],
         )
@@ -689,6 +751,7 @@ def run_layer6_htr_evidence_parser(
                     "evidence_status": line.evidence_status,
                     "provider_a_top1_readable": line.provider_a_top1_readable,
                     "provider_b_top1_readable": line.provider_b_top1_readable,
+                    "provider_c_top1_readable": line.provider_c_top1_readable,
                     "shared_readable_tokens": " | ".join(
                         line.shared_readable_tokens
                     ),
@@ -707,6 +770,17 @@ def run_layer6_htr_evidence_parser(
             "provider_b_page_readable": "\n".join(
                 line.provider_b_top1_readable
                 for line in lines
+            ),
+            "provider_c_page_readable": (
+                "\n".join(
+                    line.provider_c_top1_readable
+                    for line in lines
+                )
+                if manifest_c
+                else None
+            ),
+            "canonical_htr_readiness_basis": (
+                "provider_a_plus_provider_b"
             ),
             "line_order": [
                 line.line_id

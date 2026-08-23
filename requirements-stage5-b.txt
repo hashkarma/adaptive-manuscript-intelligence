@@ -1,0 +1,14 @@
+# Stage 5 Provider B — TrOCR Vedic Devanagari
+# Model: yzk/trocr-large-printed-vedic
+# Processor: microsoft/trocr-large-printed
+# Clean Linux recreation of the working venv-provider-b environment.
+numpy==1.26.4
+Pillow==12.3.0
+torch==2.13.0
+torchvision==0.28.0
+transformers==4.42.1
+huggingface-hub==0.36.2
+tokenizers==0.19.1
+safetensors==0.8.0
+sentencepiece==0.2.2
+indic-transliteration==2.3.82

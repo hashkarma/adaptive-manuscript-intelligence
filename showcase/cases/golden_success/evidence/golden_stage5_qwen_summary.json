@@ -1,0 +1,200 @@
+{
+  "case_id": "golden_success",
+  "profile_id": "demo_balanced",
+  "run_id": "stage4-adaptive_20260820_184938",
+  "provider": "qwen_bedrock_mantle",
+  "model_id": "qwen.qwen3-vl-235b-a22b-instruct",
+  "runtime_seconds": 154.759,
+  "metrics": {
+    "algorithm_version": "0.4.2-iast-edge-normalization",
+    "provider": "qwen_bedrock_mantle",
+    "model_id": "qwen.qwen3-vl-235b-a22b-instruct",
+    "output_script": "devanagari",
+    "device": "aws-bedrock",
+    "stage4_num_lines": 11,
+    "attempted_lines": 11,
+    "recognized_lines": 11,
+    "error_lines": 0,
+    "blank_lines": 0,
+    "review_required_lines": 11,
+    "mean_hypothesis_entropy": null,
+    "mean_decoder_stability": null,
+    "mean_script_purity": 1.0,
+    "mean_latin_residual_ratio": 0.0,
+    "mean_token_repetition_ratio": 0.0,
+    "mean_hypothesis_length_spread": null,
+    "mean_sequence_length_anomaly_score": 0.1349,
+    "valid_devanagari_lines": 11,
+    "lines_with_latin_residual": 0,
+    "possible_repetitive_generation_lines": 0,
+    "sequence_length_anomaly_lines": 0,
+    "htr_readiness_H": null,
+    "cer": null,
+    "wer": null,
+    "ground_truth_available": false,
+    "recognition_accuracy_calibrated": false
+  },
+  "stage4_manifest": "frozen-provenance://golden-success/stage4-adaptive_20260820_184938/L4/line_manifest.json",
+  "canonical_l5_manifest": "frozen-provenance://golden-success/stage4-adaptive_20260820_184938/L5/htr_manifest.json",
+  "snapshot_l5_manifest": "frozen-provenance://golden-success/stage4-adaptive_20260820_184938/L5_qwen_golden/htr_manifest.json",
+  "top1_lines": [
+    {
+      "line_id": "line_001",
+      "reading_order": 1,
+      "status": "ok",
+      "raw_text": "श्रीगणेशायनमः।। यौदमनोरमाटीकासहिताकेशवीयदृष्टिः प्रारभ्यते।। आदित्यमन्त्रानघनास्य",
+      "devanagari_text": "श्रीगणेशायनमः।। यौदमनोरमाटीकासहिताकेशवीयदृष्टिः प्रारभ्यते।। आदित्यमन्त्रानघनास्य",
+      "top1_raw_text": "श्रीगणेशायनमः।। यौदमनोरमाटीकासहिताकेशवीयदृष्टिः प्रारभ्यते।। आदित्यमन्त्रानघनास्य",
+      "top1_devanagari": "श्रीगणेशायनमः।। यौदमनोरमाटीकासहिताकेशवीयदृष्टिः प्रारभ्यते।। आदित्यमन्त्रानघनास्य",
+      "review_required": true,
+      "warnings": [
+        "DECODER_AMBIGUITY_UNAVAILABLE",
+        "DECODER_STABILITY_UNAVAILABLE"
+      ]
+    },
+    {
+      "line_id": "line_002",
+      "reading_order": 2,
+      "status": "ok",
+      "raw_text": "कारञ्चिदंसदंसंततमादधानम्।जगत्यस्मृतिस्थितिनाशहेतुंश्रीभास्करंभास्वररूपमीडे॥विद्यानिधिमहंवन्दे",
+      "devanagari_text": "कारञ्चिदंसदंसंततमादधानम्।जगत्यस्मृतिस्थितिनाशहेतुंश्रीभास्करंभास्वररूपमीडे॥विद्यानिधिमहंवन्दे",
+      "top1_raw_text": "कारञ्चिदंसदंसंततमादधानम्।जगत्यस्मृतिस्थितिनाशहेतुंश्रीभास्करंभास्वररूपमीडे॥विद्यानिधिमहंवन्दे",
+      "top1_devanagari": "कारञ्चिदंसदंसंततमादधानम्।जगत्यस्मृतिस्थितिनाशहेतुंश्रीभास्करंभास्वररूपमीडे॥विद्यानिधिमहंवन्दे",
+      "review_required": true,
+      "warnings": [
+        "DECODER_AMBIGUITY_UNAVAILABLE",
+        "DECODER_STABILITY_UNAVAILABLE"
+      ]
+    },
+    {
+      "line_id": "line_003",
+      "reading_order": 3,
+      "status": "ok",
+      "raw_text": "द्वपं विबुधार्चितम्। यस्य स्मरणतः साध्यं सिद्धिः प्राप्नोति सत्वरम्॥ श्रीकेशवार्येवचनानि जयति तानि निर्देष्टव्या",
+      "devanagari_text": "द्वपं विबुधार्चितम्। यस्य स्मरणतः साध्यं सिद्धिः प्राप्नोति सत्वरम्॥ श्रीकेशवार्येवचनानि जयति तानि निर्देष्टव्या",
+      "top1_raw_text": "द्वपं विबुधार्चितम्। यस्य स्मरणतः साध्यं सिद्धिः प्राप्नोति सत्वरम्॥ श्रीकेशवार्येवचनानि जयति तानि निर्देष्टव्या",
+      "top1_devanagari": "द्वपं विबुधार्चितम्। यस्य स्मरणतः साध्यं सिद्धिः प्राप्नोति सत्वरम्॥ श्रीकेशवार्येवचनानि जयति तानि निर्देष्टव्या",
+      "review_required": true,
+      "warnings": [
+        "DECODER_AMBIGUITY_UNAVAILABLE",
+        "DECODER_STABILITY_UNAVAILABLE"
+      ]
+    },
+    {
+      "line_id": "line_004",
+      "reading_order": 4,
+      "status": "ok",
+      "raw_text": "निबद्धलाथेसुपूरितानिधन्यानि शिष्यजनबुद्धिविरुद्धानिखल्याश्रगणिबुधतोषविधायकानि॥अपिस्कुर",
+      "devanagari_text": "निबद्धलाथेसुपूरितानिधन्यानि शिष्यजनबुद्धिविरुद्धानिखल्याश्रगणिबुधतोषविधायकानि॥अपिस्कुर",
+      "top1_raw_text": "निबद्धलाथेसुपूरितानिधन्यानि शिष्यजनबुद्धिविरुद्धानिखल्याश्रगणिबुधतोषविधायकानि॥अपिस्कुर",
+      "top1_devanagari": "निबद्धलाथेसुपूरितानिधन्यानि शिष्यजनबुद्धिविरुद्धानिखल्याश्रगणिबुधतोषविधायकानि॥अपिस्कुर",
+      "review_required": true,
+      "warnings": [
+        "DECODER_AMBIGUITY_UNAVAILABLE",
+        "DECODER_STABILITY_UNAVAILABLE"
+      ]
+    },
+    {
+      "line_id": "line_005",
+      "reading_order": 5,
+      "status": "ok",
+      "raw_text": "स्याण्डतमण्डनेन प्रचण्डपाण्डित्यमखण्डयेन। ज्ञानाधिराजस्य गुरुर्नृसिंह प्रचण्डचण्डाशुमति तमीडे॥श्री",
+      "devanagari_text": "स्याण्डतमण्डनेन प्रचण्डपाण्डित्यमखण्डयेन। ज्ञानाधिराजस्य गुरुर्नृसिंह प्रचण्डचण्डाशुमति तमीडे॥श्री",
+      "top1_raw_text": "स्याण्डतमण्डनेन प्रचण्डपाण्डित्यमखण्डयेन। ज्ञानाधिराजस्य गुरुर्नृसिंह प्रचण्डचण्डाशुमति तमीडे॥श्री",
+      "top1_devanagari": "स्याण्डतमण्डनेन प्रचण्डपाण्डित्यमखण्डयेन। ज्ञानाधिराजस्य गुरुर्नृसिंह प्रचण्डचण्डाशुमति तमीडे॥श्री",
+      "review_required": true,
+      "warnings": [
+        "DECODER_AMBIGUITY_UNAVAILABLE",
+        "DECODER_STABILITY_UNAVAILABLE"
+      ]
+    },
+    {
+      "line_id": "line_006",
+      "reading_order": 6,
+      "status": "ok",
+      "raw_text": "माक्ष्वार्यगाणतज्चक्रचूडामाणसज्जनरन्द्वन्धमाविटविटययेणनतुल्यतनौमिनिर्व्यधिषणापि॒हे",
+      "devanagari_text": "माक्ष्वार्यगाणतज्चक्रचूडामाणसज्जनरन्द्वन्धमाविटविटययेणनतुल्यतनौमिनिर्व्यधिषणापि॒हे",
+      "top1_raw_text": "माक्ष्वार्यगाणतज्चक्रचूडामाणसज्जनरन्द्वन्धमाविटविटययेणनतुल्यतनौमिनिर्व्यधिषणापि॒हे",
+      "top1_devanagari": "माक्ष्वार्यगाणतज्चक्रचूडामाणसज्जनरन्द्वन्धमाविटविटययेणनतुल्यतनौमिनिर्व्यधिषणापि॒हे",
+      "review_required": true,
+      "warnings": [
+        "DECODER_AMBIGUITY_UNAVAILABLE",
+        "DECODER_STABILITY_UNAVAILABLE"
+      ]
+    },
+    {
+      "line_id": "line_007",
+      "reading_order": 7,
+      "status": "ok",
+      "raw_text": "ताः॥ श्रीकश्यपेगगनाभिः ४० वृत्तबद्धादिताजातकपद्धतियो। तैरेवतस्याविरुतिः कृताऽस्तिपरंनतन्नाऽस्तिस",
+      "devanagari_text": "ताः॥ श्रीकश्यपेगगनाभिः ४० वृत्तबद्धादिताजातकपद्धतियो। तैरेवतस्याविरुतिः कृताऽस्तिपरंनतन्नाऽस्तिस",
+      "top1_raw_text": "ताः॥ श्रीकश्यपेगगनाभिः ४० वृत्तबद्धादिताजातकपद्धतियो। तैरेवतस्याविरुतिः कृताऽस्तिपरंनतन्नाऽस्तिस",
+      "top1_devanagari": "ताः॥ श्रीकश्यपेगगनाभिः ४० वृत्तबद्धादिताजातकपद्धतियो। तैरेवतस्याविरुतिः कृताऽस्तिपरंनतन्नाऽस्तिस",
+      "review_required": true,
+      "warnings": [
+        "DECODER_AMBIGUITY_UNAVAILABLE",
+        "DECODER_STABILITY_UNAVAILABLE"
+      ]
+    },
+    {
+      "line_id": "line_008",
+      "reading_order": 8,
+      "status": "ok",
+      "raw_text": "युक्तिर्ह का॥ संप्राप्तितः शिष्यगणेन युक्तिः कार्योतिवर्येतिदिव्याकरोह म् सना सनां तदिदं तिंकरोमियतोजनोमेत",
+      "devanagari_text": "युक्तिर्ह का॥ संप्राप्तितः शिष्यगणेन युक्तिः कार्योतिवर्येतिदिव्याकरोह म् सना सनां तदिदं तिंकरोमियतोजनोमेत",
+      "top1_raw_text": "युक्तिर्ह का॥ संप्राप्तितः शिष्यगणेन युक्तिः कार्योतिवर्येतिदिव्याकरोह म् सना सनां तदिदं तिंकरोमियतोजनोमेत",
+      "top1_devanagari": "युक्तिर्ह का॥ संप्राप्तितः शिष्यगणेन युक्तिः कार्योतिवर्येतिदिव्याकरोह म् सना सनां तदिदं तिंकरोमियतोजनोमेत",
+      "review_required": true,
+      "warnings": [
+        "DECODER_AMBIGUITY_UNAVAILABLE",
+        "DECODER_STABILITY_UNAVAILABLE"
+      ]
+    },
+    {
+      "line_id": "line_009",
+      "reading_order": 9,
+      "status": "ok",
+      "raw_text": "कलापिरज्जुः॥यद्यप्यशक्याविद्यतिविधातुमयाजडनामलक्षेश्वरोक्तः।तथापिकुवैशिनपादपत्प्रसादतः।",
+      "devanagari_text": "कलापिरज्जुः॥यद्यप्यशक्याविद्यतिविधातुमयाजडनामलक्षेश्वरोक्तः।तथापिकुवैशिनपादपत्प्रसादतः।",
+      "top1_raw_text": "कलापिरज्जुः॥यद्यप्यशक्याविद्यतिविधातुमयाजडनामलक्षेश्वरोक्तः।तथापिकुवैशिनपादपत्प्रसादतः।",
+      "top1_devanagari": "कलापिरज्जुः॥यद्यप्यशक्याविद्यतिविधातुमयाजडनामलक्षेश्वरोक्तः।तथापिकुवैशिनपादपत्प्रसादतः।",
+      "review_required": true,
+      "warnings": [
+        "DECODER_AMBIGUITY_UNAVAILABLE",
+        "DECODER_STABILITY_UNAVAILABLE"
+      ]
+    },
+    {
+      "line_id": "line_010",
+      "reading_order": 10,
+      "status": "ok",
+      "raw_text": "श्राद्धमनोरमाख्याम् अश्वश्लोकोऽश्वकसुनिबर्चशोऽनोपर्दारावारतीरनिकटवृत्तिनन्दिग्रामनिवासक्षेत्रम्",
+      "devanagari_text": "श्राद्धमनोरमाख्याम् अश्वश्लोकोऽश्वकसुनिबर्चशोऽनोपर्दारावारतीरनिकटवृत्तिनन्दिग्रामनिवासक्षेत्रम्",
+      "top1_raw_text": "श्राद्धमनोरमाख्याम् अश्वश्लोकोऽश्वकसुनिबर्चशोऽनोपर्दारावारतीरनिकटवृत्तिनन्दिग्रामनिवासक्षेत्रम्",
+      "top1_devanagari": "श्राद्धमनोरमाख्याम् अश्वश्लोकोऽश्वकसुनिबर्चशोऽनोपर्दारावारतीरनिकटवृत्तिनन्दिग्रामनिवासक्षेत्रम्",
+      "review_required": true,
+      "warnings": [
+        "DECODER_AMBIGUITY_UNAVAILABLE",
+        "DECODER_STABILITY_UNAVAILABLE"
+      ]
+    },
+    {
+      "line_id": "line_011",
+      "reading_order": 11,
+      "status": "ok",
+      "raw_text": "तथारसुन्दरचरणकमलयुगलभजनावाप्रसन्नस्तविद्यः सकलागमाचार्येवयं श्रीकमलाकरटेवन्नन्दनः",
+      "devanagari_text": "तथारसुन्दरचरणकमलयुगलभजनावाप्रसन्नस्तविद्यः सकलागमाचार्येवयं श्रीकमलाकरटेवन्नन्दनः",
+      "top1_raw_text": "तथारसुन्दरचरणकमलयुगलभजनावाप्रसन्नस्तविद्यः सकलागमाचार्येवयं श्रीकमलाकरटेवन्नन्दनः",
+      "top1_devanagari": "तथारसुन्दरचरणकमलयुगलभजनावाप्रसन्नस्तविद्यः सकलागमाचार्येवयं श्रीकमलाकरटेवन्नन्दनः",
+      "review_required": true,
+      "warnings": [
+        "DECODER_AMBIGUITY_UNAVAILABLE",
+        "DECODER_STABILITY_UNAVAILABLE"
+      ]
+    }
+  ],
+  "interpretation": {
+    "qwen_role": "Golden-case Stage-5 visual HTR provider operating on the persisted Stage-4 line crops.",
+    "accuracy_claim": "No CER/WER or scholar-verified accuracy claim is made until ground truth is available."
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "artifact_version": "0.3.0-golden-stage6-recovered-continuation",
+  "case_id": "golden_success",
+  "profile_id": "demo_balanced",
+  "original_response_was_truncated": true,
+  "recovered_complete_lines": 6,
+  "recovered_line_ids": [
+    "line_001",
+    "line_002",
+    "line_003",
+    "line_004",
+    "line_005",
+    "line_006"
+  ],
+  "continuation_requested_line_ids": [
+    "line_007",
+    "line_008",
+    "line_009",
+    "line_010",
+    "line_011"
+  ],
+  "continuation_runtime_seconds": 62.541,
+  "validation": {
+    "status": "ok",
+    "expected_lines": 11,
+    "returned_lines": 11,
+    "missing_line_ids": [],
+    "extra_line_ids": [],
+    "normalized_candidate_lines": 11,
+    "translated_candidate_lines": 11,
+    "page_translation_available": true
+  },
+  "scientific_status": {
+    "output_is_ai_candidate": true,
+    "scholar_verified": false,
+    "ground_truth_available": false,
+    "confidence_values_are_calibrated": false,
+    "cer": null,
+    "wer": null,
+    "stage5_was_visual_htr": true,
+    "stage6_continuation_was_text_only": true
+  }
+}

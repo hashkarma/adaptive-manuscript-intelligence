@@ -1,0 +1,217 @@
+{
+  "case_id": "golden_success",
+  "display_name": "Golden Success Manuscript",
+  "profile_id": "demo_balanced",
+  "source_run_dir": "frozen-provenance://golden-success/stage4-adaptive_20260820_184938",
+  "frozen_case_dir": "showcase/cases/golden_success",
+  "demo_message": "Case 1 proves capability: the six-stage manuscript pipeline successfully segments the page, recognizes all line images, and produces normalized Sanskrit/Devanagari and English translation candidates. Outputs remain explicitly marked for scholar validation until ground truth is supplied.",
+  "stage4": {
+    "status": "completed",
+    "accepted_path": "classical_segmentation",
+    "line_count": 11,
+    "segmentation_readiness_S": 0.8854,
+    "qwen_fallback_used": false
+  },
+  "stage5": {
+    "status": "completed",
+    "provider": "qwen_bedrock_mantle",
+    "model_id": "qwen.qwen3-vl-235b-a22b-instruct",
+    "recognized_lines": 11,
+    "all_lines_nonempty": true,
+    "ground_truth_available": false,
+    "cer": null,
+    "wer": null,
+    "professor_gt_benchmark": {
+      "benchmark_version": "1.0",
+      "metric_scope": "professor_ground_truth",
+      "primary_metric": "strict_cer",
+      "secondary_metric": "content_cer",
+      "wer_interpretation": "spacing_and_tokenization_sensitive",
+      "providers": {
+        "A": {
+          "label": "TrOCR Sanskrit baseline",
+          "provider_id": "trocr_iast_baseline",
+          "model_id": "Piyush3142/trocr-sanskrit-ocr",
+          "coverage": 1.0,
+          "evaluated_line_count": 11,
+          "strict_cer": 0.9810981098109811,
+          "strict_cer_percent": 98.11,
+          "wer": 2.0357142857142856,
+          "wer_percent": 203.57,
+          "content_cer": 0.7923387096774194,
+          "content_cer_percent": 79.23
+        },
+        "B": {
+          "label": "TrOCR Vedic Devanagari",
+          "provider_id": "trocr_vedic_devanagari",
+          "model_id": "yzk/trocr-large-printed-vedic",
+          "coverage": 1.0,
+          "evaluated_line_count": 11,
+          "strict_cer": 1.0567056705670568,
+          "strict_cer_percent": 105.67,
+          "wer": 2.0357142857142856,
+          "wer_percent": 203.57,
+          "content_cer": 0.8356854838709677,
+          "content_cer_percent": 83.57
+        },
+        "C": {
+          "label": "Qwen3-VL via Bedrock Mantle",
+          "provider_id": "qwen_bedrock_mantle",
+          "model_id": "qwen.qwen3-vl-235b-a22b-instruct",
+          "coverage": 1.0,
+          "evaluated_line_count": 11,
+          "strict_cer": 0.2907290729072907,
+          "strict_cer_percent": 29.07,
+          "wer": 1.1875,
+          "wer_percent": 118.75,
+          "content_cer": 0.23084677419354838,
+          "content_cer_percent": 23.08
+        }
+      },
+      "strict_cer_ranking_best_to_worst": [
+        "C",
+        "A",
+        "B"
+      ],
+      "content_cer_ranking_best_to_worst": [
+        "C",
+        "A",
+        "B"
+      ],
+      "best_provider_by_strict_cer": "C",
+      "best_provider_by_content_cer": "C",
+      "interpretation": "Provider C (Qwen3-VL via Bedrock Mantle) has the lowest Professor-grounded transcription error on the Golden manuscript.",
+      "scientific_guardrails": {
+        "cer_wer_do_not_replace_H": true,
+        "cer_wer_do_not_replace_T": true,
+        "content_cer_is_secondary_diagnostic": true,
+        "wer_is_spacing_sensitive": true,
+        "translation_not_validated_by_this_benchmark": true
+      }
+    }
+  },
+  "stage6": {
+    "status": "completed_candidate",
+    "expected_lines": 11,
+    "returned_lines": 11,
+    "normalized_candidate_lines": 11,
+    "translated_candidate_lines": 11,
+    "page_translation_available": true,
+    "candidate_output_status": "AI_CANDIDATE_SCHOLAR_VALIDATION_PENDING",
+    "ground_truth_available": false,
+    "cer": null,
+    "wer": null
+  },
+  "page_level": {
+    "english_translation_candidate": "Salutations to Sri Ganesha. The Keshaviya Drishti, accompanied by the Yaudamanorama commentary, begins. Of the Aditya mantras, dense with rays, I praise Sri Bhaskara, the radiant form, cause of the world’s memory, existence, and destruction. I bow to the treasure of knowledge, the twice-born, worshipped by the gods. By whose remembrance, accomplishment and success are swiftly attained. The words of Sri Keshavaarya triumph; those are to be declared. In the bound chapters, filled with auspiciousness, contrary to disciples’ understanding, yet pleasing to the wise astrologers. Even so, by the most learned Syanda Manda, whose fierce scholarship is unbroken. The guru of the king of knowledge, Nrsimha, of fierce and swift intellect — I praise him. O jewel of the mathematical circle of Makshvaarya, bound to the noble king, by the incomparable one, even the unexcelled one, O he who is beyond description! Those. By Sri Kashyapeya’s calculations, 40 verses bound to the Aditya horoscope method. By them alone, its exposition is made; yet, beyond that, there is none. What is the reasoning? Acquired by the group of disciples, the reasoning is to be done by Karyotivarya — I divine it thus. Hence, I do this, for the people may know. The rope of the arts. Though it is impossible to describe, as said by Ajadanamalaksheshvara. Yet, by the grace of Kuvaisinapadapat. Named Shraddhamanorama, the horse-verse, of Ashvakasunibarcha, near the riverbank of Anopardaravara, in Nandigram, the abode region. Thus, by worshipping the pair of lotus feet of Rasundara, the learned one is pleased — I, the teacher of all scriptures, Sri Kamalakaradevanandana.",
+    "plain_english_summary": "This page opens with invocations to Ganesha and Bhaskara, introduces a commentary on Aditya mantras and horoscopes, credits scholars and teachers, and ends with the author’s self-identification as a learned teacher devoted to Rasundara. It blends devotional, scholarly, and autobiographical elements.",
+    "unresolved_items": [
+      "Unclear compound names: 'अजडनामलक्षेश्वरोक्तः', 'कुवैशिनपादपत्प्रसादतः', 'अश्वश्लोकोऽश्वकसुनिबर्चशोऽनोपर्दारावारतीर'",
+      "Ambiguous segmentation in line 11: 'रसुन्दरचरणकमलयुगलभजनावाप्रसन्नस्तविद्यः'"
+    ]
+  },
+  "scientific_guardrails": {
+    "scholar_verified": false,
+    "accuracy_claimed": false,
+    "confidence_values_calibrated": false,
+    "ground_truth_required_for_cer_wer": true,
+    "translation_label": "AI CANDIDATE — SCHOLAR VALIDATION PENDING",
+    "professor_sanskrit_text_is_ground_truth": true,
+    "professor_supplied_physical_line_breaks": false,
+    "physical_line_alignment_is_project_visual_reviewed": true,
+    "strict_cer_is_primary_professor_gt_htr_metric": true,
+    "content_cer_is_secondary_diagnostic": true,
+    "wer_is_spacing_sensitive": true,
+    "stage6_translation_ground_truth_available": false,
+    "stage6_translation_remains_ai_candidate": true
+  },
+  "frozen_files": {
+    "stage4_decision": {
+      "type": "file",
+      "source": "frozen-provenance://golden-success/stage4-adaptive_20260820_184938/adaptive_stage4/stage4_adaptive_decision.json",
+      "frozen_path": "showcase/cases/golden_success/evidence/stage4_adaptive_decision.json",
+      "bytes": 835,
+      "sha256": "9f9a0603ea4118802e66ac388f88922dee6350314e5fe536069cb83754164aab"
+    },
+    "stage4_summary": {
+      "type": "file",
+      "source": "frozen-provenance://golden-success/stage4-adaptive_20260820_184938/adaptive_stage4/classical_stage4_summary.json",
+      "frozen_path": "showcase/cases/golden_success/evidence/stage4_classical_summary.json",
+      "bytes": 9039,
+      "sha256": "30aa7e466d391882f90b061a88138ef424e969e138651b750a713ac23a8139a5"
+    },
+    "stage4_overlay": {
+      "type": "file",
+      "source": "frozen-provenance://golden-success/stage4-adaptive_20260820_184938/L4/segmentation_overlay.png",
+      "frozen_path": "showcase/cases/golden_success/artifacts/segmentation_overlay.png",
+      "bytes": 3004155,
+      "sha256": "554de5c1439adc279e09d783b00894fa9329916c73e381d7b9d412ef5d03d880"
+    },
+    "stage4_line_manifest": {
+      "type": "file",
+      "source": "frozen-provenance://golden-success/stage4-adaptive_20260820_184938/L4/line_manifest.json",
+      "frozen_path": "showcase/cases/golden_success/artifacts/line_manifest.json",
+      "bytes": 7372,
+      "sha256": "156a704ead9a61ae22bdf931433e5460852d2a271c26134b222bb89beeb4af7a"
+    },
+    "stage5_manifest": {
+      "type": "file",
+      "source": "frozen-provenance://golden-success/stage4-adaptive_20260820_184938/L5/htr_manifest.json",
+      "frozen_path": "showcase/cases/golden_success/artifacts/htr_manifest.json",
+      "bytes": 33274,
+      "sha256": "408d69285b35895846278c03ad9a2424b3ca93d09cf11baf1e6585e9c3c12c82"
+    },
+    "stage5_summary": {
+      "type": "file",
+      "source": "frozen-provenance://golden-success/stage4-adaptive_20260820_184938/showcase_summary/golden_stage5_qwen_summary.json",
+      "frozen_path": "showcase/cases/golden_success/evidence/golden_stage5_qwen_summary.json",
+      "bytes": 17721,
+      "sha256": "5e494bb483b74bc51661aee5a2804400856d70e5bebe073611e42c1a9aa7083e"
+    },
+    "stage5_clean": {
+      "type": "file",
+      "source": "frozen-provenance://golden-success/stage4-adaptive_20260820_184938/L5_qwen_golden_clean/golden_transcription.json",
+      "frozen_path": "showcase/cases/golden_success/evidence/golden_transcription.json",
+      "bytes": 12125,
+      "sha256": "0196904328b4b8fe4c5abc883d1fbb286e31334b844a3e0a39565430a6455744"
+    },
+    "stage6_complete": {
+      "type": "file",
+      "source": "frozen-provenance://golden-success/stage4-adaptive_20260820_184938/L6_golden_semantic_assist/stage6_semantic_candidate_complete.json",
+      "frozen_path": "showcase/cases/golden_success/evidence/stage6_semantic_candidate_complete.json",
+      "bytes": 30829,
+      "sha256": "f67574b76b62aea7ce2f44d8e2792ba7de1ebe8e4e833e98e26265c3c3820ddd"
+    },
+    "stage6_audit": {
+      "type": "file",
+      "source": "frozen-provenance://golden-success/stage4-adaptive_20260820_184938/L6_golden_semantic_assist/stage6_semantic_candidate_complete_audit.json",
+      "frozen_path": "showcase/cases/golden_success/evidence/stage6_semantic_candidate_complete_audit.json",
+      "bytes": 1061,
+      "sha256": "d02746df272aecbcafdf70aceb3868fef95fcf6248f0aa84b3d01ee05e9f37ba"
+    },
+    "profile": {
+      "type": "file",
+      "source": "showcase/config/demo_balanced_profile.json",
+      "frozen_path": "showcase/cases/golden_success/demo_balanced_profile.json",
+      "bytes": 5368,
+      "sha256": "5ba61f4dc1b24239ae52b3604427989dd5e3e53c91591b1c4d9f4dd9097f2c4a"
+    },
+    "professor_ground_truth": "data/ground_truth/golden_success/ground_truth.json",
+    "professor_gt_provenance": "data/ground_truth/golden_success/provenance.json",
+    "professor_gt_stage5_benchmark": "showcase/cases/golden_success/evidence/professor_gt_stage5_benchmark_v1.json"
+  },
+  "professor_ground_truth": {
+    "available": true,
+    "dataset_id": "golden_success_professor_gt_v1",
+    "source_text_status": "PROFESSOR SUPPLIED",
+    "physical_line_alignment": "PROJECT VISUAL REVIEWED",
+    "professor_supplied_physical_line_breaks": false,
+    "line_count": 11,
+    "canonical_ground_truth": "data/ground_truth/golden_success/ground_truth.json",
+    "provenance": "data/ground_truth/golden_success/provenance.json",
+    "benchmark_evidence": "showcase/cases/golden_success/evidence/professor_gt_stage5_benchmark_v1.json",
+    "stage5_accuracy_metrics_authorized": true,
+    "translation_ground_truth_available": false,
+    "stage6_translation_professor_validated": false
+  }
+}

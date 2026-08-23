@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from core.artifact_store import ArtifactStore
 
 
+# STAGE6B_PROVIDER_C_EVIDENCE_V3
 LAYER6B_VERSION = "0.2.0-position-aware-candidate-lattice"
 
 
@@ -575,6 +576,7 @@ def run_layer6b_candidate_reconstruction(
         for provider, key in (
             ("provider_a", "provider_a_hypotheses"),
             ("provider_b", "provider_b_hypotheses"),
+            ("provider_c", "provider_c_hypotheses"),
         ):
             hypotheses = row.get(key, [])
             if not isinstance(hypotheses, list):

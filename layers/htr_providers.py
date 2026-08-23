@@ -912,6 +912,23 @@ def create_htr_provider(
             )
         )
 
+    if provider_name in {
+        "qwen_bedrock",
+        "qwen_bedrock_mantle",
+        "qwen3_vl_bedrock",
+    }:
+        from layers.qwen_bedrock_provider import (
+            DEFAULT_QWEN_BEDROCK_MODEL_ID,
+            QwenBedrockMantleHTRProvider,
+        )
+
+        return QwenBedrockMantleHTRProvider(
+            model_id=(
+                model_id
+                or DEFAULT_QWEN_BEDROCK_MODEL_ID
+            ),
+        )
+
     raise ValueError(
         f"Unknown HTR provider "
         f"'{provider_name}'. "

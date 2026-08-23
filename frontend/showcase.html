@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Adaptive Manuscript Intelligence — Professor Showcase</title>
+  <link rel="stylesheet" href="/showcase-assets/showcase.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">IIT Jodhpur · M.Tech AI/ML Project Showcase</div>
+        <h1>Adaptive Manuscript Intelligence</h1>
+        <p class="subtitle">
+          Stage 0 manuscript profiling + six-stage core processing pipeline with adaptive multi-model orchestration
+        </p>
+      </div>
+      <div class="status-stack">
+        <span class="pill live-pill" id="apiStatus">API CHECKING</span>
+        <span class="pill validated-pill">SCIENTIFIC GUARDRAILS ENABLED</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero-grid">
+        <article class="panel mission-panel">
+          <div class="section-kicker">Research Objective</div>
+          <h2>Recover, reconstruct and interpret difficult Indic manuscripts without hiding uncertainty.</h2>
+          <p>
+            The system combines deterministic image processing, adaptive HTR providers,
+            linguistic reconstruction, evidence-aware trust and scholar escalation.
+          </p>
+          <div class="principle">
+            <strong>Core principle:</strong>
+            use AI when it adds evidence; abstain when the evidence does not support a trusted answer.
+          </div>
+        </article>
+
+        <article class="panel mode-panel">
+          <div class="section-kicker">Execution Mode</div>
+          <div class="mode-switcher" id="modeSwitcher"></div>
+          <div class="mode-description" id="modeDescription"></div>
+          <div class="execution-note">
+            <span class="dot"></span>
+            Frozen showcase cases are displayed as <strong>VALIDATED PRIOR EXECUTION</strong>.
+            Live execution will be enabled separately for selected demo paths.
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <div>
+            <div class="section-kicker">Pipeline Architecture</div>
+            <h2>Stage 0 → Stage 6</h2>
+          </div>
+          <div class="legend">
+            <span><i class="legend-dot deterministic"></i> Deterministic core</span>
+            <span><i class="legend-dot adaptive"></i> Adaptive AI capability</span>
+          </div>
+        </div>
+        <div class="stage-track" id="stageTrack"></div>
+      </section>
+
+      <section class="section-block orchestrator-section">
+        <div class="section-heading">
+          <div>
+            <div class="section-kicker">Key Project Contribution</div>
+            <h2>Adaptive Orchestrator Intelligence</h2>
+          </div>
+          <span class="pill orchestrator-pill">EVIDENCE → DECISION → ACTION</span>
+        </div>
+
+        <div class="orchestrator-grid">
+          <article class="panel">
+            <div class="orchestrator-loop" id="orchestratorLoop"></div>
+          </article>
+
+          <article class="panel intelligence-panel">
+            <div class="section-kicker">Why this is intelligent</div>
+            <h3>It does not run every model blindly.</h3>
+            <p>
+              The orchestrator observes stage evidence, identifies the weak point,
+              invokes only the capability that can add evidence, measures whether
+              the retry helped, and either proceeds or safely escalates.
+            </p>
+            <div class="intelligence-examples" id="intelligenceExamples"></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <div>
+            <div class="section-kicker">Evidence-based Demonstration</div>
+            <h2>Two manuscripts, two responsibilities</h2>
+          </div>
+        </div>
+        <div class="case-grid" id="caseGrid"></div>
+      </section>
+
+      <section class="section-block" id="caseDetailSection">
+        <div class="section-heading">
+          <div>
+            <div class="section-kicker">Selected Case</div>
+            <h2 id="detailTitle">Loading…</h2>
+          </div>
+          <span class="pill validated-pill" id="executionState">VALIDATED PRIOR EXECUTION</span>
+        </div>
+
+        <div class="detail-grid">
+          <article class="panel">
+            <div class="section-kicker">Evidence Metrics</div>
+            <div class="metric-grid" id="metricGrid"></div>
+            <div class="metric-disclaimer" id="metricDisclaimer"></div>
+          </article>
+
+          <article class="panel">
+            <div class="section-kicker">Adaptive Decision</div>
+            <div id="decisionPanel"></div>
+          </article>
+        </div>
+
+        <div class="detail-grid second-row">
+          <article class="panel">
+            <div class="section-kicker">Processing Evidence</div>
+            <div id="evidencePanel"></div>
+          </article>
+
+          <article class="panel">
+            <div class="section-kicker">Scientific Status</div>
+            <div id="scientificPanel"></div>
+          </article>
+        </div>
+
+        <!-- PROFESSOR_GT_PANEL_V1 -->
+        <article class="panel professor-gt-panel hidden" id="professorGtPanel">
+          <div class="section-heading compact-heading">
+            <div>
+              <div class="section-kicker">Professor Ground Truth · Stage 5 Benchmark</div>
+              <h2>Human reference vs independent HTR providers</h2>
+            </div>
+            <span class="pill gt-pill" id="professorGtStatus">GROUND TRUTH AVAILABLE</span>
+          </div>
+          <div id="professorGtContent"></div>
+        </article>
+
+        <article class="panel scholar-workspace" id="scholarWorkspace">
+          <div class="section-heading compact-heading">
+            <div>
+              <div class="section-kicker">Scholar-assist Workspace</div>
+              <h2>Original → Devanagari reconstruction → Translation</h2>
+            </div>
+            <div class="candidate-badge">AI CANDIDATE — SCHOLAR VALIDATION PENDING</div>
+          </div>
+
+          <div class="workspace-grid">
+            <section class="workspace-column">
+              <div class="workspace-label">1 · Original manuscript page</div>
+              <div class="manuscript-frame">
+                <img
+                  id="originalManuscriptImage"
+                  src="/showcase-assets/showcase_original_manuscript.png"
+                  alt="Original manuscript page used in the Golden Success Case"
+                />
+              </div>
+              <p class="workspace-note">
+                Original visual evidence used by the pipeline.
+              </p>
+            </section>
+
+            <section class="workspace-column">
+              <div class="workspace-label">2 · Stage-6 Normalized Devanagari/Sanskrit Candidate</div>
+              <div class="text-scroll devanagari-output" id="devanagariOutcome"></div>
+              <p class="workspace-note">
+                Normalized reconstruction candidate produced after Stage-5 HTR and Stage-6 semantic assistance.
+              </p>
+            </section>
+
+            <section class="workspace-column">
+              <div class="workspace-label">3 · Translation candidate</div>
+              <div class="translation-tabs">
+                <button class="translation-tab active" data-lang="hindi">Hindi</button>
+                <button class="translation-tab" data-lang="english">English</button>
+              </div>
+              <div class="text-scroll translation-output" id="translationOutcome"></div>
+              <p class="workspace-note" id="translationNote">
+                Hindi rendering of the current Stage-6 interpretation; not a separate ground-truth source.
+              </p>
+            </section>
+          </div>
+
+          <div class="summary-box workspace-summary">
+            <strong>Plain-English summary</strong>
+            <p id="plainSummary"></p>
+          </div>
+          <div class="unresolved" id="unresolvedBox"></div>
+        </article>
+
+        <article class="panel no-safe-output hidden" id="noSafeOutput">
+          <div class="section-kicker">Scholar-assist Workspace</div>
+          <h3>No safe translation is being presented for this case.</h3>
+          <p>
+            The orchestrator detected insufficient evidence and deliberately routed the
+            manuscript to scholar review rather than manufacturing a fluent answer.
+          </p>
+        </article>
+      </section>
+
+      <section class="section-block glossary-section">
+        <div class="section-heading">
+          <div>
+            <div class="section-kicker">Plain-language Guide</div>
+            <h2>What the technical terms mean</h2>
+          </div>
+          <span class="pill validated-pill">FOR NON-TECHNICAL REVIEWERS</span>
+        </div>
+        <div class="glossary-grid" id="glossaryGrid"></div>
+      </section>
+
+      <section class="section-block guardrail-section">
+        <div class="section-heading">
+          <div>
+            <div class="section-kicker">Research Integrity</div>
+            <h2>What the system does not claim</h2>
+          </div>
+        </div>
+        <div class="guardrail-grid" id="guardrailGrid"></div>
+      </section>
+    </main>
+
+    <footer>
+      Adaptive Manuscript Intelligence · Professor Showcase · Read-only evidence dashboard
+    </footer>
+  </div>
+
+  <script src="/showcase-assets/showcase.js"></script>
+</body>
+</html>

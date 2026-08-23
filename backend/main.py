@@ -33,14 +33,45 @@ from orchestration.evaluator import (
 from stage5_runtime.coordinator import (
     Stage5PipelineError,
     run_stage5_pipeline,
+    run_stage5_provider_c_retry,
 )
 from stage6_runtime.coordinator import (
     Stage6PipelineError,
     run_stage6_pipeline,
 )
 
+from ground_truth_runtime.evaluator import (
+    GroundTruthValidationError,
+    attach_and_evaluate_ground_truth,
+    load_ground_truth_bundle,
+)
+
 
 app = FastAPI(title="Manuscript Intelligence Platform")
+
+# === SHOWCASE DASHBOARD BEGIN ===
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+
+SHOWCASE_FRONTEND_DIR = (Path(__file__).resolve().parents[1] / "frontend").resolve()
+
+app.mount(
+    "/showcase-assets",
+    StaticFiles(directory=str(SHOWCASE_FRONTEND_DIR)),
+    name="showcase-assets",
+)
+
+@app.get("/showcase", include_in_schema=False)
+def showcase_dashboard():
+    return FileResponse(str(SHOWCASE_FRONTEND_DIR / "showcase.html"))
+# === SHOWCASE DASHBOARD END ===
+
+
+# === SHOWCASE API BEGIN ===
+from showcase.api.showcase_router import router as showcase_router
+app.include_router(showcase_router)
+# === SHOWCASE API END ===
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -58,6 +89,12 @@ STAGE5_ACTIVE_RUNS_LOCK = threading.Lock()
 
 STAGE6_ACTIVE_RUNS: set[str] = set()
 STAGE6_ACTIVE_RUNS_LOCK = threading.Lock()
+
+
+# GENERIC_PLATFORM_ROUTE_V1
+@app.get("/platform", include_in_schema=False)
+def platform_page():
+    return FileResponse("frontend/platform.html")
 
 
 @app.get("/")
@@ -912,10 +949,148 @@ def research_stage5_htr(
                 "htr_readiness.json was not produced."
             )
 
+
+        # STAGE5_AUTO_PROVIDER_C_V1
+        # Provider C is invoked automatically only when segmentation is healthy
+        # and baseline A/B HTR readiness is weak. H remains a readiness/evidence
+        # signal; it is not accuracy, probability, CER, or WER.
+        readiness_page_for_c = readiness.get("page", {}) or {}
+        readiness_evidence_for_c = (
+            readiness_page_for_c.get("evidence", {}) or {}
+        )
+
+        S_for_c = readiness_evidence_for_c.get(
+            "segmentation_readiness"
+        )
+        H_for_c = readiness_page_for_c.get(
+            "htr_readiness_H_page"
+        )
+
+        try:
+            S_for_c = float(S_for_c)
+        except (TypeError, ValueError):
+            S_for_c = None
+
+        try:
+            H_for_c = float(H_for_c)
+        except (TypeError, ValueError):
+            H_for_c = None
+
+        provider_c_adaptive = {
+            "runtime_available": True,
+            "trigger_policy": {
+                "minimum_segmentation_readiness_S": 0.75,
+                "maximum_baseline_htr_readiness_H": 0.50,
+            },
+            "eligible": bool(
+                S_for_c is not None
+                and H_for_c is not None
+                and S_for_c >= 0.75
+                and H_for_c < 0.50
+            ),
+            "attempted": False,
+            "status": "not_triggered",
+            "baseline": {
+                "S": S_for_c,
+                "H_ab": H_for_c,
+            },
+            "scientific_guardrail": (
+                "Provider C supplies independent visual HTR evidence. "
+                "Changes in H are readiness/evidence changes and do not establish transcription accuracy without verified ground truth."
+            ),
+        }
+
+        if provider_c_adaptive["eligible"]:
+            provider_c_adaptive["attempted"] = True
+            provider_c_adaptive["status"] = "running"
+
+            try:
+                provider_c_summary = run_stage5_provider_c_retry(
+                    project_root=PROJECT_ROOT,
+                    run_id=run_id,
+                    artifacts=PROJECT_ROOT / "artifacts",
+                )
+
+                provider_c_adaptive.update(
+                    {
+                        "status": "completed",
+                        "provider_c_executed": True,
+                        "best_candidate_pair": (
+                            provider_c_summary.get(
+                                "best_candidate_pair"
+                            )
+                        ),
+                        "best_candidate_H": (
+                            provider_c_summary.get(
+                                "best_candidate_H"
+                            )
+                        ),
+                        "delta_H": provider_c_summary.get(
+                            "delta_H_vs_ab"
+                        ),
+                        "H_improved": provider_c_summary.get(
+                            "H_improved"
+                        ),
+                        "canonical_ab_readiness_preserved": (
+                            provider_c_summary.get(
+                                "canonical_ab_readiness_preserved",
+                                True,
+                            )
+                        ),
+                        "summary_path": provider_c_summary.get(
+                            "summary_path"
+                        ),
+                        "artifacts": provider_c_summary.get(
+                            "artifacts",
+                            {},
+                        ),
+                    }
+                )
+
+            except Exception as provider_c_exc:
+                # PROVIDER_C_FAILED_ATTEMPT_PROVENANCE_V1
+                provider_c_error = (
+                    f"{type(provider_c_exc).__name__}: "
+                    f"{provider_c_exc}"
+                )
+                provider_c_adaptive.update(
+                    {
+                        "status": "failed_ab_preserved",
+                        "provider_c_executed": False,
+                        "error": provider_c_error,
+                        "canonical_ab_readiness_preserved": True,
+                    }
+                )
+                store.write_json(
+                    "L5_adaptive_C/provider_c_retry_summary.json",
+                    {
+                        "schema_version": "1.0-provider-c-failed-attempt",
+                        "provider_c_executed": False,
+                        "attempted": True,
+                        "eligible": True,
+                        "runtime_available": True,
+                        "status": "failed_ab_preserved",
+                        "baseline": {
+                            "S": S_for_c,
+                            "H_ab": H_for_c,
+                        },
+                        "error": provider_c_error,
+                        "canonical_ab_readiness_preserved": True,
+                        "scientific_guardrail": (
+                            "Provider C failed after an actual adaptive attempt. "
+                            "Canonical H(A+B) remains unchanged; failure is not "
+                            "transcription accuracy or Ground Truth."
+                        ),
+                    },
+                )
+
+        provider_c_remaining_available = not bool(
+            provider_c_adaptive["attempted"]
+        )
         report5 = evaluate_and_save_layer5(
             store,
             readiness,
-            third_provider_available=third_provider_available,
+            third_provider_available=provider_c_remaining_available,
         )
 
         reports = current_layer_reports(
@@ -992,6 +1167,7 @@ def research_stage5_htr(
                 "S": final.get("signals", {}).get("S"),
                 "H": final.get("signals", {}).get("H"),
             },
+            "adaptive_provider_c": provider_c_adaptive,
             "htr_readiness": {
                 "completion": readiness_evidence.get("completion"),
                 "script_integrity": readiness_evidence.get(
@@ -1091,6 +1267,133 @@ def research_stage5_htr(
 
 
 
+# GENERIC_PROVIDER_C_ENDPOINT_V1
+@app.post("/pipeline/stage5/provider-c/{run_id}")
+def research_stage5_provider_c_retry(run_id: str):
+    """
+    Execute Qwen3-VL / Bedrock Mantle as an independent adaptive HTR retry.
+
+    The original A/B readiness artifact remains unchanged.
+    """
+    store = ArtifactStore("artifacts", run_id)
+
+    layer4_report = load_json_if_exists(
+        store.path("orchestration/layer4_report.json")
+    )
+    stage5_bundle = load_stage5_artifact_bundle(store)
+    readiness_ab = stage5_bundle.get("htr_readiness", {}) or {}
+
+    if not layer4_report or not readiness_ab:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": (
+                    "Provider C requires completed Stage 4 and baseline "
+                    "Stage-5 A/B execution."
+                ),
+                "required_action": "Complete Stage 5 A/B before Provider C.",
+            },
+        )
+
+    with STAGE5_ACTIVE_RUNS_LOCK:
+        if run_id in STAGE5_ACTIVE_RUNS:
+            return JSONResponse(
+                status_code=409,
+                content={
+                    "error": "Stage 5 is already running for this run_id.",
+                    "run_id": run_id,
+                },
+            )
+        STAGE5_ACTIVE_RUNS.add(run_id)
+
+    try:
+        summary = run_stage5_provider_c_retry(
+            project_root=PROJECT_ROOT,
+            run_id=run_id,
+            artifacts=PROJECT_ROOT / "artifacts",
+        )
+
+        manifest_c = load_json_if_exists(
+            store.path("L5_provider_C/htr_manifest.json")
+        )
+
+        lines = []
+        for row in manifest_c.get("lines", []) if manifest_c else []:
+            lines.append(
+                {
+                    "line_id": row.get("line_id"),
+                    "reading_order": row.get("reading_order"),
+                    "devanagari_text": row.get("devanagari_text")
+                    or row.get("raw_text")
+                    or "",
+                    "review_required": row.get("review_required"),
+                    "runtime_ms": row.get("runtime_ms"),
+                }
+            )
+
+        return {
+            "run_id": run_id,
+            "research_stage": 5,
+            "stage_name": "adaptive_visual_htr_provider_c",
+            "provider_c": {
+                "provider_id": (
+                    manifest_c.get("provider", {}).get("provider_id")
+                    if manifest_c
+                    else "qwen_bedrock_mantle"
+                ),
+                "model_id": (
+                    manifest_c.get("provider", {}).get("model_id")
+                    if manifest_c
+                    else None
+                ),
+                "recognized_lines": (
+                    manifest_c.get("metrics", {}).get("recognized_lines")
+                    if manifest_c
+                    else None
+                ),
+                "lines": lines,
+            },
+            "adaptive_evidence": {
+                "baseline_pair": summary.get("baseline", {}).get("pair"),
+                "H_ab": summary.get("baseline", {}).get("H"),
+                "H_ac": summary.get("candidate_pairs", {}).get("A+C", {}).get("H"),
+                "H_bc": summary.get("candidate_pairs", {}).get("B+C", {}).get("H"),
+                "best_candidate_pair": summary.get("best_candidate_pair"),
+                "best_candidate_H": summary.get("best_candidate_H"),
+                "delta_H": summary.get("delta_H_vs_ab"),
+                "H_improved": summary.get("H_improved"),
+            },
+            "scientific_interpretation": summary.get(
+                "scientific_interpretation"
+            ),
+            "canonical_ab_readiness_preserved": True,
+            "runtime_seconds": summary.get("runtime_seconds"),
+            "artifacts": summary.get("artifacts", {}),
+        }
+
+    except Stage5PipelineError as exc:
+        return JSONResponse(
+            status_code=500,
+            content={
+                "error": "Provider-C adaptive HTR execution failed.",
+                "failed_stage": exc.stage,
+                "detail": str(exc),
+                "log_path": exc.log_path,
+            },
+        )
+    except Exception as exc:
+        return JSONResponse(
+            status_code=500,
+            content={
+                "error": "Provider-C adaptive HTR execution failed.",
+                "detail": str(exc),
+            },
+        )
+    finally:
+        with STAGE5_ACTIVE_RUNS_LOCK:
+            STAGE5_ACTIVE_RUNS.discard(run_id)
+
+
 @app.post("/pipeline/stage6/run/{run_id}")
 def research_stage6_run(
     run_id: str,
@@ -1178,6 +1481,93 @@ def research_stage6_run(
         stage6e = stage6_bundle.get("stage6e_manifest", {}) or {}
         stage6f = stage6_bundle.get("stage6f_manifest", {}) or {}
         retry_state = stage6_bundle.get("retry_state", {}) or {}
+
+        # STAGE6G_PROVIDER_C_RETRY_PROVENANCE_V2
+        # Provider C already executed during Stage 5 is an attempted machine
+        # strategy, not an unused future capability. Provenance only:
+        # H(A+B), T(p), CER/WER, thresholds, and reconstruction are unchanged.
+        provider_c_retry_summary = load_json_if_exists(
+            store.path(
+                "L5_adaptive_C",
+                "provider_c_retry_summary.json",
+            )
+        )
+        provider_c_manifest = load_json_if_exists(
+            store.path(
+                "L5_provider_C",
+                "htr_manifest.json",
+            )
+        )
+
+        provider_c_already_attempted = bool(
+            provider_c_retry_summary
+            and provider_c_retry_summary.get(
+                "provider_c_executed",
+                False,
+            )
+            and provider_c_manifest
+        )
+
+        if provider_c_already_attempted:
+            retry_state = dict(retry_state)
+            attempted_actions = [
+                str(value)
+                for value in retry_state.get(
+                    "attempted_actions",
+                    [],
+                )
+                if value
+            ]
+
+            if "run_third_htr_provider" not in attempted_actions:
+                attempted_actions.append(
+                    "run_third_htr_provider"
+                )
+
+            try:
+                existing_attempt_count = int(
+                    retry_state.get("attempt_count", 0) or 0
+                )
+            except (TypeError, ValueError):
+                existing_attempt_count = 0
+
+            retry_state["attempted_actions"] = attempted_actions
+            retry_state["attempt_count"] = max(
+                existing_attempt_count,
+                len(set(attempted_actions)),
+                1,
+            )
+
+            provenance = dict(
+                retry_state.get("provenance", {}) or {}
+            )
+            provenance["provider_c_stage5_adaptive_attempt"] = {
+                "recorded": True,
+                "action": "run_third_htr_provider",
+                "source_summary": (
+                    "L5_adaptive_C/provider_c_retry_summary.json"
+                ),
+                "source_manifest": (
+                    "L5_provider_C/htr_manifest.json"
+                ),
+                "provider_c_executed": True,
+                "canonical_ab_readiness_preserved": bool(
+                    provider_c_retry_summary.get(
+                        "canonical_ab_readiness_preserved",
+                        False,
+                    )
+                ),
+                "scientific_guardrail": (
+                    "Retry accounting is provenance only; Provider C is "
+                    "candidate visual HTR evidence, not ground truth or accuracy."
+                ),
+            }
+            retry_state["provenance"] = provenance
+
+            store.write_json(
+                "orchestration/stage6_retry_state.json",
+                retry_state,
+            )
 
         if not stage6e:
             raise RuntimeError(
@@ -1444,6 +1834,93 @@ def research_stage6_finalize(
     stage6e = stage6_bundle.get("stage6e_manifest", {}) or {}
     stage6f = stage6_bundle.get("stage6f_manifest", {}) or {}
     retry_state = stage6_bundle.get("retry_state", {}) or {}
+
+    # STAGE6G_PROVIDER_C_RETRY_PROVENANCE_V2
+    # Provider C already executed during Stage 5 is an attempted machine
+    # strategy, not an unused future capability. Provenance only:
+    # H(A+B), T(p), CER/WER, thresholds, and reconstruction are unchanged.
+    provider_c_retry_summary = load_json_if_exists(
+        store.path(
+            "L5_adaptive_C",
+            "provider_c_retry_summary.json",
+        )
+    )
+    provider_c_manifest = load_json_if_exists(
+        store.path(
+            "L5_provider_C",
+            "htr_manifest.json",
+        )
+    )
+
+    provider_c_already_attempted = bool(
+        provider_c_retry_summary
+        and provider_c_retry_summary.get(
+            "provider_c_executed",
+            False,
+        )
+        and provider_c_manifest
+    )
+
+    if provider_c_already_attempted:
+        retry_state = dict(retry_state)
+        attempted_actions = [
+            str(value)
+            for value in retry_state.get(
+                "attempted_actions",
+                [],
+            )
+            if value
+        ]
+
+        if "run_third_htr_provider" not in attempted_actions:
+            attempted_actions.append(
+                "run_third_htr_provider"
+            )
+
+        try:
+            existing_attempt_count = int(
+                retry_state.get("attempt_count", 0) or 0
+            )
+        except (TypeError, ValueError):
+            existing_attempt_count = 0
+
+        retry_state["attempted_actions"] = attempted_actions
+        retry_state["attempt_count"] = max(
+            existing_attempt_count,
+            len(set(attempted_actions)),
+            1,
+        )
+
+        provenance = dict(
+            retry_state.get("provenance", {}) or {}
+        )
+        provenance["provider_c_stage5_adaptive_attempt"] = {
+            "recorded": True,
+            "action": "run_third_htr_provider",
+            "source_summary": (
+                "L5_adaptive_C/provider_c_retry_summary.json"
+            ),
+            "source_manifest": (
+                "L5_provider_C/htr_manifest.json"
+            ),
+            "provider_c_executed": True,
+            "canonical_ab_readiness_preserved": bool(
+                provider_c_retry_summary.get(
+                    "canonical_ab_readiness_preserved",
+                    False,
+                )
+            ),
+            "scientific_guardrail": (
+                "Retry accounting is provenance only; Provider C is "
+                "candidate visual HTR evidence, not ground truth or accuracy."
+            ),
+        }
+        retry_state["provenance"] = provenance
+
+        store.write_json(
+            "orchestration/stage6_retry_state.json",
+            retry_state,
+        )
 
     missing = []
 
@@ -1861,3 +2338,361 @@ def get_orchestration_report(run_id: str):
         "images": images,
     }
 
+# GENERIC_PLATFORM_UI_STATE_V1
+@app.get("/pipeline/ui-state/{run_id}")
+def generic_platform_ui_state(run_id: str):
+    """
+    Read-only presentation contract for the generic /platform workspace.
+
+    This endpoint does not execute HTR, reconstruction, translation, retries,
+    or scientific scoring. It only projects already-persisted Stage-5/Stage-6
+    artifacts into a browser-safe evidence view.
+    """
+    store = ArtifactStore("artifacts", run_id)
+
+    stage5_bundle = load_stage5_artifact_bundle(store)
+    readiness = stage5_bundle.get("htr_readiness", {}) or {}
+    readiness_page = readiness.get("page", {}) or {}
+    comparison = stage5_bundle.get("provider_comparison", {}) or {}
+    comparison_aggregate = comparison.get("aggregate", {}) or {}
+    transcription = stage5_transcription_view(stage5_bundle)
+
+    manifest_c = load_json_if_exists(
+        store.path("L5_provider_C", "htr_manifest.json")
+    )
+    provider_c_summary = load_json_if_exists(
+        store.path(
+            "L5_adaptive_C",
+            "provider_c_retry_summary.json",
+        )
+    )
+
+    provider_c_lines = []
+    if isinstance(manifest_c, dict):
+        for row in manifest_c.get("lines", []) or []:
+            if not isinstance(row, dict):
+                continue
+
+            exact = str(
+                row.get(
+                    "devanagari_text",
+                    row.get("devanagari", ""),
+                )
+                or ""
+            )
+
+            provider_c_lines.append(
+                {
+                    "line_id": row.get("line_id"),
+                    "reading_order": row.get("reading_order"),
+                    "devanagari_text": exact,
+                    "devanagari_display": (
+                        simplify_devanagari_for_display(exact)
+                    ),
+                    "raw_text": row.get("raw_text"),
+                    "review_required": row.get("review_required"),
+                    "runtime_ms": row.get("runtime_ms"),
+                }
+            )
+
+    provider_c_page_display = "\n".join(
+        str(row.get("devanagari_display", "") or "")
+        for row in provider_c_lines
+        if row.get("devanagari_display")
+    )
+
+    provider_meta = (
+        manifest_c.get("provider", {})
+        if isinstance(manifest_c, dict)
+        else {}
+    ) or {}
+
+    baseline = (
+        provider_c_summary.get("baseline", {})
+        if isinstance(provider_c_summary, dict)
+        else {}
+    ) or {}
+    candidate_pairs = (
+        provider_c_summary.get("candidate_pairs", {})
+        if isinstance(provider_c_summary, dict)
+        else {}
+    ) or {}
+
+    ac = candidate_pairs.get("A+C", {}) or {}
+    bc = candidate_pairs.get("B+C", {}) or {}
+
+    provider_c_executed = bool(
+        (
+            provider_c_summary.get("provider_c_executed", False)
+            if isinstance(provider_c_summary, dict)
+            else False
+        )
+        or provider_c_lines
+    )
+
+    # PROVIDER_C_FAILED_ATTEMPT_UI_STATE_V1
+    provider_c_summary_status = (
+        provider_c_summary.get("status")
+        if isinstance(provider_c_summary, dict)
+        else None
+    )
+
+    adaptive_evidence = {
+        "attempted": bool(provider_c_summary),
+        "status": (
+            "completed"
+            if provider_c_executed
+            else (
+                provider_c_summary_status
+                or ("failed" if provider_c_summary else "not_attempted")
+            )
+        ),
+        "provider_c_executed": provider_c_executed,
+        "H_ab": baseline.get(
+            "H",
+            readiness_page.get("htr_readiness_H_page"),
+        ),
+        "H_ac": ac.get("H"),
+        "H_bc": bc.get("H"),
+        "best_candidate_pair": (
+            provider_c_summary.get("best_candidate_pair")
+            if isinstance(provider_c_summary, dict)
+            else None
+        ),
+        "best_candidate_H": (
+            provider_c_summary.get("best_candidate_H")
+            if isinstance(provider_c_summary, dict)
+            else None
+        ),
+        "delta_H": (
+            provider_c_summary.get("delta_H_vs_ab")
+            if isinstance(provider_c_summary, dict)
+            else None
+        ),
+        "H_improved": (
+            provider_c_summary.get("H_improved")
+            if isinstance(provider_c_summary, dict)
+            else None
+        ),
+        "canonical_ab_readiness_preserved": (
+            provider_c_summary.get(
+                "canonical_ab_readiness_preserved",
+                True,
+            )
+            if isinstance(provider_c_summary, dict)
+            else True
+        ),
+        "scientific_guardrail": (
+            "H(A+B) remains the canonical Stage-5 readiness signal. "
+            "H(A+C), H(B+C) and delta-H are comparative adaptive "
+            "evidence only; they are not recognition accuracy."
+        ),
+    }
+
+    stage6_bundle = load_stage6_artifact_bundle(store)
+    stage6e = stage6_bundle.get("stage6e_manifest", {}) or {}
+    stage6f = stage6_bundle.get("stage6f_manifest", {}) or {}
+    stage6e_metrics = stage6e.get("metrics", {}) or {}
+    stage6f_metrics = stage6f.get("metrics", {}) or {}
+
+    layer6_report = load_json_if_exists(
+        store.path("orchestration", "layer6_report.json")
+    )
+    final_decision = load_json_if_exists(
+        store.path("orchestration", "final_decision.json")
+    )
+
+    run_gt_bundle = load_ground_truth_bundle(
+        PROJECT_ROOT / "artifacts" / run_id
+    )
+    run_gt = run_gt_bundle.get("ground_truth")
+    run_gt_provenance = run_gt_bundle.get("provenance")
+    run_gt_benchmark = run_gt_bundle.get("stage5_benchmark")
+
+    run_gt_available = bool(
+        run_gt
+        and run_gt_provenance
+        and run_gt_benchmark
+    )
+
+    run_gt_summary = {
+        "available": run_gt_available,
+        "dataset_id": (
+            run_gt.get("dataset_id")
+            if isinstance(run_gt, dict)
+            else None
+        ),
+        "source_text_status": (
+            run_gt.get("source_text_status")
+            if isinstance(run_gt, dict)
+            else None
+        ),
+        "physical_line_alignment_status": (
+            run_gt.get("physical_line_alignment_status")
+            if isinstance(run_gt, dict)
+            else None
+        ),
+        "translation_ground_truth_available": bool(
+            run_gt.get(
+                "translation_ground_truth_available",
+                False,
+            )
+            if isinstance(run_gt, dict)
+            else False
+        ),
+    }
+
+    stage6_view = {
+        "available": bool(stage6e or stage6f),
+        "signals": {
+            "H": readiness_page.get("htr_readiness_H_page"),
+            "T": stage6f_metrics.get("page_T"),
+        },
+        "stage6": {
+            "trust_status": stage6f_metrics.get("page_T_status"),
+            "unresolved_lines": stage6f_metrics.get("unresolved_lines"),
+            "adaptive_retry_required_lines": stage6f_metrics.get(
+                "adaptive_retry_required_lines"
+            ),
+            "translation_eligible_lines": stage6f_metrics.get(
+                "translation_eligible_lines"
+            ),
+            "reconstructed_lines": stage6e_metrics.get(
+                "reconstructed_lines"
+            ),
+            "partially_supported_lines": stage6e_metrics.get(
+                "partially_supported_lines"
+            ),
+            "abstained_lines": stage6e_metrics.get("abstained_lines"),
+            "normalized_lines": stage6e_metrics.get("normalized_lines"),
+            "reconstruction_evidence_index": stage6e_metrics.get(
+                "page_reconstruction_evidence_index"
+            ),
+        },
+        "adaptive_routing": (
+            layer6_report if isinstance(layer6_report, dict) else {}
+        ),
+        "final_orchestration": (
+            final_decision if isinstance(final_decision, dict) else {}
+        ),
+    }
+
+    return {
+        "run_id": run_id,
+        "presentation_contract": "generic-platform-provider-c-ui-v2-ground-truth",
+        "stage5": {
+            "available": bool(readiness),
+            "signals": {
+                "H": readiness_page.get("htr_readiness_H_page")
+            },
+            "htr_readiness": {
+                "H": readiness_page.get("htr_readiness_H_page"),
+                "ground_truth_available": readiness_page.get(
+                    "ground_truth_available",
+                    False,
+                ),
+                "cer": readiness_page.get("cer"),
+                "wer": readiness_page.get("wer"),
+            },
+            "provider_comparison": {
+                "mean_content_char_similarity": comparison_aggregate.get(
+                    "mean_content_char_similarity"
+                ),
+                "median_content_char_similarity": comparison_aggregate.get(
+                    "median_content_char_similarity"
+                ),
+            },
+            "transcription": transcription,
+            "provider_c": {
+                "available": bool(
+                    manifest_c
+                    or (
+                        isinstance(provider_c_summary, dict)
+                        and provider_c_summary.get("runtime_available", False)
+                    )
+                ),
+                "executed": provider_c_executed,
+                "provider_id": provider_meta.get("provider_id"),
+                "model_id": provider_meta.get("model_id"),
+                "page_display": provider_c_page_display or None,
+                "lines": provider_c_lines,
+            },
+            "adaptive_evidence": adaptive_evidence,
+            "ground_truth": run_gt_summary,
+            "ground_truth_benchmark": (
+                run_gt_benchmark
+                if isinstance(run_gt_benchmark, dict)
+                else {}
+            ),
+        },
+        "stage6": stage6_view,
+        "scientific_boundary": {
+            "H_is_accuracy": False,
+            "T_is_accuracy": False,
+            "pairwise_H_is_accuracy": False,
+            "provider_c_is_ground_truth": False,
+            "translation_is_scholar_validated": False,
+        },
+    }
+
+# GENERIC_RUN_GROUND_TRUTH_V1
+@app.post("/pipeline/ground-truth/{run_id}")
+def attach_generic_verified_ground_truth(run_id: str, payload: dict):
+    """Attach externally verified transcription Ground Truth to an existing run."""
+    run_dir = PROJECT_ROOT / "artifacts" / run_id
+
+    if not run_dir.exists():
+        return JSONResponse(
+            status_code=404,
+            content={"error": "Unknown run_id", "run_id": run_id},
+        )
+
+    try:
+        return attach_and_evaluate_ground_truth(
+            run_id=run_id,
+            run_dir=run_dir,
+            payload=payload,
+        )
+    except GroundTruthValidationError as exc:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": "Ground Truth validation failed",
+                "detail": str(exc),
+                "run_id": run_id,
+            },
+        )
+
+
+@app.get("/pipeline/ground-truth/{run_id}")
+def get_generic_verified_ground_truth(run_id: str):
+    """Read-only status/benchmark view for run-level transcription Ground Truth."""
+    run_dir = PROJECT_ROOT / "artifacts" / run_id
+
+    if not run_dir.exists():
+        return JSONResponse(
+            status_code=404,
+            content={"error": "Unknown run_id", "run_id": run_id},
+        )
+
+    bundle = load_ground_truth_bundle(run_dir)
+    benchmark = bundle.get("stage5_benchmark")
+
+    return {
+        "run_id": run_id,
+        "ground_truth_available": bool(
+            bundle.get("ground_truth")
+            and bundle.get("provenance")
+            and benchmark
+        ),
+        "ground_truth": bundle.get("ground_truth"),
+        "provenance": bundle.get("provenance"),
+        "stage5_benchmark": benchmark,
+        "scientific_boundary": {
+            "CER_WER_scope": "Stage-5 transcription only",
+            "H_unchanged": True,
+            "T_unchanged": True,
+            "routing_thresholds_unchanged": True,
+            "translation_validation_separate": True,
+        },
+    }

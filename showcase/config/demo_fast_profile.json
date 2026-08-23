@@ -1,0 +1,30 @@
+{
+  "profile_id": "demo_fast",
+  "profile_version": "0.1.0",
+  "purpose": "Backup profile when professor requests the quickest possible path.",
+  "inherits_from": "demo_balanced",
+  "changes": {
+    "stage5": {
+      "golden_case_preferred_provider_order": [
+        "qwen_bedrock_mantle"
+      ],
+      "runtime_bounds": {
+        "max_lines_live_default": 3,
+        "allow_single_line_quick_demo": true
+      }
+    },
+    "stage6": {
+      "candidate_output_mode_when_untrusted": true,
+      "allow_translation_candidate_even_if_untrusted": true,
+      "prefer_cached_or_prevalidated_outputs": true
+    },
+    "performance": {
+      "bounded_retrieval_for_live_demo": true,
+      "reuse_stage6_indexes_when_available": true,
+      "intended_runtime_guidance": {
+        "golden_case_live_target_minutes": 1,
+        "difficult_case_live_target_minutes": 0.5
+      }
+    }
+  }
+}

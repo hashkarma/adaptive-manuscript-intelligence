@@ -1,0 +1,278 @@
+{
+  "readiness_version": "0.1.0-stage5f-htr-readiness",
+  "definition": {
+    "H": "HTR system readiness for downstream processing; NOT recognition accuracy.",
+    "fusion_method": "weighted_geometric_mean",
+    "weights": {
+      "segmentation_readiness": 0.1,
+      "completion": 0.05,
+      "script_integrity": 0.05,
+      "decoder_reliability": 0.3,
+      "sequence_quality": 0.15,
+      "cross_provider_agreement": 0.35
+    },
+    "reason": "Geometric fusion prevents high segmentation/script scores from hiding low decoder reliability or low cross-provider agreement.",
+    "ground_truth_dependency": "CER/WER remain unavailable until scholar-verified ground truth exists."
+  },
+  "page": {
+    "evidence": {
+      "segmentation_readiness": 0.8854,
+      "completion": 1.0,
+      "script_integrity": 0.9929,
+      "decoder_reliability": 0.1303,
+      "sequence_quality": 0.9301,
+      "cross_provider_agreement": 0.2575
+    },
+    "htr_readiness_H_page": 0.3297,
+    "line_H_mean": 0.3272,
+    "line_H_median": 0.3154,
+    "low_readiness_lines": 11,
+    "low_agreement_lines": 11,
+    "total_lines": 11,
+    "routing": {
+      "decision": "third_provider_or_scholar_review",
+      "reason_codes": [
+        "LOW_CROSS_PROVIDER_AGREEMENT",
+        "LOW_DECODER_RELIABILITY",
+        "PAGE_WIDE_LOW_CROSS_PROVIDER_AGREEMENT"
+      ]
+    },
+    "cer": null,
+    "wer": null,
+    "ground_truth_available": false,
+    "recognition_accuracy_calibrated": false
+  },
+  "lines": [
+    {
+      "line_id": "line_001",
+      "reading_order": 1,
+      "evidence": {
+        "segmentation_readiness": 0.8854,
+        "completion": 1.0,
+        "script_integrity": 1.0,
+        "decoder_reliability": 0.1174,
+        "sequence_quality": 0.8041,
+        "cross_provider_agreement": 0.2027
+      },
+      "htr_readiness_H_line": 0.2876,
+      "routing": {
+        "decision": "third_provider_or_scholar_review",
+        "reason_codes": [
+          "LOW_CROSS_PROVIDER_AGREEMENT",
+          "LOW_DECODER_RELIABILITY"
+        ]
+      },
+      "interpretation": "System HTR readiness only. Not recognition accuracy."
+    },
+    {
+      "line_id": "line_002",
+      "reading_order": 2,
+      "evidence": {
+        "segmentation_readiness": 0.8854,
+        "completion": 1.0,
+        "script_integrity": 1.0,
+        "decoder_reliability": 0.1184,
+        "sequence_quality": 0.9852,
+        "cross_provider_agreement": 0.2444
+      },
+      "htr_readiness_H_line": 0.3174,
+      "routing": {
+        "decision": "third_provider_or_scholar_review",
+        "reason_codes": [
+          "LOW_CROSS_PROVIDER_AGREEMENT",
+          "LOW_DECODER_RELIABILITY"
+        ]
+      },
+      "interpretation": "System HTR readiness only. Not recognition accuracy."
+    },
+    {
+      "line_id": "line_003",
+      "reading_order": 3,
+      "evidence": {
+        "segmentation_readiness": 0.8854,
+        "completion": 1.0,
+        "script_integrity": 1.0,
+        "decoder_reliability": 0.1187,
+        "sequence_quality": 0.9433,
+        "cross_provider_agreement": 0.3535
+      },
+      "htr_readiness_H_line": 0.3591,
+      "routing": {
+        "decision": "third_provider_or_scholar_review",
+        "reason_codes": [
+          "LOW_CROSS_PROVIDER_AGREEMENT",
+          "LOW_DECODER_RELIABILITY"
+        ]
+      },
+      "interpretation": "System HTR readiness only. Not recognition accuracy."
+    },
+    {
+      "line_id": "line_004",
+      "reading_order": 4,
+      "evidence": {
+        "segmentation_readiness": 0.8854,
+        "completion": 1.0,
+        "script_integrity": 1.0,
+        "decoder_reliability": 0.2445,
+        "sequence_quality": 0.9575,
+        "cross_provider_agreement": 0.3034
+      },
+      "htr_readiness_H_line": 0.4237,
+      "routing": {
+        "decision": "third_provider_or_scholar_review",
+        "reason_codes": [
+          "LOW_CROSS_PROVIDER_AGREEMENT",
+          "LOW_DECODER_RELIABILITY"
+        ]
+      },
+      "interpretation": "System HTR readiness only. Not recognition accuracy."
+    },
+    {
+      "line_id": "line_005",
+      "reading_order": 5,
+      "evidence": {
+        "segmentation_readiness": 0.8854,
+        "completion": 1.0,
+        "script_integrity": 0.922,
+        "decoder_reliability": 0.1176,
+        "sequence_quality": 0.9296,
+        "cross_provider_agreement": 0.2427
+      },
+      "htr_readiness_H_line": 0.312,
+      "routing": {
+        "decision": "third_provider_or_scholar_review",
+        "reason_codes": [
+          "LOW_CROSS_PROVIDER_AGREEMENT",
+          "LOW_DECODER_RELIABILITY"
+        ]
+      },
+      "interpretation": "System HTR readiness only. Not recognition accuracy."
+    },
+    {
+      "line_id": "line_006",
+      "reading_order": 6,
+      "evidence": {
+        "segmentation_readiness": 0.8854,
+        "completion": 1.0,
+        "script_integrity": 1.0,
+        "decoder_reliability": 0.117,
+        "sequence_quality": 0.9306,
+        "cross_provider_agreement": 0.2188
+      },
+      "htr_readiness_H_line": 0.3017,
+      "routing": {
+        "decision": "third_provider_or_scholar_review",
+        "reason_codes": [
+          "LOW_CROSS_PROVIDER_AGREEMENT",
+          "LOW_DECODER_RELIABILITY"
+        ]
+      },
+      "interpretation": "System HTR readiness only. Not recognition accuracy."
+    },
+    {
+      "line_id": "line_007",
+      "reading_order": 7,
+      "evidence": {
+        "segmentation_readiness": 0.8854,
+        "completion": 1.0,
+        "script_integrity": 1.0,
+        "decoder_reliability": 0.13,
+        "sequence_quality": 0.9105,
+        "cross_provider_agreement": 0.2637
+      },
+      "htr_readiness_H_line": 0.3313,
+      "routing": {
+        "decision": "third_provider_or_scholar_review",
+        "reason_codes": [
+          "LOW_CROSS_PROVIDER_AGREEMENT",
+          "LOW_DECODER_RELIABILITY"
+        ]
+      },
+      "interpretation": "System HTR readiness only. Not recognition accuracy."
+    },
+    {
+      "line_id": "line_008",
+      "reading_order": 8,
+      "evidence": {
+        "segmentation_readiness": 0.8854,
+        "completion": 1.0,
+        "script_integrity": 1.0,
+        "decoder_reliability": 0.1174,
+        "sequence_quality": 0.9742,
+        "cross_provider_agreement": 0.3152
+      },
+      "htr_readiness_H_line": 0.3455,
+      "routing": {
+        "decision": "third_provider_or_scholar_review",
+        "reason_codes": [
+          "LOW_CROSS_PROVIDER_AGREEMENT",
+          "LOW_DECODER_RELIABILITY"
+        ]
+      },
+      "interpretation": "System HTR readiness only. Not recognition accuracy."
+    },
+    {
+      "line_id": "line_009",
+      "reading_order": 9,
+      "evidence": {
+        "segmentation_readiness": 0.8854,
+        "completion": 1.0,
+        "script_integrity": 1.0,
+        "decoder_reliability": 0.1175,
+        "sequence_quality": 0.9669,
+        "cross_provider_agreement": 0.2188
+      },
+      "htr_readiness_H_line": 0.3038,
+      "routing": {
+        "decision": "third_provider_or_scholar_review",
+        "reason_codes": [
+          "LOW_CROSS_PROVIDER_AGREEMENT",
+          "LOW_DECODER_RELIABILITY"
+        ]
+      },
+      "interpretation": "System HTR readiness only. Not recognition accuracy."
+    },
+    {
+      "line_id": "line_010",
+      "reading_order": 10,
+      "evidence": {
+        "segmentation_readiness": 0.8854,
+        "completion": 1.0,
+        "script_integrity": 1.0,
+        "decoder_reliability": 0.1176,
+        "sequence_quality": 0.9527,
+        "cross_provider_agreement": 0.2449
+      },
+      "htr_readiness_H_line": 0.3154,
+      "routing": {
+        "decision": "third_provider_or_scholar_review",
+        "reason_codes": [
+          "LOW_CROSS_PROVIDER_AGREEMENT",
+          "LOW_DECODER_RELIABILITY"
+        ]
+      },
+      "interpretation": "System HTR readiness only. Not recognition accuracy."
+    },
+    {
+      "line_id": "line_011",
+      "reading_order": 11,
+      "evidence": {
+        "segmentation_readiness": 0.8854,
+        "completion": 1.0,
+        "script_integrity": 1.0,
+        "decoder_reliability": 0.1175,
+        "sequence_quality": 0.8767,
+        "cross_provider_agreement": 0.2243
+      },
+      "htr_readiness_H_line": 0.302,
+      "routing": {
+        "decision": "third_provider_or_scholar_review",
+        "reason_codes": [
+          "LOW_CROSS_PROVIDER_AGREEMENT",
+          "LOW_DECODER_RELIABILITY"
+        ]
+      },
+      "interpretation": "System HTR readiness only. Not recognition accuracy."
+    }
+  ]
+}

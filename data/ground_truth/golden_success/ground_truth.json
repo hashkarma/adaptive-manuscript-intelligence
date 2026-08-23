@@ -1,0 +1,279 @@
+{
+  "schema_version": "1.0",
+  "dataset_id": "golden_success_professor_gt_v1",
+  "case_id": "golden_success",
+  "manuscript_id": "golden_success",
+  "script": "Devanagari",
+  "language": "Sanskrit",
+  "professor_source_page": 1,
+  "reference_scope": "diplomatic_transcription_reference",
+  "source_text_status": "professor_supplied",
+  "physical_line_alignment_status": "project_visual_reviewed",
+  "professor_supplied_physical_line_breaks": false,
+  "translation_ground_truth_available": false,
+  "lines": [
+    {
+      "line_id": "line_001",
+      "reference_text": "श्रीगणेशाय नमः । प्रौढमनोरमाटीकासहिता केशवीया पद्धतिः प्रारभ्यते । आदित्यमज्ञानघनान्ध",
+      "source_spans": [
+        {
+          "paragraph_index": 2,
+          "start_char": 0,
+          "end_char_exclusive": 66,
+          "text": "श्रीगणेशाय नमः । प्रौढमनोरमाटीकासहिता केशवीया पद्धतिः प्रारभ्यते ।"
+        },
+        {
+          "paragraph_index": 3,
+          "start_char": 0,
+          "end_char_exclusive": 18,
+          "text": "आदित्यमज्ञानघनान्ध"
+        }
+      ],
+      "text_status": "professor_supplied",
+      "alignment_status": "project_visual_reviewed"
+    },
+    {
+      "line_id": "line_002",
+      "reference_text": "कारच्छिदं मुदं सन्ततमादधानम् । जगत्प्रसूतिस्थितिनाशहेतुं श्रीभास्करं भास्वररूपमीडे ॥ विघ्ननिघ्नमहं वन्दे वि",
+      "source_spans": [
+        {
+          "paragraph_index": 3,
+          "start_char": 18,
+          "end_char_exclusive": 48,
+          "text": "कारच्छिदं मुदं सन्ततमादधानम् ।"
+        },
+        {
+          "paragraph_index": 4,
+          "start_char": 0,
+          "end_char_exclusive": 53,
+          "text": "जगत्प्रसूतिस्थितिनाशहेतुं श्रीभास्करं भास्वररूपमीडे ॥"
+        },
+        {
+          "paragraph_index": 5,
+          "start_char": 0,
+          "end_char_exclusive": 22,
+          "text": "विघ्ननिघ्नमहं वन्दे वि"
+        }
+      ],
+      "text_status": "professor_supplied",
+      "alignment_status": "project_visual_reviewed"
+    },
+    {
+      "line_id": "line_003",
+      "reference_text": "घ्नपं विबुधार्चितम्। यस्य स्मरणतः साध्यं सिद्धिं प्राप्तनोति सत्वरम् ॥ श्रीकेशवार्यवचनानि जयन्ति तानि निर्दूषणा",
+      "source_spans": [
+        {
+          "paragraph_index": 5,
+          "start_char": 22,
+          "end_char_exclusive": 42,
+          "text": "घ्नपं विबुधार्चितम्।"
+        },
+        {
+          "paragraph_index": 6,
+          "start_char": 0,
+          "end_char_exclusive": 49,
+          "text": "यस्य स्मरणतः साध्यं सिद्धिं प्राप्तनोति सत्वरम् ॥"
+        },
+        {
+          "paragraph_index": 7,
+          "start_char": 0,
+          "end_char_exclusive": 40,
+          "text": "श्रीकेशवार्यवचनानि जयन्ति तानि निर्दूषणा"
+        }
+      ],
+      "text_status": "professor_supplied",
+      "alignment_status": "project_visual_reviewed"
+    },
+    {
+      "line_id": "line_004",
+      "reference_text": "नि बहुलार्थसुपूरितानि । धन्यानि शिष्यजनबुद्धिवृद्धिदानि स्वल्पाक्षराणि बुधतोषविधायकानि ॥ अपि स्फुर",
+      "source_spans": [
+        {
+          "paragraph_index": 7,
+          "start_char": 40,
+          "end_char_exclusive": 63,
+          "text": "नि बहुलार्थसुपूरितानि ।"
+        },
+        {
+          "paragraph_index": 8,
+          "start_char": 0,
+          "end_char_exclusive": 64,
+          "text": "धन्यानि शिष्यजनबुद्धिवृद्धिदानि स्वल्पाक्षराणि बुधतोषविधायकानि ॥"
+        },
+        {
+          "paragraph_index": 9,
+          "start_char": 0,
+          "end_char_exclusive": 9,
+          "text": "अपि स्फुर"
+        }
+      ],
+      "text_status": "professor_supplied",
+      "alignment_status": "project_visual_reviewed"
+    },
+    {
+      "line_id": "line_005",
+      "reference_text": "त्पण्डितमण्डनेन प्रचण्डपाण्डित्यमखण्डि येन । ज्ञानाधिराजस्य गुरुं नृसिंहं प्रचण्डचण्डांशुमतिं तमीडे ॥ श्री",
+      "source_spans": [
+        {
+          "paragraph_index": 9,
+          "start_char": 9,
+          "end_char_exclusive": 53,
+          "text": "त्पण्डितमण्डनेन प्रचण्डपाण्डित्यमखण्डि येन ।"
+        },
+        {
+          "paragraph_index": 10,
+          "start_char": 0,
+          "end_char_exclusive": 56,
+          "text": "ज्ञानाधिराजस्य गुरुं नृसिंहं प्रचण्डचण्डांशुमतिं तमीडे ॥"
+        },
+        {
+          "paragraph_index": 11,
+          "start_char": 0,
+          "end_char_exclusive": 4,
+          "text": "श्री"
+        }
+      ],
+      "text_status": "professor_supplied",
+      "alignment_status": "project_visual_reviewed"
+    },
+    {
+      "line_id": "line_006",
+      "reference_text": "मच्छिवाख्यं गणितज्ञचक्रचूडामणिं सज्जनवृन्दवन्द्यम् ॥ विदुर्विदेयं धिषणेन तुल्यं तं नौमि नित्यं धिषणाप्ति हे",
+      "source_spans": [
+        {
+          "paragraph_index": 11,
+          "start_char": 4,
+          "end_char_exclusive": 56,
+          "text": "मच्छिवाख्यं गणितज्ञचक्रचूडामणिं सज्जनवृन्दवन्द्यम् ॥"
+        },
+        {
+          "paragraph_index": 12,
+          "start_char": 0,
+          "end_char_exclusive": 54,
+          "text": "विदुर्विदेयं धिषणेन तुल्यं तं नौमि नित्यं धिषणाप्ति हे"
+        }
+      ],
+      "text_status": "professor_supplied",
+      "alignment_status": "project_visual_reviewed"
+    },
+    {
+      "line_id": "line_007",
+      "reference_text": "तोः ॥ श्रीकेशवार्यैर्गगनाब्धि ४० वृत्तबद्धोदितजातकपद्धतिर्या । तैरेव तस्या विवृतिः कृताऽस्तिपरं न तत्राऽस्ति सु",
+      "source_spans": [
+        {
+          "paragraph_index": 12,
+          "start_char": 54,
+          "end_char_exclusive": 59,
+          "text": "तोः ॥"
+        },
+        {
+          "paragraph_index": 13,
+          "start_char": 0,
+          "end_char_exclusive": 56,
+          "text": "श्रीकेशवार्यैर्गगनाब्धि ४० वृत्तबद्धोदितजातकपद्धतिर्या ।"
+        },
+        {
+          "paragraph_index": 14,
+          "start_char": 0,
+          "end_char_exclusive": 48,
+          "text": "तैरेव तस्या विवृतिः कृताऽस्तिपरं न तत्राऽस्ति सु"
+        }
+      ],
+      "text_status": "professor_supplied",
+      "alignment_status": "project_visual_reviewed"
+    },
+    {
+      "line_id": "line_008",
+      "reference_text": "युक्तिरुक्ता ॥ सं प्रार्थितः शिष्यगणेन युक्तिः कार्यातिवर्येति दिवाकरोहम् । सवासनां तद्विवृतिं करोमि यतो जनो में स",
+      "source_spans": [
+        {
+          "paragraph_index": 14,
+          "start_char": 48,
+          "end_char_exclusive": 62,
+          "text": "युक्तिरुक्ता ॥"
+        },
+        {
+          "paragraph_index": 15,
+          "start_char": 0,
+          "end_char_exclusive": 60,
+          "text": "सं प्रार्थितः शिष्यगणेन युक्तिः कार्यातिवर्येति दिवाकरोहम् ।"
+        },
+        {
+          "paragraph_index": 16,
+          "start_char": 0,
+          "end_char_exclusive": 38,
+          "text": "सवासनां तद्विवृतिं करोमि यतो जनो में स"
+        }
+      ],
+      "text_status": "professor_supplied",
+      "alignment_status": "project_visual_reviewed"
+    },
+    {
+      "line_id": "line_009",
+      "reference_text": "कलोऽपरिञ्ञ्यः ॥ यद्यप्यशक्याविवृतिर्विधातुं मया जडेनामलकेशवोक्तेः ॥ तथाऽपिकुर्वे शिवपादपद्मप्रसादतः",
+      "source_spans": [
+        {
+          "paragraph_index": 16,
+          "start_char": 38,
+          "end_char_exclusive": 53,
+          "text": "कलोऽपरिञ्ञ्यः ॥"
+        },
+        {
+          "paragraph_index": 17,
+          "start_char": 0,
+          "end_char_exclusive": 51,
+          "text": "यद्यप्यशक्याविवृतिर्विधातुं मया जडेनामलकेशवोक्तेः ॥"
+        },
+        {
+          "paragraph_index": 18,
+          "start_char": 0,
+          "end_char_exclusive": 31,
+          "text": "तथाऽपिकुर्वे शिवपादपद्मप्रसादतः"
+        }
+      ],
+      "text_status": "professor_supplied",
+      "alignment_status": "project_visual_reviewed"
+    },
+    {
+      "line_id": "line_010",
+      "reference_text": " प्रौढमनोरमाख्याम् ॥ अथ श्री कौशिकमुनिवरवंशोद्भवोपरपारावारतीरनिकटवर्तिनन्दिग्रामनिवासकृदमृ",
+      "source_spans": [
+        {
+          "paragraph_index": 18,
+          "start_char": 31,
+          "end_char_exclusive": 51,
+          "text": " प्रौढमनोरमाख्याम् ॥"
+        },
+        {
+          "paragraph_index": 19,
+          "start_char": 0,
+          "end_char_exclusive": 69,
+          "text": "अथ श्री कौशिकमुनिवरवंशोद्भवोपरपारावारतीरनिकटवर्तिनन्दिग्रामनिवासकृदमृ"
+        }
+      ],
+      "text_status": "professor_supplied",
+      "alignment_status": "project_visual_reviewed"
+    },
+    {
+      "line_id": "line_011",
+      "reference_text": "तेश्वरसुन्दरचरणकमलयुगलभजनावाप्त समस्तविद्यः सकलागमाचार्यवर्यः श्रीकमलाकरदैवज्ञनन्दनः",
+      "source_spans": [
+        {
+          "paragraph_index": 19,
+          "start_char": 69,
+          "end_char_exclusive": 153,
+          "text": "तेश्वरसुन्दरचरणकमलयुगलभजनावाप्त समस्तविद्यः सकलागमाचार्यवर्यः श्रीकमलाकरदैवज्ञनन्दनः"
+        }
+      ],
+      "text_status": "professor_supplied",
+      "alignment_status": "project_visual_reviewed"
+    }
+  ],
+  "scientific_guardrails": {
+    "cer_wer_allowed_for_stage5_transcription": true,
+    "cer_wer_are_not_H": true,
+    "cer_wer_are_not_T": true,
+    "stage6_translation_is_not_professor_validated": true,
+    "professor_line_breaks_not_claimed": true
+  }
+}

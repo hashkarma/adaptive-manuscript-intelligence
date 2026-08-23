@@ -116,3 +116,65 @@ knowledge/
 *_before_*.py
 *.pre_stage5.py
 *_pre_stage5.py
+
+# ---------------------------------------------------------------------------
+# Local development / professor-showcase transient files
+# Managed by showcase normalization. Do not commit machine-specific state.
+# ---------------------------------------------------------------------------
+
+# Python environments
+.venv/
+venv-*/
+
+# Python caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local logs / temporary files
+*.log
+tmp.txt
+dist/
+
+# One-off local normalization / diagnostic material
+showcase/devtools/
+
+# Large intermediate showcase runs. Canonical frozen evidence lives in
+# showcase/cases/ instead.
+showcase/logs/
+showcase/original_stage5_runs/
+showcase/qwen_stage5_smoke_runs/
+showcase/artifacts_cpu_benchmark/
+showcase/run4_line_inventory/
+showcase/run4_line_inventory_v2/
+showcase/run4_schema_inspection/
+showcase/stage4_final_tuning/
+showcase/stage4_split_tuning/
+showcase/stage4_adaptive_runs/
+
+# Local audit/report outputs
+showcase/*_output.txt
+showcase/*_diagnostics.txt
+showcase/repository_audit_report.*
+
+# Local emergency backups generated during patching
+*.pre_showcase_*.bak
+*.pre_qwen_showcase.bak
+
+# Local stage-specific environment symlinks
+# No trailing slash: these may be symlinks rather than directories.
+venv-stage*
+venv-provider-*
+
+# Additional local tuning/run directories discovered during final audit
+showcase/stage4_tuning_runs/
+showcase/stage6_env_freeze/
+
+# Local Qwen scratch area was normalized into data/ + tests/
+showcase/qwen_test/
+
+# Runtime-generated artifacts: keep the architectural folder, ignore outputs
+artifacts/*
+!artifacts/README.md

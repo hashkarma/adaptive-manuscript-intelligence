@@ -1278,6 +1278,10 @@ def run_layer5_htr(
         HTRLineResult
     ] = []
 
+    # PROVIDER_C_BOUNDED_LINE_RETRY_V1
+    # Operational provenance only. This does not enter H/S/T/CER/WER computation.
+    provider_c_retry_provenance: Dict[str, Any] = {}
+
     for row in stage4_lines:
 
         line_id = str(
@@ -1338,6 +1342,10 @@ def run_layer5_htr(
 
             continue
 
+        # Provider-C retry state is line-local. A/B remain single-attempt here.
+        provider_attempts = 0
+        provider_retry_errors: List[str] = []
+
         try:
             image = (
                 Image.open(
@@ -1352,20 +1360,59 @@ def run_layer5_htr(
                 image.size
             )
 
-            provider_result = (
-                provider.recognize(
-                    image,
-                    num_beams=(
-                        num_beams
-                    ),
-                    n_best=(
-                        n_best
-                    ),
-                    max_output_length=(
-                        max_output_length
-                    ),
-                )
+            # Provider C may occasionally return malformed protocol JSON even
+            # with temperature=0. Retry only that narrow parser-integrity failure.
+            # Maximum total attempts = 3 (initial + 2 bounded retries).
+            max_provider_attempts = (
+                3
+                if provider_name == "qwen_bedrock_mantle"
+                else 1
             )
+
+            while True:
+                provider_attempts += 1
+
+                try:
+                    provider_result = (
+                        provider.recognize(
+                            image,
+                            num_beams=(
+                                num_beams
+                            ),
+                            n_best=(
+                                n_best
+                            ),
+                            max_output_length=(
+                                max_output_length
+                            ),
+                        )
+                    )
+                    break
+
+                except Exception as provider_exc:
+                    provider_error_text = (
+                        f"{type(provider_exc).__name__}: "
+                        f"{provider_exc}"
+                    )
+                    provider_retry_errors.append(
+                        provider_error_text
+                    )
+
+                    retryable_provider_c_parse_failure = bool(
+                        provider_name
+                        == "qwen_bedrock_mantle"
+                        and (
+                            "malformed structured HTR output"
+                            in str(provider_exc)
+                        )
+                    )
+
+                    if (
+                        not retryable_provider_c_parse_failure
+                        or provider_attempts
+                        >= max_provider_attempts
+                    ):
+                        raise
 
             hypotheses = (
                 _provider_to_hypotheses(
@@ -1445,6 +1492,8 @@ def run_layer5_htr(
                 raw_iast=None,
                 transliteration_input=None,
                 devanagari_text=None,
+                # PROVIDER_C_HTR_FAILURE_CONSTRUCTOR_V1
+                normalization_actions=[],
 
                 hypotheses=[],
                 quality=_empty_quality(
@@ -1463,6 +1512,51 @@ def run_layer5_htr(
 
         results.append(
             result
+        )
+
+        if provider_name == "qwen_bedrock_mantle":
+            provider_c_retry_provenance[line_id] = {
+                "line_id": line_id,
+                "reading_order": reading_order,
+                "source_crop": crop_rel_path,
+                "attempts": provider_attempts,
+                "additional_retries": max(
+                    0,
+                    provider_attempts - 1,
+                ),
+                "retry_errors": provider_retry_errors,
+                "recovered_after_retry": bool(
+                    result.status == "ok"
+                    and provider_attempts > 1
+                ),
+                "final_status": result.status,
+                "final_error": result.error,
+            }
+
+    if provider_name == "qwen_bedrock_mantle":
+        store.write_json(
+            "L5/provider_c_retry_provenance.json",
+            {
+                "schema_version": (
+                    "1.0-provider-c-bounded-line-retry"
+                ),
+                "policy": {
+                    "provider": "qwen_bedrock_mantle",
+                    "max_total_attempts_per_line": 3,
+                    "max_additional_retries_per_line": 2,
+                    "retry_scope": (
+                        "malformed_structured_htr_output_only"
+                    ),
+                    "partial_snapshot_promotion": False,
+                    "raw_protocol_fallback": False,
+                },
+                "lines": [
+                    provider_c_retry_provenance[key]
+                    for key in sorted(
+                        provider_c_retry_provenance
+                    )
+                ],
+            },
         )
 
     _apply_page_length_diagnostics(

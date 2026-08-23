@@ -1,0 +1,17 @@
+{
+  "stage": "stage4",
+  "profile_id": "demo_balanced",
+  "classical_result": {
+    "line_count": 11,
+    "segmentation_readiness_S": 0.8854,
+    "overlay_path": "frozen-provenance://golden-success/stage4-adaptive_20260820_184938/L4/segmentation_overlay.png"
+  },
+  "qwen_fallback_considered": false,
+  "fallback_reasons": [],
+  "used_validated_qwen_stage4": false,
+  "accepted_path": "classical_segmentation",
+  "accepted_line_count": 11,
+  "accepted_S": 0.8854,
+  "accepted_overlay_path": "frozen-provenance://golden-success/stage4-adaptive_20260820_184938/L4/segmentation_overlay.png",
+  "ui_recommendation": "accept_classical_segmentation"
+}

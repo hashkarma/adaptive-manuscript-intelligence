@@ -1,0 +1,97 @@
+{
+  "case_id": "difficult_adaptive",
+  "display_name": "Difficult Adaptive Manuscript",
+  "source_run_dir": "frozen-provenance://baseline/original-stage5-baseline",
+  "frozen_case_dir": "showcase/cases/difficult_adaptive",
+  "demo_message": "Case 2 proves judgement: strong segmentation is followed by weak recognition readiness and zero semantic trust. The orchestrator invokes an independent Qwen Provider-C retry, measures that readiness does not improve, exhausts the currently declared executable machine capability set, and routes the case to scholar review rather than fabricating certainty.",
+  "canonical_metrics": {
+    "S": 0.8854,
+    "H_AB": 0.3371,
+    "T": 0.0,
+    "H_AC": 0.3297,
+    "H_BC": 0.3298,
+    "selected_retry_pair": "B+C",
+    "selected_retry_H": 0.3298,
+    "delta_H": -0.0073
+  },
+  "stage5_baseline": {
+    "provider_a": "trocr_iast_baseline",
+    "provider_b": "trocr_vedic_devanagari",
+    "htr_readiness_H": 0.3371,
+    "evidence": {
+      "segmentation_readiness": 0.8854,
+      "completion": 1.0,
+      "script_integrity": 0.9864,
+      "decoder_reliability": 0.1271,
+      "sequence_quality": 0.9159,
+      "cross_provider_agreement": 0.2823
+    },
+    "low_readiness_lines": 11,
+    "low_agreement_lines": 11,
+    "ground_truth_available": false,
+    "cer": null,
+    "wer": null
+  },
+  "stage6_baseline": {
+    "semantic_trust_T": 0.0,
+    "reconstructed_lines": 0,
+    "partially_supported_lines": 0,
+    "abstained_lines": 11,
+    "page_reconstruction_evidence_index": 0.3045,
+    "normalized_lines": 0,
+    "unresolved_lines": 11,
+    "translation_eligible_lines": 0
+  },
+  "provider_c_retry": {
+    "provider": "qwen_bedrock_mantle",
+    "model_id": "qwen.qwen3-vl-235b-a22b-instruct",
+    "attempted_lines": 11,
+    "recognized_lines": 11,
+    "error_lines": 0,
+    "baseline_H_AB": 0.3371,
+    "H_AC": 0.3297,
+    "H_BC": 0.3298,
+    "selected_retry_pair": "B+C",
+    "selected_retry_H": 0.3298,
+    "delta_H": -0.0073,
+    "improved_over_baseline": false
+  },
+  "final_orchestration": {
+    "status": "review_required",
+    "decision": "scholar_review_after_machine_exhaustion",
+    "next_action": "route_to_scholar_review",
+    "machine_retry_exhausted": true,
+    "scholar_review_required": true,
+    "retry_state": {
+      "attempt_count": 1,
+      "attempted_actions": [
+        "run_third_htr_provider"
+      ],
+      "max_machine_retry_attempts": 3
+    }
+  },
+  "scientific_guardrails": {
+    "ground_truth_available": false,
+    "cer": null,
+    "wer": null,
+    "accuracy_claimed": false,
+    "H_is_not_accuracy": true,
+    "T_is_not_accuracy": true,
+    "page_reconstruction_evidence_index_is_not_confidence": true,
+    "provider_c_non_improvement_does_not_prove_linguistic_inferiority": true,
+    "machine_retry_exhaustion_scope": "under the currently declared executable capability set"
+  },
+  "supporting_evidence_files_copied": [
+    "showcase/cases/difficult_adaptive/evidence/supporting/L6__stage6g_routing_showcase.json",
+    "showcase/cases/difficult_adaptive/evidence/supporting/L6__stage6g_input_adapter.json",
+    "showcase/cases/difficult_adaptive/evidence/supporting/L5_readiness__htr_readiness.json",
+    "showcase/cases/difficult_adaptive/evidence/supporting/L5_provider_C_evaluation__readiness_A_C.json",
+    "showcase/cases/difficult_adaptive/evidence/supporting/L5_provider_C_evaluation__readiness_B_C.json",
+    "showcase/cases/difficult_adaptive/evidence/supporting/L5_provider_C_evaluation__provider_c_selection.json",
+    "showcase/cases/difficult_adaptive/evidence/supporting/L5_compare__provider_comparison.json",
+    "showcase/cases/difficult_adaptive/evidence/supporting/L5_provider_C__provider_c_provenance.json",
+    "showcase/cases/difficult_adaptive/evidence/supporting/L5_provider_C_evaluation__comparison_A_C.json",
+    "showcase/cases/difficult_adaptive/evidence/supporting/L5_provider_C_evaluation__comparison_B_C.json",
+    "showcase/cases/difficult_adaptive/evidence/supporting/L5_compare__provider_comparison.json"
+  ]
+}

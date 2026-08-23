@@ -1,0 +1,183 @@
+{
+  "artifact_version": "0.1.0-golden-stage5-clean-transcription",
+  "case_id": "golden_success",
+  "source_manifest": "frozen-provenance://golden-success/stage4-adaptive_20260820_184938/L5/htr_manifest.json",
+  "num_lines": 11,
+  "nonempty_lines": 11,
+  "empty_lines": 0,
+  "embedded_json_lines_unwrapped": 0,
+  "all_lines_nonempty": true,
+  "page_text_is_scholar_verified": false,
+  "cer": null,
+  "wer": null,
+  "ground_truth_available": false,
+  "lines": [
+    {
+      "line_id": "line_001",
+      "reading_order": 1,
+      "status": "ok",
+      "diplomatic_transcription_candidate": "श्रीगणेशायनमः।। यौदमनोरमाटीकासहिताकेशवीयदृष्टिः प्रारभ्यते।। आदित्यमन्त्रानघनास्य",
+      "devanagari_ratio": 1.0,
+      "review_required": true,
+      "source_provenance": {
+        "source": "devanagari_text",
+        "provider_confidence": null,
+        "uncertainties": [],
+        "visual_observations": null
+      },
+      "interpretation": "Visual HTR candidate from Qwen Stage 5. Not scholar-verified and not CER/WER-calibrated."
+    },
+    {
+      "line_id": "line_002",
+      "reading_order": 2,
+      "status": "ok",
+      "diplomatic_transcription_candidate": "कारञ्चिदंसदंसंततमादधानम्।जगत्यस्मृतिस्थितिनाशहेतुंश्रीभास्करंभास्वररूपमीडे॥विद्यानिधिमहंवन्दे",
+      "devanagari_ratio": 1.0,
+      "review_required": true,
+      "source_provenance": {
+        "source": "devanagari_text",
+        "provider_confidence": null,
+        "uncertainties": [],
+        "visual_observations": null
+      },
+      "interpretation": "Visual HTR candidate from Qwen Stage 5. Not scholar-verified and not CER/WER-calibrated."
+    },
+    {
+      "line_id": "line_003",
+      "reading_order": 3,
+      "status": "ok",
+      "diplomatic_transcription_candidate": "द्वपं विबुधार्चितम्। यस्य स्मरणतः साध्यं सिद्धिः प्राप्नोति सत्वरम्॥ श्रीकेशवार्येवचनानि जयति तानि निर्देष्टव्या",
+      "devanagari_ratio": 1.0,
+      "review_required": true,
+      "source_provenance": {
+        "source": "devanagari_text",
+        "provider_confidence": null,
+        "uncertainties": [],
+        "visual_observations": null
+      },
+      "interpretation": "Visual HTR candidate from Qwen Stage 5. Not scholar-verified and not CER/WER-calibrated."
+    },
+    {
+      "line_id": "line_004",
+      "reading_order": 4,
+      "status": "ok",
+      "diplomatic_transcription_candidate": "निबद्धलाथेसुपूरितानिधन्यानि शिष्यजनबुद्धिविरुद्धानिखल्याश्रगणिबुधतोषविधायकानि॥अपिस्कुर",
+      "devanagari_ratio": 1.0,
+      "review_required": true,
+      "source_provenance": {
+        "source": "devanagari_text",
+        "provider_confidence": null,
+        "uncertainties": [],
+        "visual_observations": null
+      },
+      "interpretation": "Visual HTR candidate from Qwen Stage 5. Not scholar-verified and not CER/WER-calibrated."
+    },
+    {
+      "line_id": "line_005",
+      "reading_order": 5,
+      "status": "ok",
+      "diplomatic_transcription_candidate": "स्याण्डतमण्डनेन प्रचण्डपाण्डित्यमखण्डयेन। ज्ञानाधिराजस्य गुरुर्नृसिंह प्रचण्डचण्डाशुमति तमीडे॥श्री",
+      "devanagari_ratio": 1.0,
+      "review_required": true,
+      "source_provenance": {
+        "source": "devanagari_text",
+        "provider_confidence": null,
+        "uncertainties": [],
+        "visual_observations": null
+      },
+      "interpretation": "Visual HTR candidate from Qwen Stage 5. Not scholar-verified and not CER/WER-calibrated."
+    },
+    {
+      "line_id": "line_006",
+      "reading_order": 6,
+      "status": "ok",
+      "diplomatic_transcription_candidate": "माक्ष्वार्यगाणतज्चक्रचूडामाणसज्जनरन्द्वन्धमाविटविटययेणनतुल्यतनौमिनिर्व्यधिषणापि॒हे",
+      "devanagari_ratio": 1.0,
+      "review_required": true,
+      "source_provenance": {
+        "source": "devanagari_text",
+        "provider_confidence": null,
+        "uncertainties": [],
+        "visual_observations": null
+      },
+      "interpretation": "Visual HTR candidate from Qwen Stage 5. Not scholar-verified and not CER/WER-calibrated."
+    },
+    {
+      "line_id": "line_007",
+      "reading_order": 7,
+      "status": "ok",
+      "diplomatic_transcription_candidate": "ताः॥ श्रीकश्यपेगगनाभिः ४० वृत्तबद्धादिताजातकपद्धतियो। तैरेवतस्याविरुतिः कृताऽस्तिपरंनतन्नाऽस्तिस",
+      "devanagari_ratio": 1.0,
+      "review_required": true,
+      "source_provenance": {
+        "source": "devanagari_text",
+        "provider_confidence": null,
+        "uncertainties": [],
+        "visual_observations": null
+      },
+      "interpretation": "Visual HTR candidate from Qwen Stage 5. Not scholar-verified and not CER/WER-calibrated."
+    },
+    {
+      "line_id": "line_008",
+      "reading_order": 8,
+      "status": "ok",
+      "diplomatic_transcription_candidate": "युक्तिर्ह का॥ संप्राप्तितः शिष्यगणेन युक्तिः कार्योतिवर्येतिदिव्याकरोह म् सना सनां तदिदं तिंकरोमियतोजनोमेत",
+      "devanagari_ratio": 1.0,
+      "review_required": true,
+      "source_provenance": {
+        "source": "devanagari_text",
+        "provider_confidence": null,
+        "uncertainties": [],
+        "visual_observations": null
+      },
+      "interpretation": "Visual HTR candidate from Qwen Stage 5. Not scholar-verified and not CER/WER-calibrated."
+    },
+    {
+      "line_id": "line_009",
+      "reading_order": 9,
+      "status": "ok",
+      "diplomatic_transcription_candidate": "कलापिरज्जुः॥यद्यप्यशक्याविद्यतिविधातुमयाजडनामलक्षेश्वरोक्तः।तथापिकुवैशिनपादपत्प्रसादतः।",
+      "devanagari_ratio": 1.0,
+      "review_required": true,
+      "source_provenance": {
+        "source": "devanagari_text",
+        "provider_confidence": null,
+        "uncertainties": [],
+        "visual_observations": null
+      },
+      "interpretation": "Visual HTR candidate from Qwen Stage 5. Not scholar-verified and not CER/WER-calibrated."
+    },
+    {
+      "line_id": "line_010",
+      "reading_order": 10,
+      "status": "ok",
+      "diplomatic_transcription_candidate": "श्राद्धमनोरमाख्याम् अश्वश्लोकोऽश्वकसुनिबर्चशोऽनोपर्दारावारतीरनिकटवृत्तिनन्दिग्रामनिवासक्षेत्रम्",
+      "devanagari_ratio": 1.0,
+      "review_required": true,
+      "source_provenance": {
+        "source": "devanagari_text",
+        "provider_confidence": null,
+        "uncertainties": [],
+        "visual_observations": null
+      },
+      "interpretation": "Visual HTR candidate from Qwen Stage 5. Not scholar-verified and not CER/WER-calibrated."
+    },
+    {
+      "line_id": "line_011",
+      "reading_order": 11,
+      "status": "ok",
+      "diplomatic_transcription_candidate": "तथारसुन्दरचरणकमलयुगलभजनावाप्रसन्नस्तविद्यः सकलागमाचार्येवयं श्रीकमलाकरटेवन्नन्दनः",
+      "devanagari_ratio": 1.0,
+      "review_required": true,
+      "source_provenance": {
+        "source": "devanagari_text",
+        "provider_confidence": null,
+        "uncertainties": [],
+        "visual_observations": null
+      },
+      "interpretation": "Visual HTR candidate from Qwen Stage 5. Not scholar-verified and not CER/WER-calibrated."
+    }
+  ],
+  "page_diplomatic_transcription_candidate": "श्रीगणेशायनमः।। यौदमनोरमाटीकासहिताकेशवीयदृष्टिः प्रारभ्यते।। आदित्यमन्त्रानघनास्य\nकारञ्चिदंसदंसंततमादधानम्।जगत्यस्मृतिस्थितिनाशहेतुंश्रीभास्करंभास्वररूपमीडे॥विद्यानिधिमहंवन्दे\nद्वपं विबुधार्चितम्। यस्य स्मरणतः साध्यं सिद्धिः प्राप्नोति सत्वरम्॥ श्रीकेशवार्येवचनानि जयति तानि निर्देष्टव्या\nनिबद्धलाथेसुपूरितानिधन्यानि शिष्यजनबुद्धिविरुद्धानिखल्याश्रगणिबुधतोषविधायकानि॥अपिस्कुर\nस्याण्डतमण्डनेन प्रचण्डपाण्डित्यमखण्डयेन। ज्ञानाधिराजस्य गुरुर्नृसिंह प्रचण्डचण्डाशुमति तमीडे॥श्री\nमाक्ष्वार्यगाणतज्चक्रचूडामाणसज्जनरन्द्वन्धमाविटविटययेणनतुल्यतनौमिनिर्व्यधिषणापि॒हे\nताः॥ श्रीकश्यपेगगनाभिः ४० वृत्तबद्धादिताजातकपद्धतियो। तैरेवतस्याविरुतिः कृताऽस्तिपरंनतन्नाऽस्तिस\nयुक्तिर्ह का॥ संप्राप्तितः शिष्यगणेन युक्तिः कार्योतिवर्येतिदिव्याकरोह म् सना सनां तदिदं तिंकरोमियतोजनोमेत\nकलापिरज्जुः॥यद्यप्यशक्याविद्यतिविधातुमयाजडनामलक्षेश्वरोक्तः।तथापिकुवैशिनपादपत्प्रसादतः।\nश्राद्धमनोरमाख्याम् अश्वश्लोकोऽश्वकसुनिबर्चशोऽनोपर्दारावारतीरनिकटवृत्तिनन्दिग्रामनिवासक्षेत्रम्\nतथारसुन्दरचरणकमलयुगलभजनावाप्रसन्नस्तविद्यः सकलागमाचार्येवयं श्रीकमलाकरटेवन्नन्दनः",
+  "next_stage_intent": "Use this clean candidate as Stage-6 semantic/reconstruction input while preserving its unverified status."
+}

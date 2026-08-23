@@ -1,0 +1,80 @@
+{
+  "layer": "layer6",
+  "stage": "stage6_semantic_interpretation",
+  "routing_version": "0.1.0-stage6g-adaptive-retry-controller",
+  "status": "review_required",
+  "signals": {
+    "S": 0.8854,
+    "H": 0.3371,
+    "T": 0.0,
+    "interpretation": {
+      "S": "Stage 4 segmentation readiness.",
+      "H": "Stage 5 HTR system readiness; not recognition accuracy.",
+      "T": "Stage 6 semantic/transcription trust/readiness; not calibrated probability, CER or WER."
+    }
+  },
+  "stage6_completion": {
+    "num_lines": 11,
+    "reconstructed_lines": 0,
+    "partially_supported_lines": 0,
+    "abstained_lines": 11,
+    "normalized_lines": 0
+  },
+  "semantic_trust": {
+    "page_T": 0.0,
+    "unresolved_lines": 11,
+    "translation_eligible_lines": 0,
+    "normalized_page_complete": false
+  },
+  "retry_state": {
+    "attempt_count": 1,
+    "attempted_actions": [
+      "run_third_htr_provider"
+    ],
+    "max_machine_retry_attempts": 3
+  },
+  "capabilities": {
+    "third_htr_provider": true,
+    "alternate_visual_htr": false,
+    "expanded_context_retrieval": false
+  },
+  "candidate_machine_actions": [
+    {
+      "action": "run_third_htr_provider",
+      "failure_domain": "stage5_recognition",
+      "reason": "Use a materially different HTR provider to obtain new independent visual evidence."
+    }
+  ],
+  "unattempted_machine_actions": [],
+  "selected_retry_action": null,
+  "failure_domain": "stage5_recognition",
+  "complaints": [
+    "HTR_READINESS_REMAINS_LOW_AFTER_STAGE6_RECOVERY"
+  ],
+  "recommendations": [
+    "Stage 6 semantic recovery has completed and no further executable machine retry remains under the current capability set. Scholar review is now permitted."
+  ],
+  "validation_trace": [
+    "Stage 4 segmentation is strong; do not bounce the page back to segmentation merely because H(p) or T(p) is low.",
+    "Stage 5 H(p)=0.3371; this is HTR system readiness, not accuracy.",
+    "Stage 6F T(p)=0.0000; this is semantic/transcription trust/readiness, not a calibrated probability."
+  ],
+  "decision": "scholar_review_after_machine_exhaustion",
+  "next_action": "route_to_scholar_review",
+  "machine_retry_exhausted": true,
+  "machine_retry_exhaustion_reason": "no_additional_executable_machine_strategy_available",
+  "scholar_review_required": true,
+  "scholar_review_policy": {
+    "allowed_before_stage6_completion": false,
+    "allowed_while_executable_machine_retry_remains": false,
+    "allowed_after_machine_exhaustion": true
+  },
+  "policy": {
+    "stage4_min_segmentation_readiness": 0.6,
+    "htr_low_readiness": 0.5,
+    "translation_trust_threshold": 0.65,
+    "high_trust_threshold": 0.8,
+    "max_machine_retry_attempts": 3
+  },
+  "audit_note": "Stage 6G is the first orchestration point permitted to authorize scholar review. It does so only after Stage 6 trust evaluation and machine-retry exhaustion under the explicitly declared runtime capabilities."
+}

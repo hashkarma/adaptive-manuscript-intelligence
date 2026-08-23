@@ -1,0 +1,72 @@
+{
+  "case_id": "golden_success",
+  "case_label": "Golden Success Manuscript",
+  "execution_state": "VALIDATED_PRIOR_EXECUTION",
+  "stage_path": [
+    "Stage 0 Manuscript Profiling/Ingest",
+    "Stage 1 Restoration",
+    "Stage 2 Damage Analysis",
+    "Stage 3 Layout Analysis",
+    "Stage 4 Segmentation",
+    "Stage 5 HTR",
+    "Stage 6 Reconstruction & Translation"
+  ],
+  "metrics": {
+    "S": 0.8854,
+    "H": null,
+    "T": null,
+    "recognized_lines": 11,
+    "normalized_lines": 11,
+    "translated_lines": 11,
+    "professor_gt_stage5": {
+      "primary_metric": "strict_cer",
+      "provider_a": {
+        "strict_cer_percent": 98.11,
+        "content_cer_percent": 79.23,
+        "wer_percent": 203.57
+      },
+      "provider_b": {
+        "strict_cer_percent": 105.67,
+        "content_cer_percent": 83.57,
+        "wer_percent": 203.57
+      },
+      "provider_c": {
+        "strict_cer_percent": 29.07,
+        "content_cer_percent": 23.08,
+        "wer_percent": 118.75
+      },
+      "ranking": [
+        "C",
+        "A",
+        "B"
+      ],
+      "best_provider": "C"
+    }
+  },
+  "labels": [
+    "RECOGNITION COMPLETED",
+    "NORMALIZED SANSKRIT CANDIDATE",
+    "ENGLISH TRANSLATION CANDIDATE",
+    "AI CANDIDATE — SCHOLAR VALIDATION PENDING"
+  ],
+  "page_translation_candidate": "Salutations to Sri Ganesha. The Keshaviya Drishti, accompanied by the Yaudamanorama commentary, begins. Of the Aditya mantras, dense with rays, I praise Sri Bhaskara, the radiant form, cause of the world’s memory, existence, and destruction. I bow to the treasure of knowledge, the twice-born, worshipped by the gods. By whose remembrance, accomplishment and success are swiftly attained. The words of Sri Keshavaarya triumph; those are to be declared. In the bound chapters, filled with auspiciousness, contrary to disciples’ understanding, yet pleasing to the wise astrologers. Even so, by the most learned Syanda Manda, whose fierce scholarship is unbroken. The guru of the king of knowledge, Nrsimha, of fierce and swift intellect — I praise him. O jewel of the mathematical circle of Makshvaarya, bound to the noble king, by the incomparable one, even the unexcelled one, O he who is beyond description! Those. By Sri Kashyapeya’s calculations, 40 verses bound to the Aditya horoscope method. By them alone, its exposition is made; yet, beyond that, there is none. What is the reasoning? Acquired by the group of disciples, the reasoning is to be done by Karyotivarya — I divine it thus. Hence, I do this, for the people may know. The rope of the arts. Though it is impossible to describe, as said by Ajadanamalaksheshvara. Yet, by the grace of Kuvaisinapadapat. Named Shraddhamanorama, the horse-verse, of Ashvakasunibarcha, near the riverbank of Anopardaravara, in Nandigram, the abode region. Thus, by worshipping the pair of lotus feet of Rasundara, the learned one is pleased — I, the teacher of all scriptures, Sri Kamalakaradevanandana.",
+  "plain_english_summary": "This page opens with invocations to Ganesha and Bhaskara, introduces a commentary on Aditya mantras and horoscopes, credits scholars and teachers, and ends with the author’s self-identification as a learned teacher devoted to Rasundara. It blends devotional, scholarly, and autobiographical elements.",
+  "unresolved_items": [
+    "Unclear compound names: 'अजडनामलक्षेश्वरोक्तः', 'कुवैशिनपादपत्प्रसादतः', 'अश्वश्लोकोऽश्वकसुनिबर्चशोऽनोपर्दारावारतीर'",
+    "Ambiguous segmentation in line 11: 'रसुन्दरचरणकमलयुगलभजनावाप्रसन्नस्तविद्यः'"
+  ],
+  "professor_ground_truth": {
+    "available": true,
+    "status_label": "PROFESSOR GROUND TRUTH AVAILABLE",
+    "source_text_status": "PROFESSOR SUPPLIED",
+    "physical_line_alignment": "PROJECT VISUAL REVIEWED",
+    "line_count": 11,
+    "translation_ground_truth_available": false
+  },
+  "professor_gt_labels": {
+    "ground_truth": "PROFESSOR GROUND TRUTH AVAILABLE",
+    "ground_truth_provenance": "Professor Sanskrit text; project-reviewed 11-line alignment",
+    "stage5_accuracy": "Professor-GT transcription evaluation",
+    "stage6_translation_validation": "AI CANDIDATE — SCHOLAR VALIDATION PENDING"
+  }
+}

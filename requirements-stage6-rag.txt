@@ -1,0 +1,5 @@
+# Stage 6D.2 noisy-retrieval runtime
+# The working local environment contains additional research packages,
+# but the actual Stage 6D.2 code dependency detected by the portability
+# audit is RapidFuzz. Keep this environment intentionally minimal.
+RapidFuzz==3.14.5

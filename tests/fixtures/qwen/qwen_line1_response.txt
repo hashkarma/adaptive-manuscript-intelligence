@@ -1,0 +1,23 @@
+{
+  "script_guess": "Devanagari",
+  "transcription": "श्रीगणेशायनमः॥ ष्ट्रैटमनोर्माटीकासहिताकेरवीप्रद्धतिः प्रारभ्यते॥ आदित्यमत्तानघनाम",
+  "confidence": 0.85,
+  "uncertainties": [
+    {
+      "location": "ष्ट्रैटमनोर्माटीका",
+      "possible_reading": "ष्ट्रैटमनोर्माटीका / ष्ट्रैटमनोर्माटीका",
+      "reason": "The initial cluster 'ष्ट्रै' is unusual and may be a ligature or scribal variant; the 'टी' and 'का' are clear but the full compound is visually ambiguous."
+    },
+    {
+      "location": "केरवीप्रद्धतिः",
+      "possible_reading": "केरवीप्रद्धतिः / केरवीप्रद्धतिः",
+      "reason": "The sequence 'प्रद्धतिः' may be intended as 'प्रद्धतिः' (with double 'ध') or possibly 'प्रदतिः' — the double 'ध' is visually present but may be a scribal emphasis or error."
+    },
+    {
+      "location": "आदित्यमत्तानघनाम",
+      "possible_reading": "आदित्यमत्तानघनाम / आदित्यमत्तानघनाम",
+      "reason": "The final portion 'घनाम' is clear, but the full compound 'मत्तानघनाम' is unusual; may be 'मत्तानघनाम' or 'मत्तानघनाम' — no clear break or sandhi marker visible."
+    }
+  ],
+  "visual_observations": "The script is Devanagari, written in a traditional manuscript hand with some ligatures and slight ink bleed. The line is well-preserved but contains unusual compounds and possible scribal abbreviations or variants. No major lacunae, but some characters are tightly joined or slightly smudged, requiring cautious reading."
+}

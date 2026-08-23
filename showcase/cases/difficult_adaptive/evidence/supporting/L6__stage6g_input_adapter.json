@@ -1,0 +1,16 @@
+{
+  "stage4_adapter": {
+    "source": "L4/line_manifest.json",
+    "observed_segmentation_confidence": 0.8854,
+    "new_score_invented": false
+  },
+  "stage5_H_adapter": {
+    "original_page_H": 0.3371,
+    "routing_page_H": 0.3371,
+    "adaptation_applied": false,
+    "reason": null,
+    "interpretation": "H(p) is HTR system readiness for orchestration, not recognition accuracy, CER, WER, or a calibrated probability."
+  },
+  "original_stage5_readiness_preserved": true,
+  "routing_only": true
+}

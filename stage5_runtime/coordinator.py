@@ -314,6 +314,216 @@ def _stage4_S(
     )
 
 
+# GENERIC_PROVIDER_C_RETRY_V1
+def run_stage5_provider_c_retry(
+    *,
+    project_root: str | Path,
+    run_id: str,
+    artifacts: str | Path = "artifacts",
+    n_best: int = 3,
+    max_output_length: int = 192,
+    provider_timeout_seconds: int = 1800,
+) -> Dict[str, Any]:
+    """
+    Execute Qwen3-VL / Bedrock Mantle as adaptive Provider C.
+
+    Canonical A/B readiness is preserved. A+C and B+C readiness are written
+    separately. delta_H is readiness/evidence change, not transcription accuracy.
+    """
+    project_root = Path(project_root).resolve()
+
+    artifacts_path = Path(artifacts)
+    if not artifacts_path.is_absolute():
+        artifacts_path = project_root / artifacts_path
+    artifacts_path = artifacts_path.resolve()
+
+    run_dir = artifacts_path / run_id
+
+    stage4_manifest = run_dir / "L4" / "line_manifest.json"
+    if not stage4_manifest.exists():
+        raise Stage5PipelineError(
+            "provider_c_stage4_validation",
+            "Stage 4 line_manifest.json is missing. Complete Stage 4 first.",
+        )
+
+    manifest_a_path = run_dir / "L5_provider_A" / "htr_manifest.json"
+    manifest_b_path = run_dir / "L5_provider_B" / "htr_manifest.json"
+    readiness_ab_path = run_dir / "L5_readiness" / "htr_readiness.json"
+
+    for required, label in (
+        (manifest_a_path, "Provider-A manifest"),
+        (manifest_b_path, "Provider-B manifest"),
+        (readiness_ab_path, "A/B readiness"),
+    ):
+        if not required.exists():
+            raise Stage5PipelineError(
+                "provider_c_prerequisite",
+                f"{label} is missing: {required}",
+            )
+
+    runtime_dir = run_dir / "stage5_runtime"
+    runtime_dir.mkdir(parents=True, exist_ok=True)
+
+    temp_c = "L5_provider_C_next"
+    stale = run_dir / temp_c
+    if stale.exists():
+        shutil.rmtree(stale)
+
+    command_c = [
+        sys.executable,
+        "-m",
+        "stage5_runtime.run_provider",
+        run_id,
+        "--provider",
+        "qwen_bedrock_mantle",
+        "--snapshot",
+        temp_c,
+        "--artifacts",
+        str(artifacts_path),
+        "--device",
+        "auto",
+        "--num-beams",
+        "1",
+        "--n-best",
+        str(n_best),
+        "--max-output-length",
+        str(max_output_length),
+    ]
+
+    started_at = time.time()
+
+    _run_subprocess(
+        command=command_c,
+        cwd=project_root,
+        log_path=runtime_dir / "provider_c.log",
+        stage="provider_c",
+        timeout_seconds=provider_timeout_seconds,
+    )
+
+    manifest_c_next = run_dir / temp_c / "htr_manifest.json"
+    if not manifest_c_next.exists():
+        raise Stage5PipelineError(
+            "provider_c",
+            f"Fresh Provider-C manifest is missing: {manifest_c_next}",
+        )
+
+    _promote_snapshot(
+        run_dir=run_dir,
+        temporary_name=temp_c,
+        canonical_name="L5_provider_C",
+    )
+
+    manifest_c_path = run_dir / "L5_provider_C" / "htr_manifest.json"
+
+    manifest_a = _load_json(manifest_a_path)
+    manifest_b = _load_json(manifest_b_path)
+    manifest_c = _load_json(manifest_c_path)
+    readiness_ab = _load_json(readiness_ab_path)
+
+    comparison_ac = compare_manifests(manifest_a, manifest_c)
+    comparison_bc = compare_manifests(manifest_b, manifest_c)
+
+    stage4_S = _stage4_S(run_dir)
+
+    readiness_ac = evaluate_readiness(
+        stage4_S=stage4_S,
+        manifest_a=manifest_a,
+        manifest_b=manifest_c,
+        comparison=comparison_ac,
+    )
+    readiness_bc = evaluate_readiness(
+        stage4_S=stage4_S,
+        manifest_a=manifest_b,
+        manifest_b=manifest_c,
+        comparison=comparison_bc,
+    )
+
+    evidence_dir = run_dir / "L5_adaptive_C"
+    evidence_dir.mkdir(parents=True, exist_ok=True)
+
+    comparison_ac_path = evidence_dir / "provider_ac_comparison.json"
+    comparison_bc_path = evidence_dir / "provider_bc_comparison.json"
+    readiness_ac_path = evidence_dir / "htr_readiness_ac.json"
+    readiness_bc_path = evidence_dir / "htr_readiness_bc.json"
+
+    _write_json(comparison_ac_path, comparison_ac)
+    _write_json(comparison_bc_path, comparison_bc)
+    _write_json(readiness_ac_path, readiness_ac)
+    _write_json(readiness_bc_path, readiness_bc)
+
+    def page_H(readiness: Dict[str, Any]) -> float | None:
+        value = (readiness.get("page", {}) or {}).get("htr_readiness_H_page")
+        return float(value) if value is not None else None
+
+    H_ab = page_H(readiness_ab)
+    H_ac = page_H(readiness_ac)
+    H_bc = page_H(readiness_bc)
+
+    candidates = [
+        ("A+C", H_ac),
+        ("B+C", H_bc),
+    ]
+    candidates = [row for row in candidates if row[1] is not None]
+
+    best_pair = None
+    best_H = None
+    if candidates:
+        best_pair, best_H = max(candidates, key=lambda row: row[1])
+
+    delta_H = None
+    if H_ab is not None and best_H is not None:
+        delta_H = best_H - H_ab
+
+    provider_c_summary = _repair_promoted_runtime_summary(
+        run_dir=run_dir,
+        canonical_name="L5_provider_C",
+    )
+
+    summary = {
+        "version": "0.1.0-generic-provider-c-adaptive-retry",
+        "run_id": run_id,
+        "provider_c_executed": True,
+        "provider_c": provider_c_summary,
+        "baseline": {"pair": "A+B", "H": H_ab},
+        "candidate_pairs": {
+            "A+C": {
+                "H": H_ac,
+                "comparison_path": str(comparison_ac_path),
+                "readiness_path": str(readiness_ac_path),
+            },
+            "B+C": {
+                "H": H_bc,
+                "comparison_path": str(comparison_bc_path),
+                "readiness_path": str(readiness_bc_path),
+            },
+        },
+        "best_candidate_pair": best_pair,
+        "best_candidate_H": best_H,
+        "delta_H_vs_ab": delta_H,
+        "H_improved": bool(delta_H is not None and delta_H > 0),
+        "scientific_interpretation": (
+            "delta_H measures change in HTR readiness/evidence under an "
+            "independent Provider-C retry. It is not CER, WER, probability "
+            "of correctness, or scholar-verified transcription accuracy."
+        ),
+        "canonical_ab_readiness_preserved": True,
+        "artifacts": {
+            "provider_c_manifest": str(manifest_c_path),
+            "provider_c_log": str(runtime_dir / "provider_c.log"),
+            "provider_ac_comparison": str(comparison_ac_path),
+            "provider_bc_comparison": str(comparison_bc_path),
+            "htr_readiness_ac": str(readiness_ac_path),
+            "htr_readiness_bc": str(readiness_bc_path),
+        },
+        "runtime_seconds": round(time.time() - started_at, 3),
+    }
+
+    summary_path = evidence_dir / "provider_c_retry_summary.json"
+    _write_json(summary_path, summary)
+    summary["summary_path"] = str(summary_path)
+    return summary
+
+
 def run_stage5_pipeline(
     *,
     project_root: str | Path,

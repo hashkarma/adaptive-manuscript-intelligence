@@ -1,0 +1,381 @@
+{
+  "document_assessment": {
+    "script": "Devanagari",
+    "language_guess": "Sanskrit",
+    "work_or_title_guess": "Yaudamanoramāṭīkāsahitā Kēśavīya Dṛṣṭiḥ",
+    "genre_guess": "Astrological commentary or treatise",
+    "overall_notes": "Text appears to be an astrological or astronomical commentary with invocations, authorial statements, and technical references. Contains likely title, guru homage, and astrological terminology. Multiple lines show orthographic or segmentation errors from HTR.",
+    "candidate_output_status": "AI_CANDIDATE_SCHOLAR_VALIDATION_PENDING"
+  },
+  "lines": [
+    {
+      "line_id": "line_001",
+      "observed_htr": "श्रीगणेशायनमः।। यौदमनोरमाटीकासहिताकेशवीयदृष्टिः प्रारभ्यते।। आदित्यमन्त्रानघनास्य",
+      "normalized_sanskrit_candidate": "श्रीगणेशाय नमः।। यौदमनोरमाटीकासहिता केशवीयदृष्टिः प्रारभ्यते।। आदित्यमन्त्राणां घनास्य",
+      "english_translation_candidate": "Salutations to Sri Ganesha. The Keshaviya Drishti, accompanied by the Yaudamanorama commentary, begins. Of the Aditya mantras, dense...",
+      "candidate_confidence_uncalibrated": 0.85,
+      "uncertain_spans": [],
+      "edits": [
+        {
+          "observed_span": "श्रीगणेशायनमः",
+          "proposed_span": "श्रीगणेशाय नमः",
+          "rationale": "Standard sandhi separation for invocation formula.",
+          "evidence_basis": "linguistic_only"
+        },
+        {
+          "observed_span": "यौदमनोरमाटीकासहिताकेशवीयदृष्टिः",
+          "proposed_span": "यौदमनोरमाटीकासहिता केशवीयदृष्टिः",
+          "rationale": "Insert space to separate compound noun from following noun; matches known title structure.",
+          "evidence_basis": "linguistic_only"
+        },
+        {
+          "observed_span": "आदित्यमन्त्रानघनास्य",
+          "proposed_span": "आदित्यमन्त्राणां घनास्य",
+          "rationale": "Correct sandhi: 'मन्त्राणां' (genitive plural) expected; 'घनास्य' likely correct as is.",
+          "evidence_basis": "linguistic_only"
+        }
+      ],
+      "scholar_review_priority": "high"
+    },
+    {
+      "line_id": "line_002",
+      "observed_htr": "कारञ्चिदंसदंसंततमादधानम्।जगत्यस्मृतिस्थितिनाशहेतुंश्रीभास्करंभास्वररूपमीडे॥विद्यानिधिमहंवन्दे",
+      "normalized_sanskrit_candidate": "कारञ्चिदंसदंसं ततमादधानम्। जगत्यस्मृतिस्थितिनाशहेतुं श्रीभास्करं भास्वररूपमीडे॥ विद्यानिधिमहं वन्दे",
+      "english_translation_candidate": "Who holds the sun’s rays continuously; I praise Sri Bhaskara, the radiant form, cause of the world’s memory, existence, and destruction. I bow to the treasure of knowledge.",
+      "candidate_confidence_uncalibrated": 0.8,
+      "uncertain_spans": [],
+      "edits": [
+        {
+          "observed_span": "कारञ्चिदंसदंसंततमादधानम्",
+          "proposed_span": "कारञ्चिदंसदंसं ततमादधानम्",
+          "rationale": "Insert space after 'अंसदंसं' to separate compound; 'ततमादधानम्' is plausible as 'continuously holding'.",
+          "evidence_basis": "linguistic_only"
+        },
+        {
+          "observed_span": "जगत्यस्मृतिस्थितिनाशहेतुंश्रीभास्करंभास्वररूपमीडे",
+          "proposed_span": "जगत्यस्मृतिस्थितिनाशहेतुं श्रीभास्करं भास्वररूपमीडे",
+          "rationale": "Insert spaces to separate compounds: 'जगत्यस्मृतिस्थितिनाशहेतुं' = cause of world’s memory/existence/destruction; 'श्रीभास्करं' = Sri Bhaskara; 'भास्वररूपमीडे' = praise radiant form.",
+          "evidence_basis": "linguistic_only"
+        },
+        {
+          "observed_span": "विद्यानिधिमहंवन्दे",
+          "proposed_span": "विद्यानिधिमहं वन्दे",
+          "rationale": "Insert space: 'विद्यानिधिमहं' → 'विद्यानिधिमहं' (I, the treasure of knowledge) + 'वन्दे' (bow).",
+          "evidence_basis": "linguistic_only"
+        }
+      ],
+      "scholar_review_priority": "medium"
+    },
+    {
+      "line_id": "line_003",
+      "observed_htr": "द्वपं विबुधार्चितम्। यस्य स्मरणतः साध्यं सिद्धिः प्राप्नोति सत्वरम्॥ श्रीकेशवार्येवचनानि जयति तानि निर्देष्टव्या",
+      "normalized_sanskrit_candidate": "द्वपं विबुधार्चितम्। यस्य स्मरणतः साध्यं सिद्धिः प्राप्नोति सत्वरम्॥ श्रीकेशवार्येवचनानि जयति तानि निर्देष्टव्यानि",
+      "english_translation_candidate": "The twice-born, worshipped by the gods. By whose remembrance, accomplishment and success are swiftly attained. The words of Sri Keshavaarya triumph; those are to be declared.",
+      "candidate_confidence_uncalibrated": 0.75,
+      "uncertain_spans": [
+        {
+          "span": "द्वपं",
+          "alternatives": [
+            "द्विपं",
+            "द्विपः",
+            "द्विपाः"
+          ],
+          "reason": "Ambiguous; may be 'द्विपः' (elephant) or 'द्विप' (twice-born). Context suggests 'twice-born' (Brahmin) as subject of worship."
+        }
+      ],
+      "edits": [
+        {
+          "observed_span": "निर्देष्टव्या",
+          "proposed_span": "निर्देष्टव्यानि",
+          "rationale": "Agreement: 'तानि' (those) is neuter plural; 'निर्देष्टव्यानि' matches.",
+          "evidence_basis": "linguistic_only"
+        }
+      ],
+      "scholar_review_priority": "medium"
+    },
+    {
+      "line_id": "line_004",
+      "observed_htr": "निबद्धलाथेसुपूरितानिधन्यानि शिष्यजनबुद्धिविरुद्धानिखल्याश्रगणिबुधतोषविधायकानि॥अपिस्कुर",
+      "normalized_sanskrit_candidate": "निबद्धलाथेषु पूरितानि धन्यानि शिष्यजनबुद्धिविरुद्धानि खल्याश्रगणिबुधतोषविधायकानि॥ अपि स्कुर",
+      "english_translation_candidate": "In the bound chapters, filled with auspiciousness, contrary to disciples’ understanding, yet pleasing to the wise astrologers. Even so, [author’s name?].",
+      "candidate_confidence_uncalibrated": 0.65,
+      "uncertain_spans": [
+        {
+          "span": "लाथेसु",
+          "alternatives": [
+            "लाथेषु",
+            "लाठेषु",
+            "लाथेषु"
+          ],
+          "reason": "Likely 'लाथेषु' (in chapters), but HTR may have misread 'षु' as 'सु'."
+        },
+        {
+          "span": "अपिस्कुर",
+          "alternatives": [
+            "अपि स्कुर",
+            "अपि स्कृत",
+            "अपि स्कुर्वन्"
+          ],
+          "reason": "Unclear; may be truncated name or verb. No clear linguistic basis for correction."
+        }
+      ],
+      "edits": [
+        {
+          "observed_span": "निबद्धलाथेसुपूरितानिधन्यानि",
+          "proposed_span": "निबद्धलाथेषु पूरितानि धन्यानि",
+          "rationale": "Insert spaces: 'लाथेषु' (in chapters), 'पूरितानि' (filled), 'धन्यानि' (auspicious).",
+          "evidence_basis": "linguistic_only"
+        },
+        {
+          "observed_span": "शिष्यजनबुद्धिविरुद्धानिखल्याश्रगणिबुधतोषविधायकानि",
+          "proposed_span": "शिष्यजनबुद्धिविरुद्धानि खल्याश्रगणिबुधतोषविधायकानि",
+          "rationale": "Insert space: 'विरुद्धानि' (contrary) + 'खल्याश्रगणिबुधतोषविधायकानि' (pleasing to wise astrologers).",
+          "evidence_basis": "linguistic_only"
+        }
+      ],
+      "scholar_review_priority": "high"
+    },
+    {
+      "line_id": "line_005",
+      "observed_htr": "स्याण्डतमण्डनेन प्रचण्डपाण्डित्यमखण्डयेन। ज्ञानाधिराजस्य गुरुर्नृसिंह प्रचण्डचण्डाशुमति तमीडे॥श्री",
+      "normalized_sanskrit_candidate": "स्याण्डतमण्डनेन प्रचण्डपाण्डित्यमखण्डयेन। ज्ञानाधिराजस्य गुरुर्नृसिंहः प्रचण्डचण्डाशुमति तमीडे॥ श्री",
+      "english_translation_candidate": "By the most learned Syanda Manda, whose fierce scholarship is unbroken. The guru of the king of knowledge, Nrsimha, of fierce and swift intellect — I praise him. Sri...",
+      "candidate_confidence_uncalibrated": 0.7,
+      "uncertain_spans": [
+        {
+          "span": "स्याण्डतमण्डनेन",
+          "alternatives": [
+            "स्याण्डतमण्डनेन",
+            "स्याण्डतमण्डनेन",
+            "स्याण्डतमण्डनेन"
+          ],
+          "reason": "Name likely 'Syanda Manda' or similar; HTR may have missegmented. No clear alternative without visual."
+        }
+      ],
+      "edits": [
+        {
+          "observed_span": "गुरुर्नृसिंह",
+          "proposed_span": "गुरुर्नृसिंहः",
+          "rationale": "Add visarga for proper noun ending.",
+          "evidence_basis": "linguistic_only"
+        },
+        {
+          "observed_span": "तमीडे॥श्री",
+          "proposed_span": "तमीडे॥ श्री",
+          "rationale": "Insert space before 'श्री' to separate invocation.",
+          "evidence_basis": "linguistic_only"
+        }
+      ],
+      "scholar_review_priority": "medium"
+    },
+    {
+      "line_id": "line_006",
+      "observed_htr": "माक्ष्वार्यगाणतज्चक्रचूडामाणसज्जनरन्द्वन्धमाविटविटययेणनतुल्यतनौमिनिर्व्यधिषणापि॒हे",
+      "normalized_sanskrit_candidate": "माक्ष्वार्यगाणितचक्रचूडामणि सज्जनरन्द्रवन्धमाविटविटययेण नतुल्यतनौ मिनिर्व्यधिषणापि हे",
+      "english_translation_candidate": "O jewel of the mathematical circle of Makshvaarya, bound to the noble king, by the incomparable one, even the unexcelled one, O he who is beyond description!",
+      "candidate_confidence_uncalibrated": 0.6,
+      "uncertain_spans": [
+        {
+          "span": "माक्ष्वार्यगाणतज्चक्रचूडामाण",
+          "alternatives": [
+            "माक्ष्वार्यगाणितचक्रचूडामणि",
+            "माक्ष्वार्यगाणितचक्रचूडामणि"
+          ],
+          "reason": "Likely 'गाणितचक्रचूडामणि' (jewel of the mathematical circle). HTR misread 'ि' as 'त' and 'ि' as 'ज'."
+        },
+        {
+          "span": "नतुल्यतनौमिनिर्व्यधिषणापि॒हे",
+          "alternatives": [
+            "नतुल्यतनौ मिनिर्व्यधिषणापि हे",
+            "नतुल्यतनौ मिनिर्व्यधिषणापि हे"
+          ],
+          "reason": "Segmentation unclear; 'नतुल्यतनौ' = incomparable one; 'मिनिर्व्यधिषणापि' may be 'मिनिर्व्यधिषणापि' (beyond description)."
+        }
+      ],
+      "edits": [
+        {
+          "observed_span": "माक्ष्वार्यगाणतज्चक्रचूडामाण",
+          "proposed_span": "माक्ष्वार्यगाणितचक्रचूडामणि",
+          "rationale": "Correct 'गाणतज्च' to 'गाणितचक्र' and 'माण' to 'मणि' based on common astrological/mathematical epithets.",
+          "evidence_basis": "linguistic_only"
+        },
+        {
+          "observed_span": "सज्जनरन्द्वन्धमाविटविटययेण",
+          "proposed_span": "सज्जनरन्द्रवन्धमाविटविटययेण",
+          "rationale": "Correct 'रन्द्व' to 'रन्द्र' (king) and 'वन्ध' to 'वन्ध' (bound).",
+          "evidence_basis": "linguistic_only"
+        },
+        {
+          "observed_span": "नतुल्यतनौमिनिर्व्यधिषणापि॒हे",
+          "proposed_span": "नतुल्यतनौ मिनिर्व्यधिषणापि हे",
+          "rationale": "Insert space: 'नतुल्यतनौ' (incomparable one) + 'मिनिर्व्यधिषणापि' (beyond description) + 'हे' (O).",
+          "evidence_basis": "linguistic_only"
+        }
+      ],
+      "scholar_review_priority": "high"
+    },
+    {
+      "line_id": "line_007",
+      "observed_htr": "ताः॥ श्रीकश्यपेगगनाभिः ४० वृत्तबद्धादिताजातकपद्धतियो। तैरेवतस्याविरुतिः कृताऽस्तिपरंनतन्नाऽस्तिस",
+      "normalized_sanskrit_candidate": "ताः॥ श्रीकश्यपेगणनाभिः ४० वृत्तबद्धादित्यजातकपद्धतियः। तैरेव तस्याविरुतिः कृता ऽस्ति परं न तन्नाऽस्ति स",
+      "english_translation_candidate": "Those. By Sri Kashyapeya’s calculations, 40 verses bound to the Aditya horoscope method. By them alone, its exposition is made; yet, beyond that, there is none.",
+      "candidate_confidence_uncalibrated": 0.65,
+      "uncertain_spans": [
+        {
+          "span": "गगनाभिः",
+          "alternatives": [
+            "गणनाभिः",
+            "गणनाभिः"
+          ],
+          "reason": "Likely scribal error; 'गणना' (calculation) fits context better than 'गगन' (sky)."
+        },
+        {
+          "span": "अदिताजातकपद्धतियो",
+          "alternatives": [
+            "अदित्यजातकपद्धतियः",
+            "अदित्यजातकपद्धतियः"
+          ],
+          "reason": "Aditya (solar) horoscope method is standard; 'अदिता' is unlikely here."
+        }
+      ],
+      "edits": [
+        {
+          "observed_span": "गगनाभिः",
+          "proposed_span": "गणनाभिः",
+          "rationale": "Context implies mathematical computation, not celestial bodies.",
+          "evidence_basis": "linguistic_only"
+        },
+        {
+          "observed_span": "अदिताजातकपद्धतियो",
+          "proposed_span": "अदित्यजातकपद्धतियः",
+          "rationale": "Standard term for solar horoscope method; 'अदित्य' is phonetically and contextually appropriate.",
+          "evidence_basis": "linguistic_only"
+        }
+      ],
+      "scholar_review_priority": "medium"
+    },
+    {
+      "line_id": "line_008",
+      "observed_htr": "युक्तिर्ह का॥ संप्राप्तितः शिष्यगणेन युक्तिः कार्योतिवर्येतिदिव्याकरोह म् सना सनां तदिदं तिंकरोमियतोजनोमेत",
+      "normalized_sanskrit_candidate": "युक्तिर्ह का॥ संप्राप्तितः शिष्यगणेन युक्तिः कार्योतिवर्येति दिव्याकरोहम् सना सनां तदिदं तिं करोमि यतो जनो मेत",
+      "english_translation_candidate": "What is the reasoning? Acquired by the group of disciples, the reasoning is to be done by Karyotivarya — I divine it thus. Hence, I do this, for the people may know.",
+      "candidate_confidence_uncalibrated": 0.6,
+      "uncertain_spans": [
+        {
+          "span": "कार्योतिवर्येति",
+          "alternatives": [
+            "कार्योतिवर्येति",
+            "कार्योतिवर्येति"
+          ],
+          "reason": "Name or title; no clear variant, but phonetic ambiguity remains."
+        },
+        {
+          "span": "तिंकरोमि",
+          "alternatives": [
+            "तिं करोमि",
+            "तिं करोमि"
+          ],
+          "reason": "Possible split of 'तिंकरोमि' into 'तिं करोमि' for grammatical clarity."
+        }
+      ],
+      "edits": [
+        {
+          "observed_span": "तिंकरोमि",
+          "proposed_span": "तिं करोमि",
+          "rationale": "Grammatical separation improves readability and aligns with verb usage.",
+          "evidence_basis": "linguistic_only"
+        },
+        {
+          "observed_span": "दिव्याकरोह म्",
+          "proposed_span": "दिव्याकरोहम्",
+          "rationale": "Sanskrit sandhi requires 'म्' to be attached to preceding word.",
+          "evidence_basis": "linguistic_only"
+        }
+      ],
+      "scholar_review_priority": "medium"
+    },
+    {
+      "line_id": "line_009",
+      "observed_htr": "कलापिरज्जुः॥यद्यप्यशक्याविद्यतिविधातुमयाजडनामलक्षेश्वरोक्तः।तथापिकुवैशिनपादपत्प्रसादतः।",
+      "normalized_sanskrit_candidate": "कलापिरज्जुः॥ यद्यप्यशक्याविद्यति विधातुमयाजडनामलक्षेश्वरोक्तः। तथापि कुवैशिनपादपत्प्रसादतः।",
+      "english_translation_candidate": "The rope of the arts. Though it is impossible to describe, as said by Ajadanamalaksheshvara. Yet, by the grace of Kuvaisinapadapat.",
+      "candidate_confidence_uncalibrated": 0.55,
+      "uncertain_spans": [
+        {
+          "span": "अजडनामलक्षेश्वरोक्तः",
+          "alternatives": [
+            "अजडनामलक्षेश्वरोक्तः",
+            "अजडनामलक्षेश्वरोक्तः"
+          ],
+          "reason": "Name or epithet; no clear variant, but may be compound of 'अजड' + 'नाम' + 'लक्षेश्वर'."
+        },
+        {
+          "span": "कुवैशिनपादपत्प्रसादतः",
+          "alternatives": [
+            "कुवैशिनपादपत्प्रसादतः",
+            "कुवैशिनपादपत्प्रसादतः"
+          ],
+          "reason": "Possible name or title; lacks clear parallel in known texts."
+        }
+      ],
+      "edits": [],
+      "scholar_review_priority": "high"
+    },
+    {
+      "line_id": "line_010",
+      "observed_htr": "श्राद्धमनोरमाख्याम् अश्वश्लोकोऽश्वकसुनिबर्चशोऽनोपर्दारावारतीरनिकटवृत्तिनन्दिग्रामनिवासक्षेत्रम्",
+      "normalized_sanskrit_candidate": "श्राद्धमनोरमाख्याम् अश्वश्लोकोऽश्वकसुनिबर्चशोऽनोपर्दारावारतीरनिकटवृत्तिनन्दिग्रामनिवासक्षेत्रम्",
+      "english_translation_candidate": "Named Shraddhamanorama, the horse-verse, of Ashvakasunibarcha, near the riverbank of Anopardaravara, in Nandigram, the abode region.",
+      "candidate_confidence_uncalibrated": 0.7,
+      "uncertain_spans": [
+        {
+          "span": "अश्वश्लोकोऽश्वकसुनिबर्चशोऽनोपर्दारावारतीर",
+          "alternatives": [
+            "अश्वश्लोकोऽश्वकसुनिबर्चशोऽनोपर्दारावारतीर",
+            "अश्वश्लोकोऽश्वकसुनिबर्चशोऽनोपर्दारावारतीर"
+          ],
+          "reason": "Compound name or place; no clear segmentation or known parallel."
+        }
+      ],
+      "edits": [],
+      "scholar_review_priority": "medium"
+    },
+    {
+      "line_id": "line_011",
+      "observed_htr": "तथारसुन्दरचरणकमलयुगलभजनावाप्रसन्नस्तविद्यः सकलागमाचार्येवयं श्रीकमलाकरटेवन्नन्दनः",
+      "normalized_sanskrit_candidate": "तथा रसुन्दरचरणकमलयुगलभजनावाप्रसन्नस्तविद्यः सकलागमाचार्येव यं श्रीकमलाकरटेवन्नन्दनः",
+      "english_translation_candidate": "Thus, by worshipping the pair of lotus feet of Rasundara, the learned one is pleased — I, the teacher of all scriptures, Sri Kamalakaradevanandana.",
+      "candidate_confidence_uncalibrated": 0.75,
+      "uncertain_spans": [
+        {
+          "span": "रसुन्दरचरणकमलयुगलभजनावाप्रसन्नस्तविद्यः",
+          "alternatives": [
+            "रसुन्दरचरणकमलयुगलभजनावाप्रसन्नस्तविद्यः",
+            "रसुन्दरचरणकमलयुगलभजनावाप्रसन्नस्तविद्यः"
+          ],
+          "reason": "Long compound; may be 'Rasundara' + 'charana-kamala-yugala-bhajana' + 'ava-prasanna-sthavida'."
+        }
+      ],
+      "edits": [
+        {
+          "observed_span": "यं श्रीकमलाकरटेवन्नन्दनः",
+          "proposed_span": "यं श्रीकमलाकरटेवन्नन्दनः",
+          "rationale": "No edit needed; name appears consistent with known naming patterns.",
+          "evidence_basis": "uncertain"
+        }
+      ],
+      "scholar_review_priority": "medium"
+    }
+  ],
+  "page_level": {
+    "english_translation_candidate": "Salutations to Sri Ganesha. The Keshaviya Drishti, accompanied by the Yaudamanorama commentary, begins. Of the Aditya mantras, dense with rays, I praise Sri Bhaskara, the radiant form, cause of the world’s memory, existence, and destruction. I bow to the treasure of knowledge, the twice-born, worshipped by the gods. By whose remembrance, accomplishment and success are swiftly attained. The words of Sri Keshavaarya triumph; those are to be declared. In the bound chapters, filled with auspiciousness, contrary to disciples’ understanding, yet pleasing to the wise astrologers. Even so, by the most learned Syanda Manda, whose fierce scholarship is unbroken. The guru of the king of knowledge, Nrsimha, of fierce and swift intellect — I praise him. O jewel of the mathematical circle of Makshvaarya, bound to the noble king, by the incomparable one, even the unexcelled one, O he who is beyond description! Those. By Sri Kashyapeya’s calculations, 40 verses bound to the Aditya horoscope method. By them alone, its exposition is made; yet, beyond that, there is none. What is the reasoning? Acquired by the group of disciples, the reasoning is to be done by Karyotivarya — I divine it thus. Hence, I do this, for the people may know. The rope of the arts. Though it is impossible to describe, as said by Ajadanamalaksheshvara. Yet, by the grace of Kuvaisinapadapat. Named Shraddhamanorama, the horse-verse, of Ashvakasunibarcha, near the riverbank of Anopardaravara, in Nandigram, the abode region. Thus, by worshipping the pair of lotus feet of Rasundara, the learned one is pleased — I, the teacher of all scriptures, Sri Kamalakaradevanandana.",
+    "plain_english_summary": "This page opens with invocations to Ganesha and Bhaskara, introduces a commentary on Aditya mantras and horoscopes, credits scholars and teachers, and ends with the author’s self-identification as a learned teacher devoted to Rasundara. It blends devotional, scholarly, and autobiographical elements.",
+    "unresolved_items": [
+      "Unclear compound names: 'अजडनामलक्षेश्वरोक्तः', 'कुवैशिनपादपत्प्रसादतः', 'अश्वश्लोकोऽश्वकसुनिबर्चशोऽनोपर्दारावारतीर'",
+      "Ambiguous segmentation in line 11: 'रसुन्दरचरणकमलयुगलभजनावाप्रसन्नस्तविद्यः'"
+    ],
+    "translation_is_scholar_verified": false,
+    "ground_truth_available": false,
+    "normalized_page_candidate": "श्रीगणेशाय नमः।। यौदमनोरमाटीकासहिता केशवीयदृष्टिः प्रारभ्यते।। आदित्यमन्त्राणां घनास्य\nकारञ्चिदंसदंसं ततमादधानम्। जगत्यस्मृतिस्थितिनाशहेतुं श्रीभास्करं भास्वररूपमीडे॥ विद्यानिधिमहं वन्दे\nद्वपं विबुधार्चितम्। यस्य स्मरणतः साध्यं सिद्धिः प्राप्नोति सत्वरम्॥ श्रीकेशवार्येवचनानि जयति तानि निर्देष्टव्यानि\nनिबद्धलाथेषु पूरितानि धन्यानि शिष्यजनबुद्धिविरुद्धानि खल्याश्रगणिबुधतोषविधायकानि॥ अपि स्कुर\nस्याण्डतमण्डनेन प्रचण्डपाण्डित्यमखण्डयेन। ज्ञानाधिराजस्य गुरुर्नृसिंहः प्रचण्डचण्डाशुमति तमीडे॥ श्री\nमाक्ष्वार्यगाणितचक्रचूडामणि सज्जनरन्द्रवन्धमाविटविटययेण नतुल्यतनौ मिनिर्व्यधिषणापि हे\nताः॥ श्रीकश्यपेगणनाभिः ४० वृत्तबद्धादित्यजातकपद्धतियः। तैरेव तस्याविरुतिः कृता ऽस्ति परं न तन्नाऽस्ति स\nयुक्तिर्ह का॥ संप्राप्तितः शिष्यगणेन युक्तिः कार्योतिवर्येति दिव्याकरोहम् सना सनां तदिदं तिं करोमि यतो जनो मेत\nकलापिरज्जुः॥ यद्यप्यशक्याविद्यति विधातुमयाजडनामलक्षेश्वरोक्तः। तथापि कुवैशिनपादपत्प्रसादतः।\nश्राद्धमनोरमाख्याम् अश्वश्लोकोऽश्वकसुनिबर्चशोऽनोपर्दारावारतीरनिकटवृत्तिनन्दिग्रामनिवासक्षेत्रम्\nतथा रसुन्दरचरणकमलयुगलभजनावाप्रसन्नस्तविद्यः सकलागमाचार्येव यं श्रीकमलाकरटेवन्नन्दनः"
+  }
+}

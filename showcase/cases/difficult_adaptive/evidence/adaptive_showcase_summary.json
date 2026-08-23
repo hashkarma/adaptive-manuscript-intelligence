@@ -1,0 +1,95 @@
+{
+  "showcase_summary_version": "0.1.0",
+  "status": "adaptive_cycle_completed",
+  "baseline_run": "frozen-provenance://baseline/original-stage5-baseline",
+  "qwen_provider_c_source_run": "frozen-provenance://provider-c/qwen-stage5-smoke_20260820_010620",
+  "stage4": {
+    "num_lines": 11,
+    "segmentation_readiness_S": 0.8854,
+    "mean_line_confidence": 0.8564
+  },
+  "stage5_baseline": {
+    "provider_a": "trocr_iast_baseline",
+    "provider_b": "trocr_vedic_devanagari",
+    "htr_readiness_H": 0.3371,
+    "evidence": {
+      "segmentation_readiness": 0.8854,
+      "completion": 1.0,
+      "script_integrity": 0.9864,
+      "decoder_reliability": 0.1271,
+      "sequence_quality": 0.9159,
+      "cross_provider_agreement": 0.2823
+    },
+    "mean_content_char_similarity": 0.2823,
+    "low_readiness_lines": 11,
+    "low_agreement_lines": 11,
+    "ground_truth_available": false,
+    "cer": null,
+    "wer": null
+  },
+  "stage6_baseline": {
+    "reconstructed_lines": 0,
+    "partially_supported_lines": 0,
+    "abstained_lines": 11,
+    "page_reconstruction_evidence_index": 0.3045,
+    "normalized_lines": 0,
+    "semantic_trust_T": 0.0,
+    "unresolved_lines": 11,
+    "translation_eligible_lines": 0
+  },
+  "provider_c_retry": {
+    "provider": "qwen_bedrock_mantle",
+    "model_id": "qwen.qwen3-vl-235b-a22b-instruct",
+    "attempted_lines": 11,
+    "recognized_lines": 11,
+    "error_lines": 0,
+    "baseline_H_AB": 0.3371,
+    "H_AC": 0.3297,
+    "H_BC": 0.3298,
+    "selected_retry_pair": "B+C",
+    "selected_retry_H": 0.3298,
+    "delta_H": -0.0073,
+    "improved_over_baseline": false
+  },
+  "final_orchestration": {
+    "status": "review_required",
+    "decision": "scholar_review_after_machine_exhaustion",
+    "next_action": "route_to_scholar_review",
+    "failure_domain": "stage5_recognition",
+    "machine_retry_exhausted": true,
+    "scholar_review_required": true,
+    "retry_state": {
+      "attempt_count": 1,
+      "attempted_actions": [
+        "run_third_htr_provider"
+      ],
+      "max_machine_retry_attempts": 3
+    },
+    "validation_trace": [
+      "Stage 4 segmentation is strong; do not bounce the page back to segmentation merely because H(p) or T(p) is low.",
+      "Stage 5 H(p)=0.3371; this is HTR system readiness, not accuracy.",
+      "Stage 6F T(p)=0.0000; this is semantic/transcription trust/readiness, not a calibrated probability."
+    ]
+  },
+  "research_interpretation": {
+    "adaptive_loop": [
+      "strong_stage4_segmentation",
+      "weak_dual_provider_htr_readiness_detected",
+      "deep_stage6_semantic_recovery_attempted",
+      "semantic_trust_remained_unresolved",
+      "third_htr_provider_selected_by_orchestrator",
+      "provider_c_pairwise_retry_evaluated",
+      "provider_c_did_not_improve_existing_H_metric",
+      "scholar_review_authorized_under_current_capability_set"
+    ],
+    "claims_not_made": [
+      "H_is_not_recognition_accuracy",
+      "T_is_not_recognition_accuracy",
+      "H_and_T_are_not_calibrated_probabilities",
+      "CER_and_WER_are_unavailable_without_ground_truth",
+      "provider_c_delta_H_does_not_prove_qwen_transcription_accuracy",
+      "no_claim_of_scholar_verified_normalized_sanskrit",
+      "no_claim_of_translation_correctness"
+    ]
+  }
+}

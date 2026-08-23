@@ -4,7 +4,8 @@ from dataclasses import asdict, dataclass
 from typing import Any, Dict, List, Optional
 
 
-STAGE6_ROUTING_VERSION = "0.1.0-stage6g-adaptive-retry-controller"
+# STAGE6G_PROVIDER_C_ROUTING_PROVENANCE_V2
+STAGE6_ROUTING_VERSION = "0.1.1-stage6g-provider-c-retry-provenance"
 
 
 @dataclass(frozen=True)
@@ -185,6 +186,12 @@ def evaluate_stage6_adaptive_routing(
         "not a calibrated probability."
     )
 
+    if "run_third_htr_provider" in attempted_actions:
+        validation_trace.append(
+            "Provider C / third-provider HTR has already been attempted for "
+            "this run and is not an unspent machine retry."
+        )
+
     candidate_actions: List[Dict[str, Any]] = []
 
     if third_provider_available:
@@ -322,11 +329,16 @@ def evaluate_stage6_adaptive_routing(
             )
 
             if not third_provider_available:
-                recommendations.append(
-                    "If a materially different Provider C is implemented later, "
-                    "enable that capability and it will take precedence over "
-                    "scholar escalation on future runs."
-                )
+                if "run_third_htr_provider" in attempted_actions:
+                    recommendations.append(
+                        "Provider C has already been attempted for this run; "
+                        "no unused third-provider HTR retry remains."
+                    )
+                else:
+                    recommendations.append(
+                        "No additional third-provider HTR retry is currently "
+                        "declared available for this run."
+                    )
 
     return {
         "layer": "layer6",

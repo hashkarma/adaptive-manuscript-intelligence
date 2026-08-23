@@ -1,0 +1,10 @@
+{
+  "role": "adaptive_retry_provider_c",
+  "provider": "qwen_bedrock_mantle",
+  "source_run": "frozen-provenance://provider-c/qwen-stage5-smoke_20260820_010620",
+  "source_manifest": "frozen-provenance://provider-c/qwen-stage5-smoke_20260820_010620/L5/htr_manifest.json",
+  "copied_into_baseline_run": "frozen-provenance://baseline/original-stage5-baseline/L5_provider_C",
+  "same_stage4_source": true,
+  "fresh_inference_executed_in_this_step": false,
+  "note": "Provider C is the previously validated 11-line Qwen3-VL execution on the same Stage-4 line crops. No output was fabricated or duplicated from Provider A/B."
+}

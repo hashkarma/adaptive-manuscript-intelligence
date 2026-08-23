@@ -1,0 +1,24 @@
+{
+  "script_guess": "Devanagari",
+  "visible_akshara_sequence": [
+    "श्रीगणेशायनमः",
+    "॥",
+    "प्रौढमनोरमाटीकासहिताकेशवीयप्रद्धतिः",
+    "प्रारभ्यते",
+    "॥",
+    "आदित्यमञ्जनघनाम्बु"
+  ],
+  "raw_visual_transcription": "श्रीगणेशायनमः॥ प्रौढमनोरमाटीकासहिताकेशवीयप्रद्धतिः प्रारभ्यते॥ आदित्यमञ्जनघनाम्बु",
+  "overall_visual_confidence": 0.95,
+  "uncertain_spans": [
+    {
+      "span": "प्रौढमनोरमाटीकासहिताकेशवीयप्रद्धतिः",
+      "alternatives": [
+        "प्रौढमनोरमाटीकासहिताकेशवीयप्रद्धतिः",
+        "प्रौढमनोरमाटीकासहिताकेशवीयप्रद्धतिः"
+      ],
+      "visual_reason": "The conjunct 'प्र' and 'द्ध' are visually clear, but the ligature 'के' and 'श' may be slightly fused; no alternative reading is visually supported."
+    }
+  ],
+  "do_not_trust_without_review": []
+}

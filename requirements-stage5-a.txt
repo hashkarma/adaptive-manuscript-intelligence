@@ -1,0 +1,12 @@
+# Stage 5 Provider A — TrOCR Sanskrit
+# Model: Piyush3142/trocr-sanskrit-ocr
+# Clean Linux recreation of the working venv-stage5 environment.
+numpy==2.5.2
+Pillow==12.3.0
+torch==2.13.0
+torchvision==0.28.0
+transformers==5.15.0
+huggingface-hub==1.27.0
+tokenizers==0.22.2
+safetensors==0.8.0
+indic-transliteration==2.3.82

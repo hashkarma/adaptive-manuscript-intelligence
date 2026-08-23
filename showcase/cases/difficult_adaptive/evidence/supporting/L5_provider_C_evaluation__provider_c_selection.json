@@ -1,0 +1,111 @@
+{
+  "policy_version": "0.1.0-provider-c-pairwise-retry",
+  "policy": "Provider C is an adaptive retry. Preserve the existing pairwise H(p) definition unchanged; evaluate A+C and B+C independently. For the retry path, choose the C-containing pair with the higher H(p). Always report A+B baseline and both C comparisons to avoid hiding disagreement. This is an orchestration heuristic, not a new calibrated 3-provider confidence model.",
+  "stage4_S": 0.8854,
+  "baseline_pair": {
+    "pair": "A+B",
+    "H": 0.3371,
+    "line_H_mean": 0.3341,
+    "line_H_median": 0.3356,
+    "low_readiness_lines": 11,
+    "low_agreement_lines": 11,
+    "routing": {
+      "decision": "third_provider_or_scholar_review",
+      "reason_codes": [
+        "LOW_CROSS_PROVIDER_AGREEMENT",
+        "LOW_DECODER_RELIABILITY",
+        "PAGE_WIDE_LOW_CROSS_PROVIDER_AGREEMENT"
+      ]
+    },
+    "evidence": {
+      "segmentation_readiness": 0.8854,
+      "completion": 1.0,
+      "script_integrity": 0.9864,
+      "decoder_reliability": 0.1271,
+      "sequence_quality": 0.9159,
+      "cross_provider_agreement": 0.2823
+    },
+    "comparison": {
+      "mean_content_char_similarity": 0.2823,
+      "median_content_char_similarity": 0.2895,
+      "low_agreement_lines": 11,
+      "moderate_agreement_lines": 0,
+      "high_agreement_lines": 0
+    }
+  },
+  "provider_c_pairs": [
+    {
+      "pair": "A+C",
+      "H": 0.3297,
+      "line_H_mean": 0.3272,
+      "line_H_median": 0.3154,
+      "low_readiness_lines": 11,
+      "low_agreement_lines": 11,
+      "routing": {
+        "decision": "third_provider_or_scholar_review",
+        "reason_codes": [
+          "LOW_CROSS_PROVIDER_AGREEMENT",
+          "LOW_DECODER_RELIABILITY",
+          "PAGE_WIDE_LOW_CROSS_PROVIDER_AGREEMENT"
+        ]
+      },
+      "evidence": {
+        "segmentation_readiness": 0.8854,
+        "completion": 1.0,
+        "script_integrity": 0.9929,
+        "decoder_reliability": 0.1303,
+        "sequence_quality": 0.9301,
+        "cross_provider_agreement": 0.2575
+      },
+      "comparison": {
+        "mean_content_char_similarity": 0.2575,
+        "median_content_char_similarity": 0.2444,
+        "low_agreement_lines": 11,
+        "moderate_agreement_lines": 0,
+        "high_agreement_lines": 0
+      }
+    },
+    {
+      "pair": "B+C",
+      "H": 0.3298,
+      "line_H_mean": 0.3257,
+      "line_H_median": 0.3317,
+      "low_readiness_lines": 11,
+      "low_agreement_lines": 11,
+      "routing": {
+        "decision": "third_provider_or_scholar_review",
+        "reason_codes": [
+          "LOW_CROSS_PROVIDER_AGREEMENT",
+          "LOW_DECODER_RELIABILITY",
+          "PAGE_WIDE_LOW_CROSS_PROVIDER_AGREEMENT"
+        ]
+      },
+      "evidence": {
+        "segmentation_readiness": 0.8854,
+        "completion": 1.0,
+        "script_integrity": 0.9929,
+        "decoder_reliability": 0.1196,
+        "sequence_quality": 0.9139,
+        "cross_provider_agreement": 0.2797
+      },
+      "comparison": {
+        "mean_content_char_similarity": 0.2797,
+        "median_content_char_similarity": 0.28,
+        "low_agreement_lines": 11,
+        "moderate_agreement_lines": 0,
+        "high_agreement_lines": 0
+      }
+    }
+  ],
+  "selected_retry_pair": "B+C",
+  "selected_retry_H": 0.3298,
+  "baseline_H": 0.3371,
+  "delta_H": -0.0073,
+  "improved_over_baseline": false,
+  "reaches_intermediate_readiness_0_50": false,
+  "reaches_high_readiness_0_75": false,
+  "ground_truth_available": false,
+  "H_is_accuracy": false,
+  "H_is_calibrated_probability": false,
+  "next_action": "provider_c_did_not_improve_pairwise_readiness"
+}

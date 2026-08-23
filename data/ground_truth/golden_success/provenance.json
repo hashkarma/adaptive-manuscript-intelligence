@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "dataset_id": "golden_success_professor_gt_v1",
+  "authoritative_source": {
+    "source_type": "professor_supplied_odt",
+    "original_file_name": "jatakapddhati.odt",
+    "repository_storage_policy": "Original ODT is preserved in local research artifacts and is not required to be committed to Git.",
+    "sha256": "eb55592df9ab422b66947b416766936438df1e3812287dc93a28aea8a6fc8c46",
+    "page_number_used": 1
+  },
+  "derived_alignment": {
+    "method": "visual_alignment_to_stage4_physical_lines",
+    "line_count": 11,
+    "status": "project_visual_reviewed",
+    "professor_supplied_line_breaks": false,
+    "alignment_source": "artifacts/ground_truth/intake/golden_success/canonical/golden_professor_gt_alignment_v1.json"
+  },
+  "evaluation_source": "showcase/devtools/reports/golden_professor_gt_stage5_evaluation_v2.json",
+  "permissions_note": "Before publishing the professor-supplied transcription publicly, confirm that its redistribution is permitted. The original ODT should remain outside Git unless explicitly approved."
+}

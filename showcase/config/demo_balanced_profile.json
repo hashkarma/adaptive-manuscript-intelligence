@@ -1,0 +1,147 @@
+{
+  "profile_id": "demo_balanced",
+  "profile_version": "0.1.0",
+  "purpose": "Professor-facing showcase with live adaptive flow and bounded runtime.",
+  "execution_mode_default": "auto_adaptive",
+  "allow_user_guided_override": true,
+  "allow_research_compare_mode": true,
+  "golden_case": {
+    "case_id": "golden_success",
+    "display_name": "Golden Success Manuscript",
+    "input_image": "data/samples/golden_success/manuscript.png",
+    "input_sha256": "39d7c69f5831dacb6d417f31db1c0f9e888f6267f6fbd13c06ad96c473c8825f",
+    "known_line_validation_image": "data/samples/golden_success/line1.png",
+    "known_line_validation_sha256": "5c5352d42f413ab127d20b3d40b19c770942783285062610aba55252d6128a39",
+    "qwen_line_reference_response": [
+      "tests/fixtures/qwen/qwen_line1_response.txt",
+      "tests/fixtures/qwen/qwen_line1_htr_v2_response.txt"
+    ]
+  },
+  "difficult_case": {
+    "case_id": "difficult_adaptive",
+    "display_name": "Difficult Manuscript / Adaptive Recovery Case",
+    "baseline_run_dir": "showcase/original_stage5_runs/original-stage5-baseline",
+    "provider_c_qwen_run_dir": "showcase/qwen_stage5_smoke_runs/qwen-stage5-smoke_20260820_010620",
+    "summary_json": "showcase/original_stage5_runs/original-stage5-baseline/showcase_summary/adaptive_showcase_summary.json",
+    "summary_md": "showcase/original_stage5_runs/original-stage5-baseline/showcase_summary/adaptive_showcase_summary.md"
+  },
+  "stage1_to_stage3": {
+    "enabled": true,
+    "mode": "existing_deterministic_pipeline",
+    "live_execution": true
+  },
+  "stage4": {
+    "primary_strategy": "classical_segmentation",
+    "qwen_visual_fallback_enabled": true,
+    "fallback_policy": {
+      "trigger_if_segmentation_confidence_below": 0.8,
+      "trigger_if_detected_line_count_differs_from_expected_by_at_least": 1,
+      "trigger_if_manual_review_requests_qwen": true
+    },
+    "accepted_showcase_parameters": {
+      "profile_smooth_window": 5,
+      "peak_threshold_ratio": 0.22,
+      "peak_min_distance_ratio": 0.03,
+      "physical_peak_merge_distance_ratio": 0.04,
+      "shallow_valley_ratio": 0.38,
+      "minimum_line_height_ratio": 0.025
+    },
+    "expected_golden_line_count": 11,
+    "show_stage4_readiness_S": true,
+    "persist_overlay": true,
+    "persist_debug_manifest": true
+  },
+  "stage5": {
+    "strategy": "adaptive_multi_provider",
+    "providers": [
+      "trocr_iast_baseline",
+      "trocr_vedic_devanagari",
+      "qwen_bedrock_mantle"
+    ],
+    "golden_case_preferred_provider_order": [
+      "qwen_bedrock_mantle",
+      "trocr_iast_baseline",
+      "trocr_vedic_devanagari"
+    ],
+    "difficult_case_baseline_provider_order": [
+      "trocr_iast_baseline",
+      "trocr_vedic_devanagari"
+    ],
+    "show_htr_readiness_H": true,
+    "show_cross_provider_agreement": true,
+    "enable_provider_c_retry": true,
+    "provider_c_id": "qwen_bedrock_mantle",
+    "bedrock": {
+      "aws_profile_env": "AWS_PROFILE",
+      "aws_region_env": "AWS_REGION",
+      "default_region": "us-east-1",
+      "model_id": "qwen.qwen3-vl-235b-a22b-instruct",
+      "local_gpu_required": false
+    },
+    "runtime_bounds": {
+      "max_lines_live_default": 11,
+      "allow_single_line_quick_demo": true
+    }
+  },
+  "stage6": {
+    "deterministic_pipeline_enabled": true,
+    "sub_stages": [
+      "6A_htr_evidence_parser",
+      "6B_vidyut_candidate_reconstruction",
+      "6C_morphology_grammar_validation",
+      "6D_contextual_retrieval",
+      "6D2_noisy_surface_retrieval",
+      "6E_evidence_constrained_reconstruction",
+      "6F_semantic_transcription_trust",
+      "6G_adaptive_retry_controller"
+    ],
+    "qwen_semantic_assist_enabled": true,
+    "candidate_output_mode_when_untrusted": true,
+    "candidate_fields": [
+      "candidate_transcription",
+      "candidate_normalized_devanagari",
+      "candidate_translation_english",
+      "alternative_readings",
+      "evidence_snippets",
+      "uncertain_spans"
+    ],
+    "show_semantic_trust_T": true,
+    "allow_translation_candidate_even_if_untrusted": true,
+    "translation_status_labels": {
+      "trusted": "TRUSTED / VALIDATED OUTPUT",
+      "candidate": "AI CANDIDATE — SCHOLAR VALIDATION PENDING",
+      "blocked": "NO SAFE TRANSLATION AVAILABLE"
+    }
+  },
+  "ui": {
+    "show_execution_path": true,
+    "show_live_vs_validated_badge": true,
+    "show_S_H_T_metrics": true,
+    "show_provider_details": true,
+    "show_retry_history": true,
+    "show_candidate_vs_trusted_labels": true,
+    "modes": [
+      "auto_adaptive",
+      "user_guided",
+      "research_compare"
+    ]
+  },
+  "performance": {
+    "use_cached_validated_artifacts_for_difficult_case": true,
+    "reuse_stage6_indexes_when_available": true,
+    "bounded_retrieval_for_live_demo": true,
+    "intended_runtime_guidance": {
+      "golden_case_live_target_minutes": 3,
+      "difficult_case_live_target_minutes": 1,
+      "validated_difficult_case_explanation": "Show frozen validated results rather than rerunning full 20+ minute semantic pipeline."
+    }
+  },
+  "scientific_guardrails": {
+    "do_not_relax_S_thresholds_for_demo": true,
+    "do_not_relax_H_interpretation_for_demo": true,
+    "do_not_relax_T_interpretation_for_demo": true,
+    "never_claim_accuracy_without_ground_truth": true,
+    "never_claim_CER_WER_without_ground_truth": true,
+    "always_label_cached_results_as_validated_prior_execution": true
+  }
+}
