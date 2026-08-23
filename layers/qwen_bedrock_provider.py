@@ -310,31 +310,75 @@ class QwenBedrockMantleHTRProvider(HTRProvider):
 
         requested_n_best = max(1, min(int(n_best), 5))
         prompt = STRICT_HTR_PROMPT.replace("__N_BEST__", str(requested_n_best))
-        max_tokens = max(600, min(1600, int(max_output_length) * 4))
+        # PROVIDER_C_TRUNCATION_RETRY_V1
+        # Preserve the existing economical initial budget. If Mantle
+        # explicitly reports finish_reason="length", retry the same visual
+        # request once at the already-supported 1600-token ceiling.
+        # Truncated/raw protocol text is never promoted to transcription.
+        initial_max_tokens = max(
+            600,
+            min(1600, int(max_output_length) * 4),
+        )
+        max_tokens = initial_max_tokens
+
+        messages = [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": prompt},
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": self._image_as_data_url(image)
+                        },
+                    },
+                ],
+            }
+        ]
 
         client = self._client()
-
         response = client.chat.completions.create(
             model=self._model_id,
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": prompt},
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": self._image_as_data_url(image)
-                            },
-                        },
-                    ],
-                }
-            ],
+            messages=messages,
             temperature=0.0,
             max_tokens=max_tokens,
         )
 
+        initial_finish_reason = (
+            getattr(response.choices[0], "finish_reason", None)
+            if response.choices
+            else None
+        )
+        truncation_retry_attempted = False
+
+        if (
+            initial_finish_reason == "length"
+            and initial_max_tokens < 1600
+        ):
+            truncation_retry_attempted = True
+            max_tokens = 1600
+            response = client.chat.completions.create(
+                model=self._model_id,
+                messages=messages,
+                temperature=0.0,
+                max_tokens=max_tokens,
+            )
+
+        final_finish_reason = (
+            getattr(response.choices[0], "finish_reason", None)
+            if response.choices
+            else None
+        )
         runtime_ms = (time.perf_counter() - started) * 1000.0
+
+        if final_finish_reason == "length":
+            raise RuntimeError(
+                "Qwen Bedrock provider response remained truncated "
+                "(finish_reason=length, "
+                f"initial_max_tokens={initial_max_tokens}, "
+                f"final_max_tokens={max_tokens}). "
+                "Raw truncated protocol text was rejected as transcription."
+            )
 
         raw_response = (
             response.choices[0].message.content
@@ -440,6 +484,14 @@ class QwenBedrockMantleHTRProvider(HTRProvider):
             "visual_observations": parsed.get("visual_observations", ""),
             "json_parse_error": parse_error,
             "json_recovery_actions": json_recovery_actions,
+            "finish_reason_initial": initial_finish_reason,
+            "finish_reason_final": final_finish_reason,
+            "max_tokens_initial": initial_max_tokens,
+            "max_tokens_final": max_tokens,
+            "truncation_retry_attempted": truncation_retry_attempted,
+            "truncation_retry_policy": (
+                "retry_once_at_1600_on_finish_reason_length"
+            ),
             "usage": usage,
         }
 
