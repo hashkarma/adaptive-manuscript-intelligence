@@ -3,6 +3,8 @@ from __future__ import annotations
 import base64
 import json
 import os
+import subprocess
+import sys
 import threading
 import unicodedata
 import uuid
@@ -172,6 +174,119 @@ def stage4_parameters_for_execution_profile(profile_id: str) -> dict:
             "stage4.accepted_showcase_parameters must be a JSON object"
         )
     return dict(params)
+
+
+# STAGE6_SEMANTIC_ASSIST_RUNTIME_V1
+def run_stage6_semantic_assist_subprocess(
+    run_id: str,
+    execution_profile: str,
+    profile_config: dict,
+) -> dict:
+    stage6_cfg = profile_config.get("stage6", {}) or {}
+    enabled = bool(
+        stage6_cfg.get("qwen_semantic_assist_enabled", False)
+    )
+
+    summary = {
+        "enabled": enabled,
+        "executed": False,
+        "status": "disabled" if not enabled else "not_run",
+        "candidate_output_status": (
+            "AI CANDIDATE — SCHOLAR VALIDATION PENDING"
+            if enabled
+            else None
+        ),
+        "changes_S_H_T": False,
+    }
+
+    if not enabled:
+        return summary
+
+    profile_path = PLATFORM_EXECUTION_PROFILE_CONFIGS.get(
+        execution_profile
+    )
+    if profile_path is None:
+        summary["status"] = "profile_not_available"
+        return summary
+
+    run_dir = PROJECT_ROOT / "artifacts" / run_id
+    runtime_script = (
+        PROJECT_ROOT
+        / "core"
+        / "stage6_semantic_assist_runtime.py"
+    )
+
+    cmd = [
+        sys.executable,
+        str(runtime_script),
+        "--run-dir",
+        str(run_dir),
+        "--profile",
+        str(PROJECT_ROOT / profile_path),
+    ]
+
+    summary["executed"] = True
+
+    try:
+        completed = subprocess.run(
+            cmd,
+            cwd=PROJECT_ROOT,
+            text=True,
+            capture_output=True,
+            timeout=900,
+            check=False,
+        )
+    except subprocess.TimeoutExpired as exc:
+        summary.update(
+            {
+                "status": "timeout",
+                "error": "semantic_assist_timeout",
+                "runtime_timeout_seconds": 900,
+                "stderr": str(exc),
+            }
+        )
+        return summary
+
+    summary["return_code"] = completed.returncode
+    summary["stdout_tail"] = completed.stdout[-2000:]
+    summary["stderr_tail"] = completed.stderr[-2000:]
+
+    audit_path = (
+        run_dir
+        / "L6_semantic_assist"
+        / "stage6_semantic_audit.json"
+    )
+    candidate_path = (
+        run_dir
+        / "L6_semantic_assist"
+        / "stage6_semantic_candidate.json"
+    )
+
+    if audit_path.exists():
+        audit = load_json_if_exists(str(audit_path))
+        summary["audit"] = audit
+        summary["validation"] = audit.get("validation")
+        summary["scientific_status"] = audit.get(
+            "scientific_status"
+        )
+
+    summary["candidate_artifact"] = (
+        str(candidate_path.relative_to(PROJECT_ROOT))
+        if candidate_path.exists()
+        else None
+    )
+    summary["audit_artifact"] = (
+        str(audit_path.relative_to(PROJECT_ROOT))
+        if audit_path.exists()
+        else None
+    )
+
+    summary["status"] = (
+        "ok"
+        if completed.returncode == 0 and candidate_path.exists()
+        else "error"
+    )
+    return summary
 
 
 def load_json_if_exists(path: str) -> dict:
@@ -1533,6 +1648,25 @@ def research_stage6_run(
     corresponding runtime implementations actually exist.
     """
     store = ArtifactStore("artifacts", run_id)
+    upload_state = load_stage_state(store, "upload")
+
+    try:
+        execution_profile = normalize_execution_profile(
+            upload_state.get("execution_profile", "generic_default")
+        )
+        execution_profile_config = load_execution_profile_config(
+            execution_profile
+        )
+    except (ValueError, FileNotFoundError) as exc:
+        return JSONResponse(
+            status_code=500,
+            content={
+                "error": (
+                    "Stage 6 execution profile could not be loaded."
+                ),
+                "detail": str(exc),
+            },
+        )
 
     layer4_report = load_json_if_exists(
         store.path("orchestration/layer4_report.json")
@@ -1736,6 +1870,40 @@ def research_stage6_run(
             reports,
         )
 
+        stage6_cfg = (
+            execution_profile_config.get("stage6", {}) or {}
+        )
+        candidate_mode = bool(
+            stage6_cfg.get(
+                "candidate_output_mode_when_untrusted",
+                False,
+            )
+        )
+        final_requires_review = (
+            final.get("overall_status") == "review_required"
+        )
+
+        semantic_assist = {
+            "enabled": bool(
+                stage6_cfg.get(
+                    "qwen_semantic_assist_enabled",
+                    False,
+                )
+            ),
+            "executed": False,
+            "status": "not_required",
+            "changes_S_H_T": False,
+        }
+
+        if candidate_mode and final_requires_review:
+            semantic_assist = (
+                run_stage6_semantic_assist_subprocess(
+                    run_id=run_id,
+                    execution_profile=execution_profile,
+                    profile_config=execution_profile_config,
+                )
+            )
+
         save_stage_state(
             store,
             "research_stage6_semantic",
@@ -1743,6 +1911,8 @@ def research_stage6_run(
                 "status": "done",
                 "layer": "L6",
                 "execution_mode": "integrated_isolated_subprocesses",
+                "execution_profile": execution_profile,
+                "semantic_assist": semantic_assist,
                 "coordinator_version": runtime_summary.get(
                     "coordinator_version"
                 ),
@@ -1788,6 +1958,8 @@ def research_stage6_run(
             "run_id": run_id,
             "research_stage": 6,
             "stage_name": "semantic_interpretation_and_trust",
+            "execution_profile": execution_profile,
+            "semantic_assist": semantic_assist,
             "backend_execution_mode": "integrated_isolated_subprocesses",
             "runtime": {
                 "coordinator_version": runtime_summary.get(
