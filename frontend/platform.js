@@ -1053,6 +1053,10 @@ async function upload() {
   const form = new FormData();
   form.append("file", file);
 
+  const executionProfile =
+    document.getElementById("executionProfile")?.value || "generic_default";
+  form.append("execution_profile", executionProfile);
+
   document.getElementById("uploadButton").disabled = true;
   setRunState("Uploading manuscript…");
 

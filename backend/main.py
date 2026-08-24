@@ -9,7 +9,7 @@ import uuid
 from pathlib import Path
 
 import cv2
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, Form, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -123,6 +123,55 @@ def load_stage_state(store: ArtifactStore, stage: str) -> dict:
         return {}
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
+
+
+# PLATFORM_EXECUTION_PROFILE_WIRING_V1
+PLATFORM_EXECUTION_PROFILE_CONFIGS = {
+    "generic_default": None,
+    "demo_balanced": Path("showcase/config/demo_balanced_profile.json"),
+}
+
+
+def normalize_execution_profile(profile_id: str | None) -> str:
+    value = str(profile_id or "generic_default").strip().lower()
+    if value not in PLATFORM_EXECUTION_PROFILE_CONFIGS:
+        raise ValueError(
+            "Unsupported execution profile. Allowed values: "
+            + ", ".join(sorted(PLATFORM_EXECUTION_PROFILE_CONFIGS))
+        )
+    return value
+
+
+def load_execution_profile_config(profile_id: str) -> dict:
+    profile_id = normalize_execution_profile(profile_id)
+    path = PLATFORM_EXECUTION_PROFILE_CONFIGS[profile_id]
+    if path is None:
+        return {}
+    if not path.exists():
+        raise FileNotFoundError(
+            f"Execution profile configuration is missing: {path}"
+        )
+    with open(path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    if not isinstance(data, dict):
+        raise ValueError(f"Execution profile must be a JSON object: {path}")
+    return data
+
+
+def stage4_parameters_for_execution_profile(profile_id: str) -> dict:
+    profile_id = normalize_execution_profile(profile_id)
+    profile = load_execution_profile_config(profile_id)
+    if not profile:
+        return {}
+    params = (
+        profile.get("stage4", {})
+        .get("accepted_showcase_parameters", {})
+    )
+    if not isinstance(params, dict):
+        raise ValueError(
+            "stage4.accepted_showcase_parameters must be a JSON object"
+        )
+    return dict(params)
 
 
 def load_json_if_exists(path: str) -> dict:
@@ -526,7 +575,10 @@ def health():
 # ---------------------------------------------------------------------------
 
 @app.post("/upload")
-async def upload_image(file: UploadFile = File(...)):
+async def upload_image(
+    file: UploadFile = File(...),
+    execution_profile: str = Form("generic_default"),
+):
     os.makedirs("data/raw", exist_ok=True)
 
     file_id = str(uuid.uuid4())
@@ -536,15 +588,51 @@ async def upload_image(file: UploadFile = File(...)):
     with open(input_path, "wb") as f:
         f.write(contents)
 
+    try:
+        execution_profile = normalize_execution_profile(execution_profile)
+        profile_config = load_execution_profile_config(execution_profile)
+    except (ValueError, FileNotFoundError) as exc:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": "Invalid execution profile.",
+                "detail": str(exc),
+            },
+        )
+
     run_id = ArtifactStore.new_run_id("web")
     store = ArtifactStore("artifacts", run_id)
 
     run_layer0_ingest(input_path, store, notes="web upload")
-    save_stage_state(store, "upload", {"input_path": input_path})
+    save_stage_state(
+        store,
+        "upload",
+        {
+            "input_path": input_path,
+            "execution_profile": execution_profile,
+        },
+    )
+    store.write_json(
+        "orchestration/execution_profile.json",
+        {
+            "profile_id": execution_profile,
+            "profile_source": (
+                str(PLATFORM_EXECUTION_PROFILE_CONFIGS[execution_profile])
+                if PLATFORM_EXECUTION_PROFILE_CONFIGS[execution_profile]
+                else "layer_defaults"
+            ),
+            "stage4_profile_parameters_available": bool(
+                profile_config.get("stage4", {}).get(
+                    "accepted_showcase_parameters"
+                )
+            ),
+        },
+    )
 
     return {
         "run_id": run_id,
         "pipeline_position": "preprocessing_upload",
+        "execution_profile": execution_profile,
         "raw_image": image_to_base64(store.path("L0", "raw.png")),
     }
 
@@ -770,6 +858,23 @@ def research_stage3_layout(run_id: str):
 def research_stage4_segment(run_id: str):
     """Research Stage 4 — script-aware, loss-aware line segmentation."""
     store = ArtifactStore("artifacts", run_id)
+    upload_state = load_stage_state(store, "upload")
+
+    try:
+        execution_profile = normalize_execution_profile(
+            upload_state.get("execution_profile", "generic_default")
+        )
+        stage4_profile_params = stage4_parameters_for_execution_profile(
+            execution_profile
+        )
+    except (ValueError, FileNotFoundError) as exc:
+        return JSONResponse(
+            status_code=500,
+            content={
+                "error": "Stage 4 execution profile could not be loaded.",
+                "detail": str(exc),
+            },
+        )
 
     balanced_path = store.path("L1", "balanced.png")
     binary_path = store.path("L1", "binary.png")
@@ -820,6 +925,7 @@ def research_stage4_segment(run_id: str):
             store,
             text_region_mask_u8=layout_mask,
             upstream_uncertainty_u8=upstream_uncertainty,
+            **stage4_profile_params,
         )
     except Exception as exc:
         return JSONResponse(
@@ -842,6 +948,13 @@ def research_stage4_segment(run_id: str):
         {
             "status": "done",
             "layer": "L4",
+            "execution_profile": execution_profile,
+            "stage4_parameter_source": (
+                "validated_profile"
+                if stage4_profile_params
+                else "layer4_defaults"
+            ),
+            "stage4_profile_parameters": stage4_profile_params,
             "algorithm_version": l4.metrics.get("algorithm_version"),
             "num_lines": len(l4.lines),
             "segmentation_confidence": l4.metrics.get(
@@ -857,6 +970,12 @@ def research_stage4_segment(run_id: str):
         "run_id": run_id,
         "research_stage": 4,
         "stage_name": "script_aware_line_segmentation",
+        "execution_profile": execution_profile,
+        "stage4_parameter_source": (
+            "validated_profile"
+            if stage4_profile_params
+            else "layer4_defaults"
+        ),
         "algorithm_version": l4.metrics.get("algorithm_version"),
         "num_lines": len(l4.lines),
         "metrics": l4.metrics,

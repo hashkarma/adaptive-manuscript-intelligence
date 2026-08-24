@@ -33,6 +33,10 @@
       </div>
 
       <div class="upload-row">
+        <select id="executionProfile" aria-label="Execution profile">
+          <option value="generic_default">Research Default</option>
+          <option value="demo_balanced">Demo Balanced · validated profile</option>
+        </select>
         <input id="fileInput" type="file" accept="image/*" />
         <button id="uploadButton" class="primary">Upload & Create Run</button>
         <button id="runAllButton" class="secondary" disabled>Run Current Pipeline</button>
