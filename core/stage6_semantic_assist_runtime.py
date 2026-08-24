@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 CANDIDATE_STATUS = "AI CANDIDATE — SCHOLAR VALIDATION PENDING"
+DEFAULT_BATCH_SIZE = 4
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -88,52 +89,42 @@ def read_live_stage5_lines(run_dir: Path) -> list[dict[str, Any]]:
     return out
 
 
-def build_prompt(lines: list[dict[str, Any]]) -> str:
+def split_batches(
+    lines: list[dict[str, Any]],
+    batch_size: int = DEFAULT_BATCH_SIZE,
+) -> list[list[dict[str, Any]]]:
+    if batch_size <= 0:
+        raise ValueError("batch_size must be > 0")
+    return [
+        lines[i : i + batch_size]
+        for i in range(0, len(lines), batch_size)
+    ]
+
+
+def build_line_batch_prompt(lines: list[dict[str, Any]]) -> str:
     payload = "\n".join(
         f"{row['line_id']}: {row['observed_htr']}"
         for row in lines
     )
 
     return f"""
-You are performing Stage 6 semantic assistance for an Indic manuscript
-research pipeline.
+You are performing Stage 6 semantic assistance for a Sanskrit/Indic
+manuscript research pipeline.
 
-RESEARCH RULES:
-1. The Stage-5 HTR below is NOT ground truth.
-2. Preserve every line_id exactly.
-3. Produce a useful normalized Sanskrit/Devanagari candidate when
-   linguistically plausible.
-4. If a span cannot be justified, preserve the observed reading and mark
-   it uncertain.
-5. Do NOT invent missing verses, names, dates, places, titles, or technical
-   claims just to make the text grammatical.
-6. Distinguish observed HTR from proposed normalization and English
-   translation.
-7. Every correction must be auditable in "edits".
-8. Allowed evidence_basis values are:
-   "linguistic_only", "contextual_only", "uncertain".
-9. Confidence values are self-assessed and UNCALIBRATED; never call them
-   accuracy.
-10. No page image is provided in this Stage-6 call. Visual recognition was
-    already performed in Stage 5. Do NOT claim visual confirmation for any
-    Stage-6 correction.
-11. The goal is a SCHOLAR-ASSIST PACKET: useful candidates plus explicit
-    uncertainty.
-12. Keep explanations concise so the JSON remains within the model response
-    budget.
-13. Return STRICT JSON ONLY. Do not wrap it in Markdown.
+SCIENTIFIC RULES:
+1. Stage-5 HTR is NOT ground truth.
+2. Preserve every requested line_id exactly.
+3. Produce a normalized Sanskrit/Devanagari candidate only when plausible.
+4. Preserve uncertain observed spans instead of inventing certainty.
+5. Do NOT invent verses, names, dates, places, titles, or technical claims.
+6. Confidence is self-assessed and UNCALIBRATED; it is NOT accuracy.
+7. No image is provided. Do NOT claim visual confirmation.
+8. Output remains AI CANDIDATE — SCHOLAR VALIDATION PENDING.
+9. Keep output extremely concise.
+10. Return STRICT JSON ONLY, no Markdown.
 
-Return this schema:
+Return exactly:
 {{
-  "document_assessment": {{
-    "script": "Devanagari",
-    "language_guess": "...",
-    "work_or_title_guess": "... or null",
-    "genre_guess": "... or null",
-    "overall_notes": "...",
-    "candidate_output_status":
-      "AI_CANDIDATE_SCHOLAR_VALIDATION_PENDING"
-  }},
   "lines": [
     {{
       "line_id": "line_001",
@@ -144,7 +135,7 @@ Return this schema:
       "uncertain_spans": [
         {{
           "span": "...",
-          "alternatives": ["...", "..."],
+          "alternatives": ["..."],
           "reason": "..."
         }}
       ],
@@ -153,12 +144,53 @@ Return this schema:
           "observed_span": "...",
           "proposed_span": "...",
           "rationale": "...",
-          "evidence_basis": "linguistic_only"
+          "evidence_basis": "linguistic_only|contextual_only|uncertain"
         }}
       ],
       "scholar_review_priority": "low|medium|high"
     }}
-  ],
+  ]
+}}
+
+Requested Stage-5 lines:
+{payload}
+""".strip()
+
+
+def build_page_prompt(lines: list[dict[str, Any]]) -> str:
+    payload = "\n".join(
+        (
+            f"{row['line_id']} | observed={row.get('observed_htr','')} | "
+            f"normalized={row.get('normalized_sanskrit_candidate','')} | "
+            f"translation={row.get('english_translation_candidate','')}"
+        )
+        for row in lines
+    )
+
+    return f"""
+You are producing only the PAGE-LEVEL scholar-assist synthesis for an
+Indic manuscript.
+
+RULES:
+1. These are AI candidates, NOT ground truth.
+2. Do NOT invent missing historical facts, names, dates, titles, places,
+   authorship, or technical claims.
+3. Preserve uncertainty.
+4. Translation is NOT scholar verified.
+5. Keep the response concise.
+6. Return STRICT JSON ONLY.
+
+Return exactly:
+{{
+  "document_assessment": {{
+    "script": "Devanagari",
+    "language_guess": "...",
+    "work_or_title_guess": "... or null",
+    "genre_guess": "... or null",
+    "overall_notes": "...",
+    "candidate_output_status":
+      "AI_CANDIDATE_SCHOLAR_VALIDATION_PENDING"
+  }},
   "page_level": {{
     "normalized_page_candidate": "...",
     "english_translation_candidate": "...",
@@ -169,7 +201,7 @@ Return this schema:
   }}
 }}
 
-Observed Stage-5 HTR lines:
+Line-level candidates:
 {payload}
 """.strip()
 
@@ -207,7 +239,6 @@ def validate_result(
     for row in rows:
         if not isinstance(row, dict):
             continue
-
         norm = row.get("normalized_sanskrit_candidate")
         trans = row.get("english_translation_candidate")
         priority = str(row.get("scholar_review_priority", "")).lower()
@@ -262,59 +293,64 @@ def call_model(
     )
 
 
-def merge_missing_lines(
-    base_result: dict[str, Any],
-    continuation: dict[str, Any],
-    expected_lines: list[dict[str, Any]],
+def call_json_with_retry(
+    *,
+    client: Any,
+    model_id: str,
+    prompt: str,
+    primary_max_tokens: int,
+    retry_max_tokens: int,
+    label: str,
+    out_dir: Path,
+    attempts: list[dict[str, Any]],
 ) -> dict[str, Any]:
-    expected_order = {
-        row["line_id"]: index
-        for index, row in enumerate(expected_lines)
-    }
+    last_error: Exception | None = None
 
-    merged: dict[str, dict[str, Any]] = {}
-    for source in (
-        base_result.get("lines", []),
-        continuation.get("lines", []),
+    for attempt_no, max_tokens in enumerate(
+        (primary_max_tokens, retry_max_tokens),
+        start=1,
     ):
-        if not isinstance(source, list):
-            continue
-        for row in source:
-            if not isinstance(row, dict):
-                continue
-            line_id = str(row.get("line_id") or "")
-            if line_id in expected_order:
-                merged[line_id] = row
-
-    result = dict(base_result)
-    result["lines"] = [
-        merged[line_id]
-        for line_id in sorted(
-            merged,
-            key=lambda x: expected_order[x],
+        response = call_model(
+            client=client,
+            model_id=model_id,
+            prompt=prompt,
+            max_tokens=max_tokens,
         )
-    ]
+        finish_reason = response.choices[0].finish_reason
+        raw = response.choices[0].message.content
+        raw_text = raw if isinstance(raw, str) else str(raw)
 
-    if not isinstance(result.get("page_level"), dict):
-        if isinstance(continuation.get("page_level"), dict):
-            result["page_level"] = continuation["page_level"]
+        raw_path = out_dir / f"{label}_attempt_{attempt_no}_raw.txt"
+        raw_path.write_text(raw_text + "\n", encoding="utf-8")
 
-    if not isinstance(result.get("document_assessment"), dict):
-        if isinstance(
-            continuation.get("document_assessment"),
-            dict,
-        ):
-            result["document_assessment"] = continuation[
-                "document_assessment"
-            ]
+        record = {
+            "label": label,
+            "attempt": attempt_no,
+            "max_tokens": max_tokens,
+            "finish_reason": finish_reason,
+            "raw_bytes": len(raw_text.encode("utf-8")),
+        }
 
-    return result
+        try:
+            parsed = extract_json_object(raw_text)
+            record["parse_status"] = "ok"
+            attempts.append(record)
+            return parsed
+        except Exception as exc:
+            last_error = exc
+            record["parse_status"] = "error"
+            record["parse_error"] = f"{type(exc).__name__}: {exc}"
+            attempts.append(record)
+
+    raise RuntimeError(
+        f"{label} failed JSON parsing after retry: {last_error}"
+    )
 
 
 def run_semantic_assist(
     run_dir: Path,
     profile_path: Path,
-    max_tokens: int = 7000,
+    batch_size: int = DEFAULT_BATCH_SIZE,
 ) -> dict[str, Any]:
     profile = load_json(profile_path)
     stage6_cfg = profile.get("stage6", {}) or {}
@@ -324,8 +360,8 @@ def run_semantic_assist(
             "Profile does not enable qwen_semantic_assist_enabled"
         )
 
-    lines = read_live_stage5_lines(run_dir)
-    prompt = build_prompt(lines)
+    source_lines = read_live_stage5_lines(run_dir)
+    batches = split_batches(source_lines, batch_size=batch_size)
 
     model_id = (
         (profile.get("stage5", {}) or {})
@@ -338,10 +374,6 @@ def run_semantic_assist(
 
     out_dir = run_dir / "L6_semantic_assist"
     out_dir.mkdir(parents=True, exist_ok=True)
-    (out_dir / "stage6_semantic_prompt.txt").write_text(
-        prompt,
-        encoding="utf-8",
-    )
 
     from openai import OpenAI
     from aws_bedrock_token_generator import provide_token
@@ -353,114 +385,91 @@ def run_semantic_assist(
 
     started = time.perf_counter()
     attempts: list[dict[str, Any]] = []
+    all_rows: list[dict[str, Any]] = []
 
-    response = call_model(
+    for batch_index, batch in enumerate(batches, start=1):
+        label = f"line_batch_{batch_index:02d}"
+        prompt = build_line_batch_prompt(batch)
+        (out_dir / f"{label}_prompt.txt").write_text(
+            prompt,
+            encoding="utf-8",
+        )
+
+        parsed = call_json_with_retry(
+            client=client,
+            model_id=model_id,
+            prompt=prompt,
+            primary_max_tokens=3200,
+            retry_max_tokens=5000,
+            label=label,
+            out_dir=out_dir,
+            attempts=attempts,
+        )
+
+        rows = parsed.get("lines", [])
+        if not isinstance(rows, list):
+            raise RuntimeError(f"{label} returned no lines array")
+
+        expected_ids = {row["line_id"] for row in batch}
+        returned = {
+            str(row.get("line_id"))
+            for row in rows
+            if isinstance(row, dict)
+        }
+        missing = expected_ids - returned
+        if missing:
+            raise RuntimeError(
+                f"{label} missing line ids: {sorted(missing)}"
+            )
+
+        all_rows.extend(
+            row for row in rows if isinstance(row, dict)
+        )
+
+    expected_order = {
+        row["line_id"]: index
+        for index, row in enumerate(source_lines)
+    }
+    deduped: dict[str, dict[str, Any]] = {}
+    for row in all_rows:
+        line_id = str(row.get("line_id") or "")
+        if line_id in expected_order:
+            deduped[line_id] = row
+
+    ordered_rows = [
+        deduped[line_id]
+        for line_id in sorted(
+            deduped,
+            key=lambda x: expected_order[x],
+        )
+    ]
+
+    page_prompt = build_page_prompt(ordered_rows)
+    (out_dir / "page_synthesis_prompt.txt").write_text(
+        page_prompt,
+        encoding="utf-8",
+    )
+    page_result = call_json_with_retry(
         client=client,
         model_id=model_id,
-        prompt=prompt,
-        max_tokens=max_tokens,
-    )
-    finish_reason = response.choices[0].finish_reason
-    raw = response.choices[0].message.content
-    raw_text = raw if isinstance(raw, str) else str(raw)
-    attempts.append(
-        {
-            "max_tokens": max_tokens,
-            "finish_reason": finish_reason,
-        }
+        prompt=page_prompt,
+        primary_max_tokens=2200,
+        retry_max_tokens=3500,
+        label="page_synthesis",
+        out_dir=out_dir,
+        attempts=attempts,
     )
 
-    if finish_reason == "length" and max_tokens < 8000:
-        retry_prompt = (
-            prompt
-            + "\n\nIMPORTANT: The previous response exceeded the output "
-              "budget. Return the same schema for all lines, but make notes, "
-              "edits, and uncertainty explanations extremely concise."
-        )
-        (out_dir / "stage6_semantic_prompt_retry.txt").write_text(
-            retry_prompt,
-            encoding="utf-8",
-        )
-        response = call_model(
-            client=client,
-            model_id=model_id,
-            prompt=retry_prompt,
-            max_tokens=8000,
-        )
-        finish_reason = response.choices[0].finish_reason
-        raw = response.choices[0].message.content
-        raw_text = raw if isinstance(raw, str) else str(raw)
-        attempts.append(
-            {
-                "max_tokens": 8000,
-                "finish_reason": finish_reason,
-            }
-        )
+    result = {
+        "document_assessment": page_result.get(
+            "document_assessment",
+            {},
+        ),
+        "lines": ordered_rows,
+        "page_level": page_result.get("page_level", {}),
+    }
 
-    raw_path = out_dir / "stage6_semantic_raw_response.txt"
-    raw_path.write_text(raw_text + "\n", encoding="utf-8")
-
-    result = extract_json_object(raw_text)
-    validation = validate_result(result, lines)
-
-    if validation["missing_line_ids"]:
-        missing_ids = set(validation["missing_line_ids"])
-        missing_lines = [
-            row for row in lines if row["line_id"] in missing_ids
-        ]
-        continuation_prompt = (
-            build_prompt(missing_lines)
-            + "\n\nCONTINUATION RULE: Return ONLY the requested missing "
-              "line_ids in the lines array. Keep the page_level section "
-              "concise."
-        )
-        (
-            out_dir / "stage6_semantic_continuation_prompt.txt"
-        ).write_text(
-            continuation_prompt,
-            encoding="utf-8",
-        )
-
-        continuation_response = call_model(
-            client=client,
-            model_id=model_id,
-            prompt=continuation_prompt,
-            max_tokens=5000,
-        )
-        continuation_finish = (
-            continuation_response.choices[0].finish_reason
-        )
-        continuation_raw = (
-            continuation_response.choices[0].message.content
-        )
-        continuation_text = (
-            continuation_raw
-            if isinstance(continuation_raw, str)
-            else str(continuation_raw)
-        )
-        (
-            out_dir / "stage6_semantic_continuation_raw_response.txt"
-        ).write_text(
-            continuation_text + "\n",
-            encoding="utf-8",
-        )
-        attempts.append(
-            {
-                "kind": "missing_line_continuation",
-                "max_tokens": 5000,
-                "finish_reason": continuation_finish,
-                "requested_line_ids": sorted(missing_ids),
-            }
-        )
-
-        continuation = extract_json_object(continuation_text)
-        result = merge_missing_lines(
-            base_result=result,
-            continuation=continuation,
-            expected_lines=lines,
-        )
-        validation = validate_result(result, lines)
-
+    validation = validate_result(result, source_lines)
     runtime = time.perf_counter() - started
 
     write_json(
@@ -469,12 +478,17 @@ def run_semantic_assist(
     )
 
     audit = {
-        "artifact_version": "1.0.0-live-stage6-semantic-assist",
+        "artifact_version": "1.1.0-live-stage6-semantic-assist-batched",
         "profile_id": profile.get("profile_id"),
         "model_id": model_id,
         "runtime_seconds": round(runtime, 3),
+        "execution_strategy": (
+            "batched_line_semantic_assist_plus_page_synthesis"
+        ),
+        "batch_size": batch_size,
+        "batch_count": len(batches),
         "input_transcription": "L5/page_transcription.json",
-        "input_line_count": len(lines),
+        "input_line_count": len(source_lines),
         "attempts": attempts,
         "validation": validation,
         "scientific_status": {
@@ -500,23 +514,34 @@ def run_semantic_assist(
             "Semantic assist did not return every expected line: "
             + ",".join(validation["missing_line_ids"])
         )
+    if validation["extra_line_ids"]:
+        raise RuntimeError(
+            "Semantic assist returned unexpected line ids: "
+            + ",".join(validation["extra_line_ids"])
+        )
 
     return audit
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Live Stage-6 Qwen semantic-assist candidate runtime."
+        description=(
+            "Live Stage-6 batched Qwen semantic-assist candidate runtime."
+        )
     )
     parser.add_argument("--run-dir", required=True)
     parser.add_argument("--profile", required=True)
-    parser.add_argument("--max-tokens", type=int, default=7000)
+    parser.add_argument(
+        "--batch-size",
+        type=int,
+        default=DEFAULT_BATCH_SIZE,
+    )
     args = parser.parse_args()
 
     audit = run_semantic_assist(
         run_dir=Path(args.run_dir).resolve(),
         profile_path=Path(args.profile).resolve(),
-        max_tokens=args.max_tokens,
+        batch_size=args.batch_size,
     )
 
     print("STAGE6_SEMANTIC_ASSIST=PASS")
@@ -524,6 +549,9 @@ def main() -> None:
         json.dumps(
             {
                 "runtime_seconds": audit.get("runtime_seconds"),
+                "execution_strategy": audit.get(
+                    "execution_strategy"
+                ),
                 "validation": audit.get("validation"),
                 "scientific_status": audit.get(
                     "scientific_status"

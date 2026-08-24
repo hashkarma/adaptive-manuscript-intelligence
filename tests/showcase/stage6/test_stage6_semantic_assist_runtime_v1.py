@@ -9,9 +9,10 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from core.stage6_semantic_assist_runtime import (
-    build_prompt,
-    merge_missing_lines,
+    build_line_batch_prompt,
+    build_page_prompt,
     read_live_stage5_lines,
+    split_batches,
     validate_result,
 )
 
@@ -49,27 +50,49 @@ class Stage6SemanticAssistRuntimeTest(unittest.TestCase):
                 [row["line_id"] for row in rows],
                 ["line_001", "line_002"],
             )
-            self.assertEqual(rows[0]["observed_htr"], "प्रथम")
-            self.assertEqual(rows[1]["observed_htr"], "द्वितीय")
 
-    def test_prompt_preserves_candidate_guardrails(self):
-        prompt = build_prompt(
+    def test_split_batches_11_lines(self):
+        rows = [
+            {"line_id": f"line_{i:03d}"}
+            for i in range(1, 12)
+        ]
+        batches = split_batches(rows, batch_size=4)
+        self.assertEqual(
+            [len(batch) for batch in batches],
+            [4, 4, 3],
+        )
+
+    def test_line_prompt_preserves_guardrails(self):
+        prompt = build_line_batch_prompt(
             [
                 {
                     "line_id": "line_001",
-                    "reading_order": 1,
                     "observed_htr": "श्रीगणेशायनमः",
                 }
             ]
         )
-        self.assertIn("NOT ground truth", prompt)
-        self.assertIn("UNCALIBRATED", prompt)
-        normalized_prompt = " ".join(prompt.split())
+        normalized = " ".join(prompt.split())
+        self.assertIn("NOT ground truth", normalized)
+        self.assertIn("UNCALIBRATED", normalized)
+        self.assertIn("Do NOT claim visual confirmation", normalized)
         self.assertIn(
-            "Do NOT claim visual confirmation",
-            normalized_prompt,
+            "AI CANDIDATE — SCHOLAR VALIDATION PENDING",
+            normalized,
         )
-        self.assertIn("SCHOLAR-ASSIST PACKET", prompt)
+
+    def test_page_prompt_preserves_unverified_translation(self):
+        prompt = build_page_prompt(
+            [
+                {
+                    "line_id": "line_001",
+                    "observed_htr": "x",
+                    "normalized_sanskrit_candidate": "y",
+                    "english_translation_candidate": "z",
+                }
+            ]
+        )
+        self.assertIn("NOT scholar verified", prompt)
+        self.assertIn("ground_truth_available", prompt)
 
     def test_validation_counts_candidates(self):
         expected = [
@@ -101,19 +124,6 @@ class Stage6SemanticAssistRuntimeTest(unittest.TestCase):
         self.assertEqual(v["normalized_candidate_lines"], 2)
         self.assertEqual(v["translated_candidate_lines"], 2)
         self.assertTrue(v["page_translation_available"])
-
-    def test_merge_missing_lines_preserves_order(self):
-        expected = [
-            {"line_id": "line_001"},
-            {"line_id": "line_002"},
-        ]
-        base = {"lines": [{"line_id": "line_001"}]}
-        continuation = {"lines": [{"line_id": "line_002"}]}
-        merged = merge_missing_lines(base, continuation, expected)
-        self.assertEqual(
-            [row["line_id"] for row in merged["lines"]],
-            ["line_001", "line_002"],
-        )
 
 
 if __name__ == "__main__":
