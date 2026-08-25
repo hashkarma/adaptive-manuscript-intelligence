@@ -669,6 +669,24 @@ function humanizeRoutingValue(value) {
   return words.charAt(0).toUpperCase() + words.slice(1);
 }
 
+function firstSemanticValue(row, keys) {
+  if (!row || typeof row !== "object") return "";
+  for (const key of keys) {
+    const value = row[key];
+    if (typeof value === "string" && value.trim()) return value.trim();
+  }
+  return "";
+}
+
+function semanticLineText(lines, keys) {
+  if (!Array.isArray(lines) || !lines.length) return "";
+  return lines.map((row, index) => {
+    const lineId = row?.line_id || `line_${String(index + 1).padStart(3, "0")}`;
+    const value = firstSemanticValue(row, keys);
+    return value ? `${lineId} · ${value}` : "";
+  }).filter(Boolean).join("\n");
+}
+
 function renderStage6(payload) {
   const host = document.getElementById("stage6Panel");
   const stage6 = payload.stage6 || {};
@@ -682,24 +700,109 @@ function renderStage6(payload) {
     ? routing.recommendations
     : [];
 
+  const semantic = payload.semantic_assist || {};
+  const validation = semantic.validation || {};
+  const scientific = semantic.scientific_status || {};
+  const candidate = semantic.candidate || {};
+  const candidateLines = Array.isArray(candidate.lines) ? candidate.lines : [];
+  const pageLevel = candidate.page_level || {};
+
+  const normalizedText = semanticLineText(candidateLines, [
+    "normalized_devanagari_candidate",
+    "normalized_sanskrit_candidate",
+    "normalized_candidate",
+    "normalized_devanagari",
+    "normalized_sanskrit",
+    "normalized_text",
+    "reconstruction_candidate",
+    "reconstructed_text",
+    "candidate_text",
+  ]);
+
+  const translatedText = semanticLineText(candidateLines, [
+    "english_translation_candidate",
+    "translation_candidate",
+    "english_translation",
+    "translation",
+    "translated_text",
+  ]);
+
+  const pageTranslation = firstSemanticValue(pageLevel, [
+    "english_translation_candidate",
+    "english_translation",
+    "translation_candidate",
+    "translation",
+  ]);
+
+  const semanticExecuted = semantic.executed === true;
+  const candidateLabel =
+    scientific.candidate_output_status
+    || "AI CANDIDATE — SCHOLAR VALIDATION PENDING";
+
   host.innerHTML = `
-    <table class="evidence-table">
-      <tr><td>T</td><td>${esc(fmt(signals.T))}</td></tr>
-      <tr><td>Trust status</td><td>${esc(humanizeRoutingValue(stage6.trust_status))}</td></tr>
-      <tr><td>Reconstructed lines</td><td>${esc(stage6.reconstructed_lines ?? "—")}</td></tr>
-      <tr><td>Partially supported lines</td><td>${esc(stage6.partially_supported_lines ?? "—")}</td></tr>
-      <tr><td>Abstained lines</td><td>${esc(stage6.abstained_lines ?? "—")}</td></tr>
-      <tr><td>Normalized lines</td><td>${esc(stage6.normalized_lines ?? "—")}</td></tr>
-      <tr><td>Unresolved lines</td><td>${esc(stage6.unresolved_lines ?? "—")}</td></tr>
-      <tr><td>Translation eligible lines</td><td>${esc(stage6.translation_eligible_lines ?? "—")}</td></tr>
-      <tr><td>Adaptive decision</td><td>${esc(humanizeRoutingValue(routing.decision))}</td></tr>
-      <tr><td>Selected retry</td><td>${esc(humanizeRoutingValue(routing.selected_retry_action))}</td></tr>
-      <tr><td>Machine retry attempts</td><td>${esc(retryState.attempt_count ?? 0)}</td></tr>
-      <tr><td>Attempted machine actions</td><td>${esc(attemptedActions.length ? attemptedActions.map(humanizeRoutingValue).join(", ") : "None recorded")}</td></tr>
-      <tr><td>Machine retry exhausted</td><td>${routing.machine_retry_exhausted === true ? "Yes" : "No"}</td></tr>
-      <tr><td>Exhaustion reason</td><td>${esc(humanizeRoutingValue(routing.machine_retry_exhaustion_reason))}</td></tr>
-      <tr><td>Scholar review</td><td>${routing.scholar_review_required ? "Required" : "Not currently required"}</td></tr>
-    </table>
+    <div class="stage6-subsection">
+      <div class="stage6-subheading">6A · Evidence & Trust</div>
+      <table class="evidence-table">
+        <tr><td>T</td><td>${esc(fmt(signals.T))}</td></tr>
+        <tr><td>Trust status</td><td>${esc(humanizeRoutingValue(stage6.trust_status))}</td></tr>
+        <tr><td>Reconstructed lines</td><td>${esc(stage6.reconstructed_lines ?? "—")}</td></tr>
+        <tr><td>Partially supported lines</td><td>${esc(stage6.partially_supported_lines ?? "—")}</td></tr>
+        <tr><td>Abstained lines</td><td>${esc(stage6.abstained_lines ?? "—")}</td></tr>
+        <tr><td>Normalized lines · deterministic</td><td>${esc(stage6.normalized_lines ?? "—")}</td></tr>
+        <tr><td>Unresolved lines</td><td>${esc(stage6.unresolved_lines ?? "—")}</td></tr>
+        <tr><td>Translation eligible · trusted path</td><td>${esc(stage6.translation_eligible_lines ?? "—")}</td></tr>
+        <tr><td>Adaptive decision</td><td>${esc(humanizeRoutingValue(routing.decision))}</td></tr>
+        <tr><td>Selected retry</td><td>${esc(humanizeRoutingValue(routing.selected_retry_action))}</td></tr>
+        <tr><td>Machine retry attempts</td><td>${esc(retryState.attempt_count ?? 0)}</td></tr>
+        <tr><td>Attempted machine actions</td><td>${esc(attemptedActions.length ? attemptedActions.map(humanizeRoutingValue).join(", ") : "None recorded")}</td></tr>
+        <tr><td>Machine retry exhausted</td><td>${routing.machine_retry_exhausted === true ? "Yes" : "No"}</td></tr>
+        <tr><td>Exhaustion reason</td><td>${esc(humanizeRoutingValue(routing.machine_retry_exhaustion_reason))}</td></tr>
+        <tr><td>Scholar review</td><td>${routing.scholar_review_required ? "Required" : "Not currently required"}</td></tr>
+      </table>
+    </div>
+
+    <div class="semantic-assist-box ${semanticExecuted ? "" : "semantic-assist-muted"}">
+      <div class="semantic-status-banner">${esc(candidateLabel)}</div>
+      <div class="stage6-subheading">6B · AI Scholar-Assist Candidate</div>
+      <table class="evidence-table">
+        <tr><td>Semantic assist enabled</td><td>${semantic.enabled === true ? "Yes" : "No"}</td></tr>
+        <tr><td>Semantic assist executed</td><td>${semanticExecuted ? "Yes" : "No"}</td></tr>
+        <tr><td>Execution status</td><td>${esc(semantic.status ?? "Not executed")}</td></tr>
+        <tr><td>Normalized candidates</td><td>${esc(validation.normalized_candidate_lines ?? 0)} / ${esc(validation.expected_lines ?? candidateLines.length ?? 0)}</td></tr>
+        <tr><td>Translation candidates</td><td>${esc(validation.translated_candidate_lines ?? 0)} / ${esc(validation.expected_lines ?? candidateLines.length ?? 0)}</td></tr>
+        <tr><td>Page translation</td><td>${validation.page_translation_available === true || Boolean(pageTranslation) ? "Available" : "Not available"}</td></tr>
+        <tr><td>High-priority review lines</td><td>${esc(validation.high_priority_review_lines ?? "—")}</td></tr>
+        <tr><td>Ground Truth available</td><td>${scientific.ground_truth_available === true ? "Yes" : "No"}</td></tr>
+        <tr><td>Scholar verified</td><td>${scientific.scholar_verified === true ? "Yes" : "No"}</td></tr>
+        <tr><td>CER / WER</td><td>${scientific.cer == null && scientific.wer == null ? "N/A · no verified GT" : `${esc(scientific.cer)} / ${esc(scientific.wer)}`}</td></tr>
+        <tr><td>Affects S / H / T</td><td>${scientific.changes_S_H_T === true ? "Yes" : "No"}</td></tr>
+      </table>
+
+      ${normalizedText || translatedText || pageTranslation ? `
+        <div class="semantic-output-grid">
+          <div class="provider-box">
+            <strong>Normalized Devanagari / Sanskrit candidates</strong>
+            <pre>${esc(normalizedText || "Candidate artifact exists; normalized line display fields are unavailable in this presentation view.")}</pre>
+          </div>
+          <div class="provider-box">
+            <strong>English translation candidates</strong>
+            <pre>${esc(translatedText || pageTranslation || "Candidate artifact exists; translation line display fields are unavailable in this presentation view.")}</pre>
+          </div>
+        </div>
+        ${pageTranslation ? `
+          <div class="page-translation-box">
+            <strong>Page-level translation candidate</strong>
+            <div>${esc(pageTranslation)}</div>
+          </div>
+        ` : ""}
+      ` : `
+        <div class="guardrail">
+          ${semanticExecuted
+            ? "Semantic-assist artifacts are present, but no displayable candidate text was projected."
+            : "Semantic assist has not executed for this run."}
+        </div>
+      `}
+    </div>
 
     ${recommendations.length ? `
       <div class="routing-recommendations">
@@ -709,10 +812,10 @@ function renderStage6(payload) {
     ` : ""}
 
     <div class="guardrail">
-      Stage 6 is abstention-capable. T is semantic/transcription trust-readiness,
-      not calibrated probability or accuracy. Linguistic plausibility or retrieval
-      evidence cannot override insufficient visual manuscript evidence, and this
-      result does not imply scholar-validated translation.
+      Deterministic Stage 6 is abstention-capable. T is semantic/transcription
+      trust-readiness, not calibrated probability or accuracy. AI scholar-assist
+      candidates are deliberately kept separate: they do not change S/H/T and
+      remain pending scholar validation.
     </div>
   `;
 }
@@ -1136,3 +1239,14 @@ async function boot() {
 }
 
 boot();
+
+// GENERIC_PLATFORM_CURRENT_RUN_ORCHESTRATION_LINK_V1
+const orchestrationLink = document.getElementById("orchestrationLink");
+if (orchestrationLink) {
+  orchestrationLink.addEventListener("click", event => {
+    if (!state.runId) return;
+    event.preventDefault();
+    window.location.href =
+      `/orchestration?run_id=${encodeURIComponent(state.runId)}`;
+  });
+}

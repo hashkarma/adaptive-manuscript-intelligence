@@ -40,7 +40,7 @@
     .visual-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
     .visual { border:1px solid #e5e7eb; border-radius:12px; padding:12px; }
     .visual img { width:100%; border-radius:8px; border:1px solid #ddd; margin-top:8px; }
-    .pipeline { display:grid; grid-template-columns:repeat(6,1fr); gap:8px; align-items:center; }
+    .pipeline { display:grid; grid-template-columns:repeat(7,1fr); gap:8px; align-items:center; }
     .pipe-stage { border:1px solid #dbeafe; border-radius:10px; padding:12px; text-align:center; background:#f8fbff; min-height:82px; }
     .pipe-stage.future { border-style:dashed; background:#fff7ed; border-color:#fed7aa; }
     .semantic-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
@@ -80,9 +80,13 @@
   <div class="card">
     <div class="topbar">
       <div>
-        <h1>Adaptive AI Orchestration Dashboard</h1>
+        <h1>Adaptive AI Orchestration · Current Run</h1>
         <p class="muted">
-          Explainable control plane for the six-stage manuscript research pipeline. Upload and condition analysis are pre-processing; C(p), B(p), G(p), L(p), R(p), S(p), H(p) and T(p) are orchestration signals, not additional stages. T(p) is the Stage-6 semantic/transcription trust signal.
+          Run-specific explainable control plane for Stage 0 plus the six-stage manuscript
+          research pipeline. It shows when the orchestrator accepts evidence, invokes an
+          alternate provider, measures whether the retry helped, safely abstains, executes
+          AI scholar-assist candidates, and finally routes to scholar review when required.
+          S(p), H(p) and T(p) are evidence/readiness/trust signals, not accuracy.
         </p>
       </div>
       <div class="input-row">
@@ -94,8 +98,9 @@
   </div>
 
   <div class="card">
-    <div class="preprocess"><b>Pre-processing:</b> Upload → condition analysis</div>
+    <div class="preprocess"><b>Intake:</b> Upload → manuscript profiling / script-language identification</div>
     <div class="pipeline">
+      <div class="pipe-stage"><b>Stage 0</b><br>Manuscript profiling</div>
       <div class="pipe-stage"><b>Stage 1</b><br>Restoration</div>
       <div class="pipe-stage"><b>Stage 2</b><br>Damage & uncertainty</div>
       <div class="pipe-stage"><b>Stage 3</b><br>Layout</div>
@@ -270,14 +275,21 @@
     document.getElementById("status").innerText = "Loading orchestration report...";
 
     try {
-      const res = await fetch(`${API}/orchestration/${runId}?_=${Date.now()}`, { cache: "no-store" });
-      const data = await res.json();
-      if (!res.ok || data.error) throw new Error(data.error || `HTTP ${res.status}`);
-      document.getElementById("status").innerText = `Loaded report for ${runId}`;
+      const [reportRes, uiStateRes] = await Promise.all([
+        fetch(`${API}/orchestration/${runId}?_=${Date.now()}`, { cache: "no-store" }),
+        fetch(`${API}/pipeline/ui-state/${runId}?_=${Date.now()}`, { cache: "no-store" }),
+      ]);
+      const data = await reportRes.json();
+      const uiState = uiStateRes.ok ? await uiStateRes.json() : {};
+      if (!reportRes.ok || data.error) {
+        throw new Error(data.error || `HTTP ${reportRes.status}`);
+      }
+      document.getElementById("status").innerText = `Loaded current run ${runId}`;
       renderSummary(data);
+      renderCurrentAdaptiveTrace(data, uiState);
       renderSignals(data);
       renderHTR(data);
-      renderSemantic(data);
+      renderSemantic(data, uiState);
       renderTranscription(data);
       renderLayers(data);
       renderVisuals(data);
@@ -312,6 +324,74 @@
     trace += renderList(final.complaints);
     document.getElementById("adaptiveTrace").innerHTML = trace;
     document.getElementById("summaryCard").classList.remove("hidden");
+  }
+
+  function renderCurrentAdaptiveTrace(data, uiState) {
+    const host = document.getElementById("adaptiveTrace");
+    const final = data.final_decision || {};
+    const signals = final.signals || {};
+    const stage5 = uiState?.stage5 || {};
+    const adaptive = stage5.adaptive_evidence || {};
+    const stage6 = uiState?.stage6 || {};
+    const semantic = stage6.semantic_assist || {};
+    const validation = semantic.validation || {};
+    const deterministic = stage6.stage6 || {};
+
+    const steps = [];
+
+    if (signals.S !== undefined && signals.S !== null) {
+      steps.push(`Stage 4 segmentation evidence accepted/evaluated · S = ${esc(signals.S)}`);
+    }
+
+    if (stage5.available) {
+      const h = adaptive.H_ab ?? stage5.signals?.H ?? signals.H;
+      steps.push(`Stage 5 canonical Provider A+B readiness · H = ${esc(h)}`);
+    }
+
+    if (adaptive.attempted === true) {
+      steps.push(
+        `Provider C adaptive attempt · ${esc(adaptive.status)} · H(A+C) = ${esc(adaptive.H_ac)} · H(B+C) = ${esc(adaptive.H_bc)} · ΔH = ${esc(adaptive.delta_H)}`
+      );
+    }
+
+    if (stage6.available) {
+      steps.push(
+        `Deterministic Stage 6 trust decision · T = ${esc(stage6.signals?.T ?? signals.T)} · abstained = ${esc(deterministic.abstained_lines)} · unresolved = ${esc(deterministic.unresolved_lines)}`
+      );
+    }
+
+    if (final.machine_retry_exhausted === true) {
+      steps.push("Configured machine retry path exhausted; deterministic trust remains unchanged.");
+    }
+
+    if (semantic.executed === true) {
+      steps.push(
+        `AI semantic assist completed · ${esc(validation.normalized_candidate_lines)} normalized candidates · ${esc(validation.translated_candidate_lines)} translation candidates · page translation ${validation.page_translation_available === true ? "available" : "not available"}`
+      );
+    }
+
+    if (final.scholar_review_required === true) {
+      steps.push(`Final routing · scholar review required · ${esc(final.semantic_decision || final.next_action)}`);
+    }
+
+    const className =
+      final.scholar_review_required === true ? "notice" : "success";
+
+    host.innerHTML = `
+      <div class="${className}">
+        <b>Current adaptive execution trace</b>
+        <ol>
+          ${steps.map(step => `<li>${step}</li>`).join("")}
+        </ol>
+      </div>
+      ${semantic.executed === true ? `
+        <div class="info">
+          <b>Scientific boundary:</b>
+          the semantic-assist result is an AI candidate for scholar assistance.
+          It does not alter S, H or T and is not Ground Truth.
+        </div>
+      ` : ""}
+    `;
   }
 
   function renderSignals(data) {
@@ -387,7 +467,7 @@
     document.getElementById("htrCard").classList.remove("hidden");
   }
 
-  function renderSemantic(data) {
+  function renderSemantic(data, uiState = {}) {
     const stage6 = data.stage6 || {};
     const reports = data.layer_reports || {};
     const layer6 = reports.layer6 || {};
@@ -419,6 +499,9 @@
     const decision = final.semantic_decision ?? layer6.decision ?? "N/A";
     const next = final.next_action ?? layer6.next_action ?? "N/A";
     const selectedRetry = final.selected_retry_action ?? layer6.selected_retry_action;
+    const semanticAssist = uiState?.stage6?.semantic_assist || {};
+    const validation = semanticAssist.validation || {};
+    const scientific = semanticAssist.scientific_status || {};
 
     document.getElementById("semanticInterpretation").innerHTML = `
       <div class="info">
@@ -434,11 +517,31 @@
         <b>Scholar review required:</b> ${scholar ? "Yes" : "No"}
       </div>
 
+      ${semanticAssist.executed === true ? `
+        <div class="success">
+          <b>${esc(scientific.candidate_output_status || "AI CANDIDATE — SCHOLAR VALIDATION PENDING")}</b><br>
+          Semantic assist: ${esc(semanticAssist.status)}<br>
+          Normalized candidates: ${esc(validation.normalized_candidate_lines)} / ${esc(validation.expected_lines)}<br>
+          Translation candidates: ${esc(validation.translated_candidate_lines)} / ${esc(validation.expected_lines)}<br>
+          Page translation: ${validation.page_translation_available === true ? "Available" : "Not available"}<br>
+          Scholar verified: ${scientific.scholar_verified === true ? "Yes" : "No"}<br>
+          Changes S/H/T: ${scientific.changes_S_H_T === true ? "Yes" : "No"}
+        </div>
+      ` : ""}
+
       ${renderList(layer6.recommendations)}
     `;
 
     document.getElementById("semanticCard").classList.remove("hidden");
   }
+
+  // ORCHESTRATION_CURRENT_RUN_QUERY_V1
+  window.addEventListener("DOMContentLoaded", () => {
+    const runId = new URLSearchParams(window.location.search).get("run_id");
+    if (!runId) return;
+    document.getElementById("runIdInput").value = runId;
+    loadReport();
+  });
 
   function agreementClass(value) {
     const n = Number(value);

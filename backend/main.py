@@ -2793,6 +2793,91 @@ def generic_platform_ui_state(run_id: str):
         store.path("orchestration", "final_decision.json")
     )
 
+    # GENERIC_PLATFORM_STAGE6_SEMANTIC_ASSIST_UI_V1
+    # Read-only projection of already-persisted candidate/audit artifacts.
+    # This presentation contract never executes models and never changes S/H/T.
+    stage6_semantic_state = load_json_if_exists(
+        store.path("state", "research_stage6_semantic.json")
+    )
+    stage6_semantic_audit = load_json_if_exists(
+        store.path(
+            "L6_semantic_assist",
+            "stage6_semantic_audit.json",
+        )
+    )
+    stage6_semantic_candidate = load_json_if_exists(
+        store.path(
+            "L6_semantic_assist",
+            "stage6_semantic_candidate.json",
+        )
+    )
+
+    semantic_summary = (
+        stage6_semantic_state.get("semantic_assist", {})
+        if isinstance(stage6_semantic_state, dict)
+        else {}
+    ) or {}
+    semantic_audit = (
+        stage6_semantic_audit
+        if isinstance(stage6_semantic_audit, dict)
+        else {}
+    )
+    semantic_candidate = (
+        stage6_semantic_candidate
+        if isinstance(stage6_semantic_candidate, dict)
+        else {}
+    )
+
+    semantic_validation = (
+        semantic_summary.get("validation")
+        or semantic_audit.get("validation")
+        or {}
+    )
+    semantic_scientific_status = (
+        semantic_summary.get("scientific_status")
+        or semantic_audit.get("scientific_status")
+        or {}
+    )
+
+    semantic_assist_view = {
+        "enabled": bool(
+            semantic_summary.get("enabled", False)
+            or semantic_audit
+            or semantic_candidate
+        ),
+        "executed": bool(
+            semantic_summary.get("executed", False)
+            or semantic_audit
+            or semantic_candidate
+        ),
+        "status": (
+            semantic_summary.get("status")
+            or ("ok" if semantic_candidate else None)
+        ),
+        "return_code": semantic_summary.get("return_code"),
+        "execution_profile": (
+            stage6_semantic_state.get("execution_profile")
+            if isinstance(stage6_semantic_state, dict)
+            else None
+        ),
+        "validation": (
+            semantic_validation
+            if isinstance(semantic_validation, dict)
+            else {}
+        ),
+        "scientific_status": (
+            semantic_scientific_status
+            if isinstance(semantic_scientific_status, dict)
+            else {}
+        ),
+        "candidate": semantic_candidate,
+        "audit_summary": {
+            "artifact_version": semantic_audit.get("artifact_version"),
+            "execution_strategy": semantic_audit.get("execution_strategy"),
+            "runtime_seconds": semantic_audit.get("runtime_seconds"),
+        },
+    }
+
     run_gt_bundle = load_ground_truth_bundle(
         PROJECT_ROOT / "artifacts" / run_id
     )
@@ -2834,7 +2919,12 @@ def generic_platform_ui_state(run_id: str):
     }
 
     stage6_view = {
-        "available": bool(stage6e or stage6f),
+        "available": bool(
+            stage6e
+            or stage6f
+            or semantic_candidate
+            or semantic_audit
+        ),
         "signals": {
             "H": readiness_page.get("htr_readiness_H_page"),
             "T": stage6f_metrics.get("page_T"),
@@ -2866,11 +2956,12 @@ def generic_platform_ui_state(run_id: str):
         "final_orchestration": (
             final_decision if isinstance(final_decision, dict) else {}
         ),
+        "semantic_assist": semantic_assist_view,
     }
 
     return {
         "run_id": run_id,
-        "presentation_contract": "generic-platform-provider-c-ui-v2-ground-truth",
+        "presentation_contract": "generic-platform-v3-stage6-semantic-assist",
         "stage5": {
             "available": bool(readiness),
             "signals": {

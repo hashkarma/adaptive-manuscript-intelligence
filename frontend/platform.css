@@ -573,3 +573,69 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 }
+
+/* GENERIC_PLATFORM_STAGE6_SEMANTIC_ASSIST_UI_V1 */
+.stage6-subsection {
+  margin-bottom: 14px;
+}
+
+.stage6-subheading {
+  margin: 0 0 9px;
+  color: var(--navy);
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.semantic-assist-box {
+  margin-top: 16px;
+  padding: 14px;
+  border: 1px solid var(--warning);
+  border-radius: 14px;
+  background: var(--warning-soft);
+}
+
+.semantic-assist-box.semantic-assist-muted {
+  border-color: var(--line);
+  background: rgba(255,255,255,0.45);
+}
+
+.semantic-status-banner {
+  display: inline-flex;
+  margin-bottom: 12px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: var(--navy);
+  color: white;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+.semantic-output-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.page-translation-box {
+  margin-top: 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 11px;
+  background: rgba(255,255,255,0.7);
+  line-height: 1.55;
+}
+
+.page-translation-box strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+@media (max-width: 760px) {
+  .semantic-output-grid {
+    grid-template-columns: 1fr;
+  }
+}
